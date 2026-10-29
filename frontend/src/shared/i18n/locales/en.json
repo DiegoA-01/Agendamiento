@@ -1,0 +1,11 @@
+{
+  "app": { "name": "Agenda" },
+  "home": { "tagline": "Book your appointment in under a minute." },
+  "language": { "label": "Language", "es": "Español", "en": "English" },
+  "health": {
+    "title": "Service status",
+    "loading": "Checking…",
+    "ok": "Everything is working.",
+    "error": "Could not reach the server."
+  }
+}

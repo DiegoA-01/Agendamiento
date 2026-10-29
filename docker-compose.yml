@@ -1,0 +1,84 @@
+x-backend: &backend
+  build: ./backend
+  env_file: .env
+  volumes:
+    - ./backend:/app
+  depends_on:
+    postgres:
+      condition: service_healthy
+    redis:
+      condition: service_healthy
+
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-agenda}
+      POSTGRES_USER: ${POSTGRES_USER:-agenda}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-agenda}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-agenda} -d ${POSTGRES_DB:-agenda}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  api:
+    <<: *backend
+    command: sh -c "python manage.py migrate --noinput && python manage.py runserver 0.0.0.0:8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request as u; u.urlopen('http://localhost:8000/healthz/', timeout=3)"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 15s
+
+  worker:
+    <<: *backend
+    command: celery -A config worker -l info
+
+  beat:
+    <<: *backend
+    command: celery -A config beat -l info
+
+  web:
+    build: ./frontend
+    environment:
+      VITE_API_PROXY_TARGET: http://api:8000
+    volumes:
+      - ./frontend:/app
+      - web_node_modules:/app/node_modules
+
+  caddy:
+    image: caddy:2
+    ports:
+      - "${HTTP_PORT:-8080}:80"
+      - "${HTTPS_PORT:-8443}:443"
+    environment:
+      CADDY_SITE_ADDRESS: ${CADDY_SITE_ADDRESS:-:80}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - api
+      - web
+
+volumes:
+  pgdata:
+  redisdata:
+  web_node_modules:
+  caddy_data:
+  caddy_config:

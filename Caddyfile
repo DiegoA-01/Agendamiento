@@ -1,0 +1,13 @@
+# Una sola entrada para API y frontend. TLS automático cuando CADDY_SITE_ADDRESS es un dominio
+# real; en local sirve HTTP en :80 (publicado en http://localhost:8080).
+# El TLS por subdominio de tenant y dominios propios se configura en M3.
+{$CADDY_SITE_ADDRESS::80} {
+	@backend path /api/* /healthz/ /healthz
+	handle @backend {
+		reverse_proxy api:8000
+	}
+
+	handle {
+		reverse_proxy web:5173
+	}
+}
