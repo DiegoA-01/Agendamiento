@@ -22,10 +22,12 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "rest_framework",
     "drf_spectacular",
+    "apps.tenancy",
 ]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "apps.tenancy.middleware.TenantMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.locale.LocaleMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -57,8 +59,9 @@ DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
         "NAME": os.environ.get("POSTGRES_DB", "agenda"),
-        "USER": os.environ.get("POSTGRES_USER", "agenda"),
-        "PASSWORD": os.environ.get("POSTGRES_PASSWORD", "agenda"),
+        # Rol sin superusuario: PostgreSQL ignora RLS para superusuarios.
+        "USER": os.environ.get("APP_DB_USER", "agenda_app"),
+        "PASSWORD": os.environ.get("APP_DB_PASSWORD", "agenda_app"),
         "HOST": os.environ.get("POSTGRES_HOST", "localhost"),
         "PORT": os.environ.get("POSTGRES_PORT", "5432"),
     }

@@ -13,8 +13,13 @@ warn_unused_ignores = true
 check_untyped_defs = true
 exclude = ["migrations/"]
 
+# factory-boy no trae tipos: en los tests mypy confunde las factories con los modelos.
+[[tool.mypy.overrides]]
+module = "tests.*"
+ignore_errors = true
+
 [tool.pytest.ini_options]
-DJANGO_SETTINGS_MODULE = "config.settings.dev"
 python_files = ["test_*.py"]
 testpaths = ["tests"]
-addopts = "-ra"
+# --ds gana sobre la variable de entorno DJANGO_SETTINGS_MODULE (que apunta a dev en Docker y CI).
+addopts = "-ra --ds=config.settings.test"

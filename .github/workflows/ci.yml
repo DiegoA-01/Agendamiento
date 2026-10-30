@@ -39,6 +39,12 @@ jobs:
           python-version: "3.12"
           cache: pip
           cache-dependency-path: backend/requirements*.txt
+      - name: Crear rol de la app (sin superusuario, para que RLS aplique)
+        working-directory: .
+        run: >
+          PGPASSWORD=agenda psql -h localhost -U agenda -d agenda -v ON_ERROR_STOP=1
+          -v app_user=agenda_app -v app_password=agenda_app
+          -f docker/postgres/create_app_role.sql
       - run: pip install -r requirements-dev.txt
       - run: ruff check .
       - run: ruff format --check .
