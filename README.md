@@ -19,6 +19,16 @@ Si vienes de una versión anterior (antes de M1), recrea el volumen de la base p
 
 Cada negocio (tenant) se resuelve por su host (`<slug>.<BASE_DOMAIN>`). En local `BASE_DOMAIN=localhost`, así que `http://elfilo.localhost:8080` y `http://admin.localhost:8080` funcionan sin tocar el archivo `hosts` en la mayoría de navegadores. La app se conecta a PostgreSQL con un rol sin superusuario para que RLS se aplique.
 
+## Primer Super Admin
+
+Pide la contraseña por consola (mínimo 10 caracteres). En su primer login deberá activar el 2FA con una app como Google Authenticator.
+
+```bash
+docker compose exec api python manage.py create_superadmin --email tu@correo.com
+```
+
+Los correos de recuperación de contraseña salen por consola en desarrollo (`docker compose logs api`).
+
 ## Tests y calidad
 
 ```bash

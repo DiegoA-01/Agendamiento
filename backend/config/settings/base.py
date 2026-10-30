@@ -23,6 +23,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "drf_spectacular",
     "apps.tenancy",
+    "apps.accounts",
 ]
 
 MIDDLEWARE = [
@@ -33,6 +34,7 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "apps.accounts.middleware.TenantSessionGuardMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
 ]
 
@@ -87,9 +89,36 @@ USE_TZ = True
 STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
+# Cuentas. Sesión por cookie HttpOnly + CSRF (ver docs/adr/0001-autenticacion-por-sesion.md).
+AUTH_USER_MODEL = "accounts.User"
+AUTHENTICATION_BACKENDS = ["apps.accounts.backends.AccountsBackend"]
+# El correo es único por tenant (restricciones condicionales), no globalmente.
+SILENCED_SYSTEM_CHECKS = ["auth.E003", "auth.W004"]
+# Argon2id primero: las contraseñas nuevas lo usan. PBKDF2 sigue en la lista para verificar hashes
+# viejos; Django los convierte a Argon2id solo la próxima vez que esa persona entra.
+PASSWORD_HASHERS = [
+    "config.hashers.Argon2idHasher",
+    "django.contrib.auth.hashers.PBKDF2PasswordHasher",
+]
+AUTH_PASSWORD_VALIDATORS = [
+    {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
+    {
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
+        "OPTIONS": {"min_length": 10},
+    },
+    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
+    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
+]
+EMAIL_BACKEND = os.environ.get("EMAIL_BACKEND", "django.core.mail.backends.console.EmailBackend")
+DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "Agenda <no-reply@localhost>")
+
 REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     "DEFAULT_RENDERER_CLASSES": ["rest_framework.renderers.JSONRenderer"],
+    "DEFAULT_AUTHENTICATION_CLASSES": ["apps.accounts.authentication.SessionAuth"],
+    # Seguro por defecto: toda vista exige sesión salvo que declare otra cosa.
+    "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.IsAuthenticated"],
+    "EXCEPTION_HANDLER": "config.api.api_exception_handler",
 }
 
 SPECTACULAR_SETTINGS = {

@@ -8,4 +8,5 @@ urlpatterns = [
     path("test/notes/", views.notes),
     path("test/notes-unfiltered/", views.notes_unfiltered),
     path("test/booking-only/", views.booking_only),
+    path("test/perm/<str:resource>/<str:action>/", views.PermView.as_view()),
 ]
