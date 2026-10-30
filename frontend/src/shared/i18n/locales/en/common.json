@@ -1,0 +1,94 @@
+{
+  "app": {
+    "name": "Agenda"
+  },
+  "home": {
+    "tagline": "Book your appointment in under a minute."
+  },
+  "language": {
+    "label": "Language",
+    "es": "Español",
+    "en": "English"
+  },
+  "health": {
+    "title": "Service status",
+    "loading": "Checking…",
+    "ok": "Everything is working.",
+    "error": "Could not reach the server."
+  },
+  "common": {
+    "save": "Save",
+    "saving": "Saving…",
+    "saved": "Changes saved.",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "back": "Back",
+    "loading": "Loading…",
+    "retry": "Retry",
+    "search": "Search",
+    "all": "All",
+    "copy": "Copy",
+    "copied": "Copied",
+    "loadMore": "Load more",
+    "optional": "optional",
+    "required": "This field is required.",
+    "emailFormat": "Enter a valid email.",
+    "hexFormat": "Use a 6-digit color, for example #1f2937.",
+    "errorTitle": "Could not load",
+    "yes": "Yes",
+    "no": "No"
+  },
+  "nav": {
+    "brand": "Administration",
+    "tenants": "Businesses",
+    "plans": "Plans",
+    "audit": "Audit log",
+    "signOut": "Sign out",
+    "skip": "Skip to content",
+    "main": "Main navigation"
+  },
+  "errors": {
+    "unknown": "Something went wrong. Please try again.",
+    "invalid_credentials": "Wrong email or password.",
+    "two_factor_required": "Enter the verification code.",
+    "invalid_two_factor_code": "The code is wrong or was already used. Wait for the next one and try again.",
+    "two_factor_setup_required": "You must turn on two-step verification.",
+    "two_factor_already_enabled": "Verification is already on.",
+    "two_factor_setup_not_started": "Start the verification setup first.",
+    "module_disabled": "This feature is not included in the business plan.",
+    "weak_password": "The password is not secure enough.",
+    "invalid_current_password": "The current password is not correct.",
+    "invalid_reset_token": "The link is invalid or has expired. Ask for a new one.",
+    "unknown_host": "This address does not belong to any business.",
+    "tenant_suspended": "This business is suspended.",
+    "not_found": "We could not find what you are looking for.",
+    "not_authenticated": "Your session ended. Sign in again.",
+    "permission_denied": "You do not have permission to do this.",
+    "validation_error": "Check the highlighted fields.",
+    "invalid_theme": "The theme has invalid colors.",
+    "low_contrast": "The text is hard to read with these colors (a minimum contrast of 4.5:1 is required).",
+    "plan_in_use": "Businesses are using this plan.",
+    "host_taken": "That domain is already registered.",
+    "invalid_host": "Enter a valid domain, for example www.mybusiness.com.",
+    "reserved_host": "Platform subdomains are created automatically.",
+    "cannot_delete_subdomain": "The base subdomain cannot be removed.",
+    "dns_lookup_failed": "The DNS could not be queried. Try again in a few minutes.",
+    "slugFormat": "Lowercase letters, numbers and hyphens only.",
+    "slugReserved": "That subdomain is reserved.",
+    "currencyFormat": "Use 3 letters, for example COP.",
+    "hostFormat": "Enter a valid domain, for example www.mybusiness.com.",
+    "min1": "Must be at least 1."
+  },
+  "verticals": {
+    "barbershop": "Barbershop",
+    "salon": "Salon",
+    "nails": "Nails",
+    "spa": "Spa"
+  },
+  "modules": {
+    "booking": "Bookings",
+    "commissions": "Commissions",
+    "reports": "Reports",
+    "notifications_whatsapp": "WhatsApp"
+  }
+}
