@@ -1,8 +1,9 @@
 import pytest
 from rest_framework.test import APIClient
 
+from tests.accounts.factories import SuperadminFactory
 from tests.accounts.helpers import ADMIN_HOST
-from tests.factories import PlanFactory, SuperadminFactory
+from tests.tenancy.factories import PlanFactory
 
 from .fakes import FakeResolver
 

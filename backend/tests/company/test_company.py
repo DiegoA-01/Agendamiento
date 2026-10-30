@@ -4,7 +4,7 @@ from django.db import IntegrityError, connection, transaction
 from apps.company import services as company
 from apps.company.models import Company
 from apps.tenancy.context import platform_context, tenant_context
-from tests.factories import TenantFactory
+from tests.tenancy.factories import TenantFactory
 
 pytestmark = pytest.mark.django_db
 

@@ -3,7 +3,7 @@ from rest_framework.test import APIClient
 
 from apps.accounts import totp
 from apps.accounts.models import User
-from tests.factories import PASSWORD
+from tests.accounts.factories import PASSWORD
 
 
 def host(slug: str) -> str:

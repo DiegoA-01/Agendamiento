@@ -7,7 +7,8 @@ from rest_framework.test import APIClient
 
 from apps.accounts import permissions as perms
 from apps.accounts.models import User
-from tests.factories import SuperadminFactory, TenantFactory, UserFactory
+from tests.accounts.factories import SuperadminFactory, UserFactory
+from tests.tenancy.factories import TenantFactory
 
 pytestmark = pytest.mark.django_db
 

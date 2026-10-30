@@ -7,7 +7,7 @@ from django.utils import timezone
 from apps.tenancy.context import get_current_tenant
 from apps.tenancy.middleware import TenantMiddleware
 from apps.tenancy.models import Domain
-from tests.factories import TenantFactory
+from tests.tenancy.factories import TenantFactory
 
 pytestmark = pytest.mark.django_db
 

@@ -6,7 +6,8 @@ from django.utils import timezone
 from rest_framework.test import APIClient
 
 from apps.accounts.models import User
-from tests.factories import PASSWORD, SuperadminFactory, TenantFactory, UserFactory
+from tests.accounts.factories import PASSWORD, SuperadminFactory, UserFactory
+from tests.tenancy.factories import TenantFactory
 
 from .helpers import ADMIN_HOST, host, login, post
 

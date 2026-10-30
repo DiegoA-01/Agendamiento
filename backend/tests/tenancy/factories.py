@@ -1,10 +1,8 @@
 import factory
 
-from apps.accounts.models import User
 from apps.tenancy import services
+from apps.tenancy.context import get_current_tenant, tenant_context
 from apps.tenancy.models import Plan, Tenant
-
-PASSWORD = "Clave-Segura-2026!"
 
 
 class PlanFactory(factory.django.DjangoModelFactory):
@@ -32,23 +30,20 @@ class TenantFactory(factory.django.DjangoModelFactory):
             services.sync_modules_from_plan(self)
 
 
-class UserFactory(factory.django.DjangoModelFactory):
-    """Usuario de un tenant (por defecto recepcionista). La contraseña es `PASSWORD`."""
+class TenantOwnedFactory(factory.django.DjangoModelFactory):
+    """Base de las factories de modelos de negocio.
+
+    Usa el tenant activo (o uno nuevo) y crea el registro dentro de su contexto, para que RLS
+    acepte el INSERT. Las SubFactory de modelos de negocio deben compartir el tenant:
+    `factory.SubFactory(OtraFactory, tenant=factory.SelfAttribute("..tenant"))`.
+    """
 
     class Meta:
-        model = User
+        abstract = True
 
-    email = factory.Sequence(lambda n: f"usuario{n}@example.com")
-    full_name = "Usuario de Prueba"
-    role = User.Role.RECEPTIONIST
-    tenant = factory.SubFactory(TenantFactory)
+    tenant = factory.LazyFunction(lambda: get_current_tenant() or TenantFactory())
 
     @classmethod
     def _create(cls, model_class, *args, **kwargs):
-        password = kwargs.pop("password", PASSWORD)
-        return model_class.objects.create_user(password=password, **kwargs)
-
-
-class SuperadminFactory(UserFactory):
-    role = User.Role.SUPERADMIN
-    tenant = None
+        with tenant_context(kwargs["tenant"]):
+            return super()._create(model_class, *args, **kwargs)

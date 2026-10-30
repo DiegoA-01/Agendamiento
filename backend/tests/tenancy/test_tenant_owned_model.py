@@ -2,7 +2,7 @@ import pytest
 from django.core.exceptions import ImproperlyConfigured
 
 from apps.tenancy.context import get_current_tenant, platform_context, tenant_context
-from tests.factories import TenantFactory
+from tests.tenancy.factories import TenantFactory
 from tests.testapp.models import Note
 
 pytestmark = pytest.mark.django_db

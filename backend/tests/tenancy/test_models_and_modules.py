@@ -7,7 +7,7 @@ from django.test import Client
 from apps.tenancy import services
 from apps.tenancy.constants import MODULE_KEYS, RESERVED_SLUGS
 from apps.tenancy.models import Domain, Plan, Tenant, TenantModule
-from tests.factories import PlanFactory, TenantFactory
+from tests.tenancy.factories import PlanFactory, TenantFactory
 
 pytestmark = pytest.mark.django_db
 

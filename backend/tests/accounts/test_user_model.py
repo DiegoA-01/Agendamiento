@@ -4,7 +4,8 @@ from django.db import IntegrityError, transaction
 from django.utils import timezone
 
 from apps.accounts.models import User
-from tests.factories import PASSWORD, SuperadminFactory, TenantFactory, UserFactory
+from tests.accounts.factories import PASSWORD, SuperadminFactory, UserFactory
+from tests.tenancy.factories import TenantFactory
 
 pytestmark = pytest.mark.django_db
 
