@@ -5,9 +5,9 @@ import { AuthGate } from "../features/auth/AuthGate";
 import { ChangePasswordPage } from "../features/auth/ChangePasswordPage";
 import { LoginPage } from "../features/auth/LoginPage";
 import { ForgotPasswordPage, ResetPasswordPage } from "../features/auth/RecoverPages";
+import { dashboardRoutes } from "../features/dashboard/routes";
 import { isPlatformHost } from "../shared/host";
 import { Loading } from "../shared/ui/primitives";
-import { DashboardPlaceholder } from "./DashboardPlaceholder";
 import { HomePage } from "./HomePage";
 
 // El panel del Super Admin es un paquete aparte: solo lo descarga quien entra a admin.<dominio>.
@@ -59,14 +59,7 @@ function AppRoutes() {
     <Routes>
       <Route path="/" element={<HomePage />} />
       {accountRoutes()}
-      <Route
-        path="/panel"
-        element={
-          <AuthGate>
-            <DashboardPlaceholder />
-          </AuthGate>
-        }
-      />
+      {dashboardRoutes()}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

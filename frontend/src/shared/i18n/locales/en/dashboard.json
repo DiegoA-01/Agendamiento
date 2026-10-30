@@ -1,0 +1,18 @@
+{
+  "dashboard": {
+    "menu": "Menu",
+    "comingSoon": "This section arrives in an upcoming milestone.",
+    "noSections": "Your role has no sections available in this business. Ask the owner for access.",
+    "nav": {
+      "agenda": "Schedule",
+      "appointments": "Appointments",
+      "customers": "Customers",
+      "services": "Services",
+      "team": "Team",
+      "resources": "Workstations",
+      "hours": "Working hours",
+      "reports": "Reports",
+      "company": "Business"
+    }
+  }
+}

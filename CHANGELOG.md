@@ -1,5 +1,6 @@
 # Changelog
 
+feat/m4-media
 ## M4 — Imágenes (app `media`)
 
 - `POST /api/v1/media/` (multipart, campo `file`): sube una imagen JPG, PNG o WebP y responde `201` con `id`, tamaño original y las URLs de las tres variantes. Solo para quien puede editar la empresa o el catálogo (propietario y administrador) y solo en el host de un negocio.
@@ -9,6 +10,18 @@
 - Servicios públicos para otras apps: `upload_image`, `get_media` (solo imágenes del tenant activo, para validar el id que manda el cliente) y `media_urls`.
 - En desarrollo Django sirve `/media/...` y Caddy enruta esas rutas a la API. En producción falta servirlas desde Caddy (`pormejorar.md` §34).
 - Sin dependencias nuevas (Pillow ya estaba en la lista).
+
+feat/fase0-frontend
+## Fase 0 — Contratos compartidos (frontend)
+
+Base del panel del negocio para trabajar M4 a M10 en paralelo sin choques (ver `docs/REPARTO.md`).
+
+- **Traducciones por área**: `locales/<idioma>/<area>.json` (`common`, `auth`, `platform`, `dashboard`). Un archivo nuevo se carga solo (`import.meta.glob`), sin registrarlo en ningún lado. Las claves no cambian (`t("tenants.x")` sigue igual). Un test falla si dos archivos usan la misma clave de primer nivel o si `es` y `en` no tienen los mismos archivos.
+- **Panel del negocio**: layout con el tema del negocio, menú lateral (botón "Menú" en el celular) y las rutas de la spec §13: `/agenda`, `/citas`, `/clientes`, `/servicios`, `/equipo`, `/puestos`, `/horarios`, `/reportes`, `/empresa`. Cada sección es una página provisional en su propia carpeta (`features/dashboard/<seccion>/`) y en su propio paquete (lazy). Cada frente reemplaza las suyas sin tocar `App.tsx`.
+- **El menú depende del rol y de los módulos** (matriz de la spec §5, en `features/dashboard/navigation.ts`, con tests por rol). Entrar por URL a una sección no permitida lleva al inicio del panel. `/panel` lleva a la primera sección visible.
+- Se elimina el panel provisional de M3. Cerrar sesión pasa a `useSignOut`, compartido con el panel del Super Admin.
+- Probado en el navegador como propietario y como profesional, en escritorio y a 375 px (sin desbordamiento horizontal).
+develop
 
 ## Fase 0 — Contratos compartidos (backend)
 
@@ -28,6 +41,7 @@ Base para trabajar M4 a M10 en paralelo sin choques (ver `docs/REPARTO.md`).
 - Archivos subidos en `MEDIA_ROOT` (`backend/mediafiles/`, ignorado en git).
 - **Cambio de entorno:** hay que aplicar las migraciones nuevas (`docker compose up -d api` las aplica al arrancar).
 - Pendiente para M5 (frente A): la configuración de agenda por tenant (`slot_step_min`, `min_notice_min`, `max_advance_days`, `cancel_min_hours`).
+develop
 
 ## M3 — Super Admin
 

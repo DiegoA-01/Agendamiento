@@ -1,0 +1,94 @@
+{
+  "app": {
+    "name": "Agenda"
+  },
+  "home": {
+    "tagline": "Reserva tu cita en menos de un minuto."
+  },
+  "language": {
+    "label": "Idioma",
+    "es": "Español",
+    "en": "English"
+  },
+  "health": {
+    "title": "Estado del servicio",
+    "loading": "Comprobando…",
+    "ok": "Todo funciona correctamente.",
+    "error": "No se pudo conectar con el servidor."
+  },
+  "common": {
+    "save": "Guardar",
+    "saving": "Guardando…",
+    "saved": "Cambios guardados.",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "back": "Volver",
+    "loading": "Cargando…",
+    "retry": "Reintentar",
+    "search": "Buscar",
+    "all": "Todos",
+    "copy": "Copiar",
+    "copied": "Copiado",
+    "loadMore": "Cargar más",
+    "optional": "opcional",
+    "required": "Este campo es obligatorio.",
+    "emailFormat": "Escribe un correo válido.",
+    "hexFormat": "Usa un color de 6 dígitos, por ejemplo #1f2937.",
+    "errorTitle": "No se pudo cargar",
+    "yes": "Sí",
+    "no": "No"
+  },
+  "nav": {
+    "brand": "Administración",
+    "tenants": "Empresas",
+    "plans": "Planes",
+    "audit": "Auditoría",
+    "signOut": "Cerrar sesión",
+    "skip": "Saltar al contenido",
+    "main": "Navegación principal"
+  },
+  "errors": {
+    "unknown": "Algo salió mal. Inténtalo de nuevo.",
+    "invalid_credentials": "Correo o contraseña incorrectos.",
+    "two_factor_required": "Escribe el código de verificación.",
+    "invalid_two_factor_code": "El código no es correcto o ya se usó. Espera al siguiente e inténtalo otra vez.",
+    "two_factor_setup_required": "Debes activar la verificación en dos pasos.",
+    "two_factor_already_enabled": "La verificación ya está activa.",
+    "two_factor_setup_not_started": "Primero inicia la configuración de la verificación.",
+    "module_disabled": "Esta función no está incluida en el plan del negocio.",
+    "weak_password": "La contraseña no es segura.",
+    "invalid_current_password": "La contraseña actual no es correcta.",
+    "invalid_reset_token": "El enlace no es válido o venció. Pide uno nuevo.",
+    "unknown_host": "Esta dirección no corresponde a ningún negocio.",
+    "tenant_suspended": "Este negocio está suspendido.",
+    "not_found": "No se encontró lo que buscas.",
+    "not_authenticated": "Tu sesión terminó. Inicia sesión otra vez.",
+    "permission_denied": "No tienes permiso para hacer esto.",
+    "validation_error": "Revisa los datos marcados.",
+    "invalid_theme": "El tema tiene colores inválidos.",
+    "low_contrast": "El texto no se lee bien con estos colores (se exige un contraste mínimo de 4.5:1).",
+    "plan_in_use": "Hay negocios usando este plan.",
+    "host_taken": "Ese dominio ya está registrado.",
+    "invalid_host": "Escribe un dominio válido, por ejemplo www.minegocio.com.",
+    "reserved_host": "Los subdominios de la plataforma se crean solos.",
+    "cannot_delete_subdomain": "El subdominio base no se puede quitar.",
+    "dns_lookup_failed": "No se pudo consultar el DNS. Inténtalo en unos minutos.",
+    "slugFormat": "Solo minúsculas, números y guiones.",
+    "slugReserved": "Ese subdominio está reservado.",
+    "currencyFormat": "Usa 3 letras, por ejemplo COP.",
+    "hostFormat": "Escribe un dominio válido, por ejemplo www.minegocio.com.",
+    "min1": "Debe ser al menos 1."
+  },
+  "verticals": {
+    "barbershop": "Barbería",
+    "salon": "Salón",
+    "nails": "Uñas",
+    "spa": "Spa"
+  },
+  "modules": {
+    "booking": "Reservas",
+    "commissions": "Comisiones",
+    "reports": "Reportes",
+    "notifications_whatsapp": "WhatsApp"
+  }
+}
