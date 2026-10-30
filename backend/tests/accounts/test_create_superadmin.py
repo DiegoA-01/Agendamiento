@@ -3,7 +3,7 @@ from django.core.management import call_command
 from django.core.management.base import CommandError
 
 from apps.accounts.models import User
-from tests.factories import PASSWORD
+from tests.accounts.factories import PASSWORD
 
 pytestmark = pytest.mark.django_db
 

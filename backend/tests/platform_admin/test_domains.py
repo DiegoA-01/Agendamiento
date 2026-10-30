@@ -4,7 +4,7 @@ from rest_framework.test import APIClient
 
 from apps.platform_admin.models import AuditLog
 from apps.tenancy.models import Domain
-from tests.factories import TenantFactory
+from tests.tenancy.factories import TenantFactory
 
 from .conftest import call
 

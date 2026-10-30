@@ -7,8 +7,9 @@ from apps.company.models import Company
 from apps.platform_admin.models import AuditLog
 from apps.tenancy import services as tenancy
 from apps.tenancy.models import Domain, Tenant
+from tests.accounts.factories import PASSWORD
 from tests.accounts.helpers import host, login
-from tests.factories import PASSWORD, PlanFactory, TenantFactory
+from tests.tenancy.factories import PlanFactory, TenantFactory
 
 from .conftest import call, new_tenant_payload
 

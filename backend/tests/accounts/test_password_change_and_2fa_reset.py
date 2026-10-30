@@ -8,7 +8,8 @@ from rest_framework.test import APIClient
 
 from apps.accounts import totp
 from apps.accounts.models import User
-from tests.factories import PASSWORD, SuperadminFactory, TenantFactory, UserFactory
+from tests.accounts.factories import PASSWORD, SuperadminFactory, UserFactory
+from tests.tenancy.factories import TenantFactory
 
 from .helpers import ADMIN_HOST, enable_two_factor, host, login, post
 

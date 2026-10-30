@@ -3,8 +3,9 @@ from django.conf import settings
 from rest_framework.test import APIClient
 
 from apps.platform_admin.models import AuditLog
+from tests.accounts.factories import UserFactory
 from tests.accounts.helpers import ADMIN_HOST, host
-from tests.factories import PlanFactory, TenantFactory, UserFactory
+from tests.tenancy.factories import PlanFactory, TenantFactory
 
 from .conftest import call
 

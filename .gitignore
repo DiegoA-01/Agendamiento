@@ -25,3 +25,6 @@ coverage/
 Thumbs.db
 .idea/
 .vscode/
+
+# archivos subidos en desarrollo
+backend/mediafiles/
