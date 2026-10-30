@@ -42,12 +42,11 @@ def test_locale_middleware_negotiates_language(accept: str, expected: str) -> No
 
 def test_prod_settings_require_secrets(monkeypatch: pytest.MonkeyPatch) -> None:
     import importlib
+    import sys
 
     monkeypatch.delenv("DJANGO_SECRET_KEY", raising=False)
     monkeypatch.delenv("DJANGO_ALLOWED_HOSTS", raising=False)
-    import config.settings.base as base
-    import config.settings.prod as prod
-
-    importlib.reload(base)
+    importlib.reload(importlib.import_module("config.settings.base"))
+    monkeypatch.delitem(sys.modules, "config.settings.prod", raising=False)
     with pytest.raises(ImproperlyConfigured):
-        importlib.reload(prod)
+        importlib.import_module("config.settings.prod")
