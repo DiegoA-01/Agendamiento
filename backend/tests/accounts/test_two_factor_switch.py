@@ -10,7 +10,8 @@ from django.conf import settings as django_settings
 from django.core.exceptions import ImproperlyConfigured
 from rest_framework.test import APIClient
 
-from tests.factories import SuperadminFactory, TenantFactory, UserFactory
+from tests.accounts.factories import SuperadminFactory, UserFactory
+from tests.tenancy.factories import TenantFactory
 
 from .helpers import ADMIN_HOST, enable_two_factor, host, login
 

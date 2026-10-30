@@ -8,7 +8,8 @@ from django.contrib.auth.hashers import Argon2PasswordHasher, make_password
 from rest_framework.test import APIClient
 
 from config.settings import base
-from tests.factories import PASSWORD, TenantFactory, UserFactory
+from tests.accounts.factories import PASSWORD, UserFactory
+from tests.tenancy.factories import TenantFactory
 
 from .helpers import host, login
 

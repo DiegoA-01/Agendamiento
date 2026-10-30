@@ -7,7 +7,7 @@ from django.db import DatabaseError, connection, transaction
 from django.test import Client
 
 from apps.tenancy.context import platform_context, tenant_context
-from tests.factories import TenantFactory
+from tests.tenancy.factories import TenantFactory
 from tests.testapp.models import Note
 
 pytestmark = pytest.mark.django_db

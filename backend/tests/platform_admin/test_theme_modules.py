@@ -5,7 +5,7 @@ from apps.tenancy import services as tenancy
 from apps.tenancy.constants import LANGUAGES, MODULE_KEYS, VERTICALS
 from apps.tenancy.models import Tenant
 from apps.tenancy.theme import DEFAULT_THEME, MIN_TEXT_CONTRAST, contrast_ratio
-from tests.factories import TenantFactory
+from tests.tenancy.factories import TenantFactory
 
 from .conftest import call
 
@@ -98,8 +98,8 @@ def test_missing_colors_are_rejected(api):
 def test_theme_reaches_the_business_through_me(api):
     from rest_framework.test import APIClient
 
+    from tests.accounts.factories import UserFactory
     from tests.accounts.helpers import host, login
-    from tests.factories import UserFactory
 
     tenant = TenantFactory(slug="elfilo")
     call(api, "put", f"/api/v1/tenants/{tenant.pk}/theme/", GOOD_THEME)

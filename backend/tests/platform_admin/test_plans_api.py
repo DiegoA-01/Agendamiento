@@ -3,7 +3,7 @@ import pytest
 from apps.platform_admin.models import AuditLog
 from apps.tenancy import services as tenancy
 from apps.tenancy.models import Plan
-from tests.factories import PlanFactory, TenantFactory
+from tests.tenancy.factories import PlanFactory, TenantFactory
 
 from .conftest import call
 

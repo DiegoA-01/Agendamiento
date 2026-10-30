@@ -1,5 +1,24 @@
 # Changelog
 
+## Fase 0 — Contratos compartidos (backend)
+
+Base para trabajar M4 a M10 en paralelo sin choques (ver `docs/REPARTO.md`).
+
+- Apps nuevas registradas en `INSTALLED_APPS` y en `config/urls.py` (con `urls.py` vacíos): `media`, `catalog`, `scheduling`, `booking`, `commissions`, `notifications`, `reports`. También `django.contrib.postgres` (parte de Django, no es dependencia nueva). Desde aquí nadie necesita tocar esos dos archivos.
+- Modelos y migraciones de la spec §6, todos con `TenantOwnedModel` y RLS:
+  - `media`: `MediaFile` (registro de la imagen y sus tres variantes WebP; la conversión llega en M4).
+  - `company`: `Location` (una sola sede por defecto por tenant) y `Company.logo`.
+  - `catalog`: `ServiceCategory`, `Service`, `Specialty`, `Professional`, `ProfessionalSpecialty` (tabla intermedia propia para que también tenga tenant y RLS), `ProfessionalService` con overrides, `Resource`.
+  - `scheduling`: `WorkingHours` y `TimeBlock` (exactamente uno de profesional o puesto).
+  - `booking`: `Customer` (celular único por tenant), `Appointment` con las dos restricciones de exclusión anti doble reserva (profesional y puesto; solo estados activos; límites `[)`), y `AppointmentItem`. La migración crea `btree_gist` si falta.
+  - Dinero en `DecimalField(12, 2)`, porcentajes en `DecimalField(5, 2)` con rango 0 a 100, y restricciones `CHECK` de duración y precio.
+- `tests/factories.py` se reparte en `tests/<app>/factories.py`. Nueva base `TenantOwnedFactory`, que crea cada registro dentro del contexto del tenant para que RLS acepte el INSERT, y una factory por modelo nuevo.
+- Test que falla si una tabla de negocio no activa RLS, más tests de aislamiento entre tenants para todas las tablas nuevas, de la restricción de exclusión y de los `CHECK`.
+- `docker/postgres/init.sh` ahora es ejecutable en git: en macOS y Linux no se creaba el rol de la app y los tests fallaban por contraseña.
+- Archivos subidos en `MEDIA_ROOT` (`backend/mediafiles/`, ignorado en git).
+- **Cambio de entorno:** hay que aplicar las migraciones nuevas (`docker compose up -d api` las aplica al arrancar).
+- Pendiente para M5 (frente A): la configuración de agenda por tenant (`slot_step_min`, `min_notice_min`, `max_advance_days`, `cancel_min_hours`).
+
 ## M3 — Super Admin
 
 - API del Super Admin bajo `/api/v1` (solo rol `superadmin` y solo en el host `admin.`; CSRF en escrituras): `tenants/` (CRUD, listado por cursor con búsqueda y filtro de estado), `tenants/{id}/suspend|activate/`, `theme/`, `modules/`, `domains/` (alta, `verify/`, baja), `plans/` (CRUD) y `audit-log/` (por cursor, con filtros).

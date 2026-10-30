@@ -20,12 +20,20 @@ INSTALLED_APPS = [
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
+    "django.contrib.postgres",
     "rest_framework",
     "drf_spectacular",
     "apps.tenancy",
     "apps.accounts",
     "apps.company",
     "apps.platform_admin",
+    "apps.media",
+    "apps.catalog",
+    "apps.scheduling",
+    "apps.booking",
+    "apps.commissions",
+    "apps.notifications",
+    "apps.reports",
 ]
 
 MIDDLEWARE = [
@@ -90,6 +98,9 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
+# Archivos subidos (imágenes ya convertidas a WebP por la app `media`).
+MEDIA_URL = "media/"
+MEDIA_ROOT = BASE_DIR / "mediafiles"
 
 # Verificación en dos pasos. Encendida por defecto. Se apaga SOLO en desarrollo para probar sin
 # autenticador (REQUIRE_TWO_FACTOR=0 en .env); producción no arranca con ella apagada (prod.py).
