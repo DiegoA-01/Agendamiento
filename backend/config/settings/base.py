@@ -101,6 +101,7 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 # Archivos subidos (imágenes ya convertidas a WebP por la app `media`).
 MEDIA_URL = "media/"
 MEDIA_ROOT = BASE_DIR / "mediafiles"
+MEDIA_MAX_UPLOAD_BYTES = 10 * 1024 * 1024
 
 # Verificación en dos pasos. Encendida por defecto. Se apaga SOLO en desarrollo para probar sin
 # autenticador (REQUIRE_TWO_FACTOR=0 en .env); producción no arranca con ella apagada (prod.py).

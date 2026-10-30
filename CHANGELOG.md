@@ -1,5 +1,16 @@
 # Changelog
 
+feat/m4-media
+## M4 — Imágenes (app `media`)
+
+- `POST /api/v1/media/` (multipart, campo `file`): sube una imagen JPG, PNG o WebP y responde `201` con `id`, tamaño original y las URLs de las tres variantes. Solo para quien puede editar la empresa o el catálogo (propietario y administrador) y solo en el host de un negocio.
+- Toda imagen se convierte a **WebP** en tres tamaños: `thumb` 200 px, `medium` 800 px y `large` 1600 px (lado mayor). Nunca se agranda una imagen pequeña. Se respeta la transparencia.
+- Se aplica la rotación de la cámara y se **descarta el EXIF**, que puede traer la ubicación GPS de la foto.
+- Rechazos con el formato de error estándar: `invalid_image`, `unsupported_image` (GIF, BMP…), `file_too_large` (más de 10 MB, `MEDIA_MAX_UPLOAD_BYTES`) e `image_too_large` (más de 40 megapíxeles, protección contra bombas de descompresión).
+- Servicios públicos para otras apps: `upload_image`, `get_media` (solo imágenes del tenant activo, para validar el id que manda el cliente) y `media_urls`.
+- En desarrollo Django sirve `/media/...` y Caddy enruta esas rutas a la API. En producción falta servirlas desde Caddy (`pormejorar.md` §34).
+- Sin dependencias nuevas (Pillow ya estaba en la lista).
+
 feat/fase0-frontend
 ## Fase 0 — Contratos compartidos (frontend)
 
@@ -10,6 +21,7 @@ Base del panel del negocio para trabajar M4 a M10 en paralelo sin choques (ver `
 - **El menú depende del rol y de los módulos** (matriz de la spec §5, en `features/dashboard/navigation.ts`, con tests por rol). Entrar por URL a una sección no permitida lleva al inicio del panel. `/panel` lleva a la primera sección visible.
 - Se elimina el panel provisional de M3. Cerrar sesión pasa a `useSignOut`, compartido con el panel del Super Admin.
 - Probado en el navegador como propietario y como profesional, en escritorio y a 375 px (sin desbordamiento horizontal).
+develop
 
 ## Fase 0 — Contratos compartidos (backend)
 
