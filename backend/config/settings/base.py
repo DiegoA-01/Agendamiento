@@ -24,6 +24,8 @@ INSTALLED_APPS = [
     "drf_spectacular",
     "apps.tenancy",
     "apps.accounts",
+    "apps.company",
+    "apps.platform_admin",
 ]
 
 MIDDLEWARE = [
@@ -88,6 +90,11 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
+
+# Verificación en dos pasos. Encendida por defecto. Se apaga SOLO en desarrollo para probar sin
+# autenticador (REQUIRE_TWO_FACTOR=0 en .env); producción no arranca con ella apagada (prod.py).
+# REACTIVAR antes de entregar: ver pormejorar.md.
+REQUIRE_TWO_FACTOR = env_bool("REQUIRE_TWO_FACTOR", True)
 
 # Cuentas. Sesión por cookie HttpOnly + CSRF (ver docs/adr/0001-autenticacion-por-sesion.md).
 AUTH_USER_MODEL = "accounts.User"

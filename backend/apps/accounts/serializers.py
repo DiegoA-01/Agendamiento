@@ -20,6 +20,11 @@ class PasswordResetRequestSerializer(serializers.Serializer):
     email = serializers.EmailField()
 
 
+class PasswordChangeSerializer(serializers.Serializer):
+    current_password = serializers.CharField(write_only=True, trim_whitespace=False)
+    new_password = serializers.CharField(write_only=True, trim_whitespace=False)
+
+
 class PasswordResetConfirmSerializer(serializers.Serializer):
     uid = serializers.CharField()
     token = serializers.CharField()
@@ -48,6 +53,7 @@ class MeSerializer(serializers.Serializer):
     user = UserSummarySerializer()
     role = serializers.CharField()
     two_factor_enabled = serializers.BooleanField()
+    must_change_password = serializers.BooleanField()
     is_platform_admin = serializers.BooleanField()
     tenant = MeTenantSerializer(allow_null=True)
     theme = serializers.DictField()

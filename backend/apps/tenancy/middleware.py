@@ -4,6 +4,7 @@ from django.http import HttpRequest, HttpResponse, JsonResponse
 
 from . import services
 from .context import tenant_context
+from .models import Tenant
 
 # Rutas que no dependen de un tenant (healthcheck de Docker/monitoreo y documentación).
 EXEMPT_PATHS = ("/healthz/", "/api/schema/")
@@ -44,6 +45,12 @@ class TenantMiddleware:
         if domain is None:
             return JsonResponse(
                 {"code": "unknown_host", "detail": "Host desconocido.", "fields": {}}, status=404
+            )
+
+        if domain.tenant.status == Tenant.Status.SUSPENDED:
+            return JsonResponse(
+                {"code": "tenant_suspended", "detail": "Negocio suspendido.", "fields": {}},
+                status=403,
             )
 
         request.tenant = domain.tenant

@@ -1,5 +1,24 @@
 # Changelog
 
+## M3 — Super Admin
+
+- API del Super Admin bajo `/api/v1` (solo rol `superadmin` y solo en el host `admin.`; CSRF en escrituras): `tenants/` (CRUD, listado por cursor con búsqueda y filtro de estado), `tenants/{id}/suspend|activate/`, `theme/`, `modules/`, `domains/` (alta, `verify/`, baja), `plans/` (CRUD) y `audit-log/` (por cursor, con filtros).
+- **Alta de un negocio en una sola operación atómica**: tenant, subdominio verificado, tema por defecto, módulos del plan, `Company` y propietario con contraseña temporal. Si falla un paso no queda nada a medias. La contraseña temporal se muestra una sola vez y no se guarda ni se audita; el propietario debe cambiarla en su primer ingreso (`must_change_password`).
+- Nueva app `company` con la tabla `Company` (1:1 con el tenant): la primera tabla de negocio con RLS real (`enable_rls` en su migración, probada).
+- Nueva app `platform_admin` con `AuditLog`: cada acción del Super Admin deja constancia (antes/después, sin secretos). Una acción fallida no deja entrada.
+- Tema con validación de contraste WCAG AA: el texto debe tener al menos 4.5:1 sobre el fondo y sobre la superficie. El frontend avisa en vivo; el servidor decide.
+- Dominios propios: se piden registros `TXT` (prueba de propiedad, obligatorio) y `CNAME` (informativo). Verificación por DNS sobre HTTPS con la librería estándar (sin dependencias nuevas); en tests el DNS es falso y nunca sale a internet. Ver `pormejorar.md` §26.
+- Suspender un negocio bloquea su host con `403 tenant_suspended` sin borrar datos. Eliminar es lógico. Editar un plan no cambia los módulos de los negocios existentes salvo `apply_to_tenants`; cambiar el plan de un negocio sí reinicia sus módulos.
+- Cuentas: `POST /auth/password-change/` (cierra las demás sesiones y mantiene la actual), `must_change_password` en `/me/` y comando `reset_2fa` para el Super Admin que pierde el celular.
+- **Corrección de M1**: `tenant_context` ya no tapa el error real si la transacción quedó rota (test de regresión).
+- OpenAPI sin avisos y validado en el CI (`spectacular --validate --fail-on-warn`); describe la autenticación por cookie y CSRF.
+- Frontend (React): login con los pasos de 2FA (clave manual, sin QR), cambio forzado de contraseña, recuperación de contraseña, y panel del Super Admin (empresas, nueva empresa, detalle con datos, tema con vista previa y contraste, módulos y dominios, planes y auditoría). Textos en español e inglés, estados de carga, vacío y error, y teclado y etiquetas accesibles. El panel va en un paquete aparte (lazy). Sin desbordamiento horizontal a 375 px. Probado de punta a punta en el navegador.
+- Panel provisional del negocio en `/panel` (aplica el tema del negocio); el panel real llega en M4.
+- Pruebas: 362 en el backend (incluye la matriz de seguridad de las 21 rutas) y 42 en el frontend.
+- **Interruptor `REQUIRE_TWO_FACTOR`** (por defecto encendido). Apagado solo en desarrollo (`.env` y `.env.example` lo traen en 0) para probar sin autenticador: el login entra solo con contraseña, incluso a quien ya tenga 2FA activo. Al arrancar deja un aviso en el log (`DESACTIVADA`). `config/settings/prod.py` **se niega a arrancar** si está apagado, y los tests siempre corren con él encendido. **Reactivar antes de entregar** (`pormejorar.md` §33).
+- Sin dependencias nuevas.
+- Pendiente y por decidir: ver `pormejorar.md` (QR del 2FA, códigos de recuperación, dependencia de Google para el DNS, HTTPS de dominios propios, exportación de datos).
+
 ## M2 — Accounts
 
 - App `apps.accounts`: modelo `User` propio (`AUTH_USER_MODEL`), roles `superadmin`, `owner`, `admin`, `receptionist`, `professional`. Correo único por tenant (sin distinguir mayúsculas) y único global entre Super Admins; solo el superadmin carece de tenant (restricción en base de datos).

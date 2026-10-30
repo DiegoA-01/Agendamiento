@@ -18,6 +18,19 @@ def test_creates_a_superadmin_without_tenant():
     assert user.totp_enabled is False
 
 
+@pytest.mark.parametrize(
+    ("required", "expected"),
+    [(True, "deberá activar el 2FA"), (False, "2FA está desactivado")],
+)
+def test_message_tells_whether_two_factor_is_required(settings, required, expected):
+    from io import StringIO
+
+    settings.REQUIRE_TWO_FACTOR = required
+    out = StringIO()
+    call_command("create_superadmin", email="root@x.com", password=PASSWORD, stdout=out)
+    assert expected in out.getvalue()
+
+
 def test_refuses_duplicates():
     call_command("create_superadmin", email="root@x.com", password=PASSWORD)
     with pytest.raises(CommandError, match="Ya existe"):

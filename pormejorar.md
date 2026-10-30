@@ -1,6 +1,6 @@
 # Por mejorar
 
-Lista de todo lo que se puede mejorar o ajustar en lo construido hasta M2 (esqueleto, tenancy y cuentas), explicado para entenderlo sin conocimientos previos. Se actualiza al cerrar cada hito.
+Lista de todo lo que se puede mejorar o ajustar en lo construido hasta M3 (esqueleto, tenancy, cuentas y panel del Super Admin), explicado para entenderlo sin conocimientos previos. Se actualiza al cerrar cada hito.
 
 ## Cómo leer este documento
 
@@ -22,30 +22,39 @@ Los puntos marcados **Requiere aprobación** necesitan una decisión tuya o del 
 
 | # | Tema | Prioridad | Hito sugerido |
 |---|---|---|---|
+| 33 | **REACTIVAR el 2FA antes de entregar** (hoy está apagado en desarrollo) | **Alta** | **Al final, obligatorio** |
 | 1 | Límite de intentos de login | Alta | M10 (antes si se puede) |
-| 2 | Códigos de recuperación del 2FA | Alta | M3 |
+| 2 | Códigos de recuperación del 2FA (el comando `reset_2fa` ya existe) | Alta | Pronto |
 | 3 | Cifrar el secreto del 2FA | Alta | M10 |
 | 4 | Servidor de producción | Alta | Antes de desplegar |
 | 5 | 2FA obligatorio para el propietario | Media | Decisión del equipo |
-| 6 | Activación del 2FA solo con contraseña | Media | M3 |
+| 6 | Activación del 2FA solo con contraseña | Media | Pronto |
 | 7 | Ajustar Argon2id al servidor real | Media | Al elegir el VPS |
 | 8 | Caché de la búsqueda de tenant | Media | M5 o M10 |
 | 9 | Contexto del tenant en respuestas en streaming (SSE) | Alta | M7 |
 | 10 | Tareas de Celery con tenant | Media | M8 |
-| 11 | Tenants suspendidos | Media | M3 |
+| 11 | Modo solo lectura para tenants suspendidos (el bloqueo total ya existe) | Baja | Decisión de producto |
 | 12 | Subdominios borrados siguen reservados | Baja | Cuando haga falta |
 | 13 | Correo real y plantillas | Media | M8 |
-| 14 | Contraseña temporal del propietario | Media | M3 |
+| 14 | Alta del propietario por enlace, en lugar de contraseña temporal | Media | Mejora |
 | 15 | Sesiones: duración y control | Media | M3 a M10 |
-| 16 | Registro de auditoría | Media | M3 y M10 |
+| 16 | Auditar inicios de sesión y suplantación (las acciones del Super Admin ya se registran) | Media | M10 |
 | 17 | Alcance "solo lo propio" del profesional | Media | M4 y M5 |
 | 18 | Logs con tenant e identificador de petición | Baja | M10 |
 | 19 | CI: ramas, versiones y pruebas | Media | Ahora |
-| 20 | Pruebas del frontend | Baja | M3 |
+| 20 | Pruebas de pantallas del frontend | Media | M4 en adelante |
 | 21 | Dependencias fuera de la lista | Media | Decisión del equipo |
-| 22 | Dominios propios y HTTPS | Media | M3 |
+| 22 | HTTPS automático para dominios propios (la verificación por DNS ya existe) | Media | Antes de desplegar |
 | 23 | Copias de seguridad y observabilidad | Alta | M10 |
 | 24 | Detalles técnicos que conviene conocer | Baja | Informativo |
+| 25 | QR para activar el 2FA | Media | Decisión del equipo |
+| 26 | Verificación de dominios depende de Google | Media | Antes de desplegar |
+| 27 | Si se pierde la contraseña temporal | Media | Mejora |
+| 28 | Mensajes del servidor solo en español | Baja | M4 en adelante |
+| 29 | Tamaño del paquete principal del frontend | Baja | M6 |
+| 30 | Cerrar un negocio: exportar y borrar sus datos | Media | Antes de tener clientes reales |
+| 31 | Límites del plan sin aplicar | Media | M4 |
+| 32 | Revisión de accesibilidad automática | Baja | M10 |
 
 ---
 
@@ -69,7 +78,9 @@ Los puntos marcados **Requiere aprobación** necesitan una decisión tuya o del 
 
 **Por qué importa:** ejemplo: el único Super Admin cambia de teléfono sin migrar la app de códigos. No puede entrar al panel, y por tanto nadie puede administrar los negocios.
 
-**Cuándo:** M3, junto con el panel del Super Admin.
+**Estado tras M3:** parcialmente resuelto. Ya existe el comando de emergencia `reset_2fa` (ver abajo). **Siguen pendientes los códigos de recuperación.**
+
+**Cuándo:** pronto, antes de que haya más de un Super Admin real.
 
 **Cómo (las dos partes):**
 1. **Códigos de recuperación de un solo uso.** Al activar el 2FA se muestran 8 a 10 códigos para guardar en un lugar seguro. Cada uno sirve una vez en lugar del código de 6 dígitos. Se guardan con hash, como las contraseñas.
@@ -113,7 +124,7 @@ Los puntos marcados **Requiere aprobación** necesitan una decisión tuya o del 
 
 **Por qué importa:** ejemplo: creas el Super Admin con una contraseña temporal y pasan dos días antes de que active el 2FA. En ese tiempo la cuenta está más expuesta.
 
-**Cuándo:** M3.
+**Cuándo:** pronto.
 
 **Cómo:**
 - Mitigación inmediata, sin código: activar el 2FA justo después de crear la cuenta.
@@ -180,7 +191,9 @@ Los puntos marcados **Requiere aprobación** necesitan una decisión tuya o del 
 
 **Por qué importa:** ejemplo: un negocio deja de pagar y se suspende. Si el middleware no lo bloquea, el negocio y sus clientes siguen usando el sistema sin límite. La PDF habla de periodo de gracia, luego modo solo lectura y después suspensión.
 
-**Cuándo:** M3 (cuando se pueda suspender desde el Super Admin).
+**Estado tras M3:** hoy suspender **bloquea todo** el acceso del negocio (responde 403 `tenant_suspended`) y no borra datos. El modo solo lectura de la PDF (periodo de gracia, solo lectura, suspensión) no existe.
+
+**Cuándo:** cuando el equipo defina la política de cobro y gracia.
 
 **Cómo:** decidir qué significa cada estado:
 - Reserva pública: ¿se bloquea o muestra un aviso?
@@ -210,7 +223,7 @@ Se implementa en el middleware o con un permiso global.
 **Cómo:**
 - Configurar un proveedor (Amazon SES, Brevo o Resend) con las variables `EMAIL_BACKEND` y `DEFAULT_FROM_EMAIL`, y los registros DNS del dominio de envío.
 - Mover los textos a plantillas por idioma y por vertical, como pide la spec.
-- El enlace del correo apunta a `/recuperar/confirmar`, una pantalla de frontend que **todavía no existe** (llega en M3).
+- El enlace del correo apunta a `/recuperar/confirmar`, que **ya existe** desde M3 (junto con `/recuperar`).
 
 ## 14. Contraseña temporal del propietario
 
@@ -218,9 +231,11 @@ Se implementa en el middleware o con un permiso global.
 
 **Por qué importa:** ejemplo: tú le mandas "Temporal123" por WhatsApp. Si nunca la cambia, esa clave circula en un chat.
 
-**Cuándo:** M3.
+**Estado tras M3:** resuelto con contraseña temporal. El Super Admin la crea, se muestra una sola vez y el propietario debe cambiarla en su primer ingreso (`must_change_password`). Lo que sigue pendiente es la mejora de abajo.
 
-**Cómo:** agregar un campo `must_change_password` al usuario y devolverlo en `/api/v1/me/`. El frontend lo manda a cambiar la contraseña antes de dejarlo usar el sistema. Mejor aún: en lugar de contraseña temporal, enviar un enlace de alta de un solo uso por correo.
+**Cuándo:** mejora futura.
+
+**Cómo (versión original, ya hecha):** agregar un campo `must_change_password` al usuario y devolverlo en `/api/v1/me/`. El frontend lo manda a cambiar la contraseña antes de dejarlo usar el sistema. Mejor aún: en lugar de contraseña temporal, enviar un enlace de alta de un solo uso por correo.
 
 ## 15. Sesiones: duración y control
 
@@ -243,7 +258,9 @@ Ya funcionan: cambiar la contraseña cierra todas las sesiones, y borrar o desac
 
 **Por qué importa:** ejemplo: "alguien cambió el tema de colores de un negocio, ¿quién fue?". O ante un incidente: ¿quién entró a la cuenta del Super Admin y desde dónde?
 
-**Cuándo:** M3 (acciones del Super Admin) y M10 (endurecimiento).
+**Estado tras M3:** hecho para las acciones del Super Admin (crear, editar, suspender, tema, módulos, dominios, planes). Falta auditar **inicios de sesión** (exitosos y fallidos), cambios de 2FA y de contraseña, y la suplantación de soporte.
+
+**Cuándo:** M10 (endurecimiento).
 
 **Cómo:** guardar al menos inicios de sesión (exitosos y fallidos), activaciones o cambios de 2FA, cambios de contraseña, y todas las acciones del Super Admin sobre negocios. La spec también pide suplantación auditada para soporte (el Super Admin hoy no puede ver datos de clientes).
 
@@ -293,7 +310,9 @@ Ya funcionan: cambiar la contraseña cierra todas las sesiones, y borrar o desac
 
 **Por qué importa:** el asistente de reserva (M6) y la agenda (M7) son lo que más ven los clientes. La spec exige reservar en menos de 60 segundos en móvil.
 
-**Cuándo:** M3 en adelante.
+**Estado tras M3:** hay 42 pruebas de la lógica (cliente de API, CSRF, validaciones, mensajes, idiomas, plurales, contraste). Las **pantallas** solo se probaron a mano en el navegador.
+
+**Cuándo:** M4 en adelante.
 
 **Cómo:** sumar `@testing-library/react` y `jsdom` para probar componentes (**requiere aprobación**, no están en la lista), y Playwright para el flujo completo reservar → completar → comisión en M10. Hasta entonces, los tests de pantalla se limitan a lo que permite `react-dom/server`.
 
@@ -316,7 +335,9 @@ Son paquetes que no estaban en la sección 2 de la spec. Por la regla del `CLAUD
 
 **Por qué importa:** en producción sin HTTPS, las contraseñas y las cookies de sesión viajan sin cifrar. Además, Django en producción exige HTTPS (`SECURE_SSL_REDIRECT`).
 
-**Cuándo:** M3 (alta de dominios en el Super Admin).
+**Estado tras M3:** el alta y la verificación de dominios propios por DNS ya funcionan. Falta el HTTPS: el `Caddyfile` sirve HTTP en desarrollo.
+
+**Cuándo:** antes de desplegar.
 
 **Cómo:**
 - Un certificado comodín (`*.tudominio.com`) para los subdominios, que requiere validar por DNS con el proveedor.
@@ -351,3 +372,110 @@ Información para quien mantenga el proyecto, no son errores:
 - **Documentación OpenAPI.** Los endpoints de autenticación están documentados, pero los errores (`{code, detail, fields}`) todavía no.
 - **`/healthz/` es público** y muestra si la base de datos y Redis responden. No expone secretos, pero se puede restringir a la red interna en producción.
 - **Docker Desktop en Windows** se apaga con frecuencia en este equipo. Si aparece el error del archivo `dockerInference`, ver la nota de recuperación (`wsl --shutdown` o borrar ese archivo temporal).
+
+## 25. QR para activar el 2FA
+
+**Qué es:** al activar el 2FA, la pantalla muestra una **clave manual** para escribirla en Google Authenticator. No hay código QR.
+
+**Por qué importa:** escribir 32 caracteres a mano es incómodo y fácil de equivocar. Con un QR basta escanear con el celular.
+
+**Cuándo:** cuando el equipo lo decida.
+
+**Cómo:** **Requiere aprobación.** El backend ya entrega la URI `otpauth://...` que necesita el QR. Falta una librería que lo dibuje en el frontend (por ejemplo `qrcode`), que no está en la lista de la spec. La clave manual debe seguir disponible como alternativa.
+
+## 26. Verificación de dominios depende de Google
+
+**Qué es:** para comprobar los registros DNS de un dominio propio, el servidor consulta `dns.google` (DNS sobre HTTPS) con la librería estándar, sin dependencias nuevas. Está en `backend/apps/tenancy/dns.py`.
+
+**Por qué importa:**
+- Si Google no responde o el servidor no tiene salida a internet, la verificación falla con un 503 reintentable (nunca verifica por error).
+- Cada verificación le revela a Google qué dominios de clientes se están dando de alta.
+- Google puede tener en caché un valor viejo durante unos minutos.
+
+**Cuándo:** antes de desplegar.
+
+**Cómo:** cambiar de proveedor sin tocar el resto es una línea: el setting `DNS_RESOLVER` apunta a una clase con `txt()` y `cname()`. La alternativa más estándar es una librería de DNS (`dnspython`), que **requiere aprobación** por no estar en la lista. Con ella el servidor consulta directamente a su propio resolvedor.
+
+## 27. Si se pierde la contraseña temporal
+
+**Qué es:** la contraseña temporal del propietario se muestra **una sola vez** al crear el negocio y no se guarda. Si el Super Admin la pierde antes de entregarla, hoy no hay un botón para generar otra.
+
+**Por qué importa:** ejemplo: cierras la pestaña sin copiarla. El propietario no puede entrar.
+
+**Qué se puede hacer hoy:** el propietario usa "¿Olvidaste tu contraseña?" y recibe un enlace por correo. Eso exige que el correo funcione (ver punto 13); en desarrollo el enlace sale por la consola (`docker compose logs api`).
+
+**Cuándo:** mejora futura.
+
+**Cómo:** una acción "Restablecer acceso del propietario" en el detalle de la empresa que genere otra contraseña temporal (o un enlace de alta), deje constancia en la auditoría y vuelva a marcar `must_change_password`.
+
+## 28. Mensajes del servidor solo en español
+
+**Qué es:** los errores por campo que escribe el servidor (por ejemplo "Poco contraste con el fondo (1.61:1)…") están solo en español. Los mensajes por **código** (`invalid_credentials`, `low_contrast`…) sí se traducen a español e inglés en el frontend.
+
+**Por qué importa:** un administrador con la interfaz en inglés ve algunos detalles de campo en español.
+
+**Cuándo:** cuando haya administradores de habla inglesa.
+
+**Cómo:** que el servidor devuelva códigos y parámetros (`{"code": "low_contrast", "ratio": 1.61}`) y que el frontend arme la frase, o usar el sistema de traducciones de Django (`LocaleMiddleware` ya está activo).
+
+## 29. Tamaño del paquete principal del frontend
+
+**Qué es:** el paquete principal pesa unos 506 kB (158 kB comprimido) y el compilador avisa que supera 500 kB. El panel del Super Admin ya se carga aparte (33 kB), pero el resto (React, rutas, formularios, validación con Zod, textos en dos idiomas) va junto.
+
+**Por qué importa:** la spec exige reservar en menos de 60 segundos desde un celular con 360 px. Un paquete grande tarda más en redes lentas.
+
+**Cuándo:** M6, al construir el asistente de reserva.
+
+**Cómo:** cargar por separado lo que no se usa en la reserva pública (login, recuperación), dividir los idiomas por archivo y medir con una conexión lenta simulada. Revisar el peso de Zod frente a alternativas más livianas.
+
+## 30. Cerrar un negocio: exportar y borrar sus datos
+
+**Qué es:** eliminar una empresa es **lógico**: deja de estar disponible pero sus datos siguen en la base. No hay exportación ni borrado definitivo.
+
+**Por qué importa:** la PDF dice que cada empresa es dueña de sus datos, puede exportarlos al cancelar y se retienen un plazo por definir. La Ley 1581 exige poder eliminar los datos de una persona.
+
+**Cuándo:** antes de tener clientes reales.
+
+**Cómo:** definir el plazo de retención, una exportación (por ejemplo CSV de clientes y citas) y un borrado definitivo con confirmación y registro en la auditoría. Revisarlo con un abogado.
+
+## 31. Límites del plan sin aplicar
+
+**Qué es:** los planes guardan `max_professionals` y `max_locations`, pero nada los hace cumplir todavía.
+
+**Por qué importa:** ejemplo: el plan Inicial dice "2 profesionales" y el negocio podría crear 20.
+
+**Cuándo:** M4, cuando se puedan crear profesionales y sedes.
+
+**Cómo:** validar el límite al crear cada uno (en el `services.py` del catálogo), con un error claro (`plan_limit_reached`) que el frontend traduzca.
+
+## 32. Revisión de accesibilidad automática
+
+**Qué es:** las pantallas usan etiquetas, foco visible, mensajes con `role="alert"`, tablas con `scope` y pestañas con teclado, y se revisaron a mano. No hay una prueba automática (por ejemplo axe) ni se probó con un lector de pantalla.
+
+**Por qué importa:** la spec pide accesibilidad con contraste AA.
+
+**Cuándo:** M10.
+
+**Cómo:** sumar una revisión automática a las pruebas de extremo a extremo (Playwright) y probar el flujo de reserva con un lector de pantalla.
+
+## 33. REACTIVAR el 2FA antes de entregar
+
+**Qué es:** para facilitar las pruebas, la verificación en dos pasos está **apagada en desarrollo**: `REQUIRE_TWO_FACTOR=0` en el `.env` (y en `.env.example`). Con eso el Super Admin entra solo con correo y contraseña, incluso si ya tenía el 2FA activo.
+
+**Por qué importa:** el Super Admin controla todos los negocios. Sin 2FA, una contraseña robada basta para entrar. Es lo que más protege el panel y lo que más se olvida reactivar.
+
+**Qué ya protege contra el olvido:**
+- Producción **no arranca** con él apagado (`config/settings/prod.py` lanza un error).
+- Los tests siempre corren con el 2FA exigido, aunque tu `.env` lo tenga apagado.
+- Al arrancar, el servidor escribe un aviso `Verificación en dos pasos DESACTIVADA` en el log (`docker compose logs api`).
+
+**Cuándo:** al final de las pruebas, **antes de entregar o de poner el sistema en un servidor**. Mejor, junto con el punto 2 (códigos de recuperación) y el punto 25 (QR), para que activarlo sea cómodo.
+
+**Cómo reactivarlo:**
+1. En `.env` pon `REQUIRE_TWO_FACTOR=1` o borra esa línea. Haz lo mismo en `.env.example`.
+2. Reinicia: `docker compose up -d api`.
+3. Comprueba que el aviso `DESACTIVADA` ya no sale en `docker compose logs api`.
+4. Entra a http://admin.localhost:8080: el Super Admin debe ver la pantalla de activación del 2FA (clave manual y código de 6 dígitos).
+5. Si pierdes el celular: `docker compose exec api python manage.py reset_2fa --email tu@correo.com`.
+
+**Ojo con cuentas que ya existen:** al reactivarlo, un Super Admin que **nunca** activó el 2FA tendrá que activarlo en su siguiente login. Un usuario que ya lo tenía activado vuelve a necesitar su código.

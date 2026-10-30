@@ -6,6 +6,7 @@ from typing import Any
 from django.conf import settings
 from django.contrib.auth import login as django_login
 from django.contrib.auth import logout as django_logout
+from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.hashers import check_password, make_password
 from django.contrib.auth.password_validation import validate_password
 from django.contrib.auth.tokens import default_token_generator
@@ -65,15 +66,17 @@ def _verify_totp(user: User, code: str) -> bool:
 
 def login(request: HttpRequest, email: str, password: str, totp_code: str = "") -> User:
     user = _authenticate(request, email, password)
-    if user.totp_enabled:
-        if not totp_code:
-            raise ApiError("two_factor_required", "Falta el código de verificación.", 401)
-        if not _verify_totp(user, totp_code):
-            raise ApiError("invalid_two_factor_code", "Código de verificación incorrecto.", 401)
-    elif user.role in REQUIRED_2FA_ROLES:
-        raise ApiError(
-            "two_factor_setup_required", "Debes activar la verificación en dos pasos.", 403
-        )
+    # REQUIRE_TWO_FACTOR=False solo en desarrollo (prod.py lo impide): entra solo con contraseña.
+    if settings.REQUIRE_TWO_FACTOR:
+        if user.totp_enabled:
+            if not totp_code:
+                raise ApiError("two_factor_required", "Falta el código de verificación.", 401)
+            if not _verify_totp(user, totp_code):
+                raise ApiError("invalid_two_factor_code", "Código de verificación incorrecto.", 401)
+        elif user.role in REQUIRED_2FA_ROLES:
+            raise ApiError(
+                "two_factor_setup_required", "Debes activar la verificación en dos pasos.", 403
+            )
     django_login(request, user, backend=BACKEND_PATH)
     return user
 
@@ -153,6 +156,58 @@ def confirm_password_reset(request: HttpRequest, uid: str, token: str, new_passw
     user.save(update_fields=["password", "updated_at"])
 
 
+def create_tenant_user(
+    *,
+    tenant,
+    email: str,
+    full_name: str,
+    role: str,
+    password: str,
+    must_change_password: bool = False,
+    phone: str = "",
+) -> User:
+    """Alta de un usuario de un tenant (la usa el Super Admin al crear el propietario)."""
+    return User.objects.create_user(
+        email,
+        password,
+        role=role,
+        tenant=tenant,
+        full_name=full_name,
+        phone=phone,
+        must_change_password=must_change_password,
+    )
+
+
+def change_password(
+    request: HttpRequest, user: User, current_password: str, new_password: str
+) -> None:
+    """Cambio voluntario o forzado (contraseña temporal). La sesión actual sigue abierta; las
+    demás sesiones de la persona se cierran."""
+    if not user.check_password(current_password):
+        raise ApiError("invalid_current_password", "La contraseña actual no es correcta.", 400)
+    try:
+        validate_password(new_password, user)
+    except DjangoValidationError as exc:
+        raise ApiError(
+            "weak_password",
+            "La contraseña no es segura.",
+            400,
+            {"new_password": list(exc.messages)},
+        ) from exc
+    user.set_password(new_password)
+    user.must_change_password = False
+    user.save(update_fields=["password", "must_change_password", "updated_at"])
+    update_session_auth_hash(request, user)
+
+
+def reset_two_factor(user: User) -> None:
+    """Quita el 2FA de un usuario (emergencia: perdió el celular). Solo por comando de terminal."""
+    user.totp_secret = ""
+    user.totp_enabled = False
+    user.totp_last_step = None
+    user.save(update_fields=["totp_secret", "totp_enabled", "totp_last_step", "updated_at"])
+
+
 def build_me(request: HttpRequest, user: User) -> dict[str, Any]:
     tenant = request.tenant
     return {
@@ -164,6 +219,7 @@ def build_me(request: HttpRequest, user: User) -> dict[str, Any]:
         },
         "role": user.role,
         "two_factor_enabled": user.totp_enabled,
+        "must_change_password": user.must_change_password,
         "is_platform_admin": user.role == User.Role.SUPERADMIN,
         "tenant": None
         if tenant is None

@@ -50,6 +50,7 @@ jobs:
       - run: ruff format --check .
       - run: mypy .
       - run: python manage.py makemigrations --check --dry-run
+      - run: python manage.py spectacular --validate --fail-on-warn --file /tmp/schema.yml
       - run: pytest
 
   frontend:

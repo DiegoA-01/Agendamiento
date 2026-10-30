@@ -50,6 +50,8 @@ class User(BaseModel, AbstractBaseUser):
         "tenancy.Tenant", null=True, blank=True, on_delete=models.PROTECT, related_name="users"
     )
     is_active = models.BooleanField(default=True)
+    # Contraseña temporal (alta por el Super Admin): el frontend obliga a cambiarla antes de seguir.
+    must_change_password = models.BooleanField(default=False)
     totp_secret = models.CharField(max_length=64, blank=True)
     totp_enabled = models.BooleanField(default=False)
     totp_last_step = models.BigIntegerField(null=True, blank=True)

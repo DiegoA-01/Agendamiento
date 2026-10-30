@@ -105,6 +105,22 @@ class PasswordResetConfirmView(_AuthPostView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+class PasswordChangeView(APIView):
+    """Cambio de contraseña con sesión iniciada (también el cambio forzado de la temporal)."""
+
+    @extend_schema(request=serializers.PasswordChangeSerializer, responses=serializers.MeSerializer)
+    def post(self, request):
+        data = serializers.PasswordChangeSerializer(data=request.data)
+        data.is_valid(raise_exception=True)
+        services.change_password(
+            request._request,
+            request.user,
+            data.validated_data["current_password"],
+            data.validated_data["new_password"],
+        )
+        return Response(services.build_me(request._request, request.user))
+
+
 class MeView(APIView):
     @extend_schema(responses=serializers.MeSerializer)
     def get(self, request):

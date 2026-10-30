@@ -6,5 +6,6 @@ from .health import healthz
 urlpatterns = [
     path("healthz/", healthz, name="healthz"),
     path("api/v1/", include("apps.accounts.urls")),
+    path("api/v1/", include("apps.platform_admin.urls")),
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
 ]

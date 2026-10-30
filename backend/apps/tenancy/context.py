@@ -30,6 +30,18 @@ def _set_db_setting(name: str, value: str) -> None:
         cursor.execute("SELECT set_config(%s, %s, false)", [name, value])
 
 
+def _restore_db_setting(name: str, value: str) -> None:
+    """Restaura el parámetro al salir de un contexto, sin tapar el error original.
+
+    Si el bloque falló dentro de una transacción que quedó rota, la base no acepta más consultas
+    y intentar restaurar lanzaría otro error que ocultaría el verdadero. En ese caso no hace falta:
+    el parámetro se fijó dentro de esa transacción y se revierte con ella.
+    """
+    if connection.in_atomic_block and connection.needs_rollback:
+        return
+    _set_db_setting(name, value)
+
+
 @contextmanager
 def tenant_context(tenant: "Tenant") -> Iterator["Tenant"]:
     """Activa `tenant` para el código del bloque (ORM y RLS). Pensado también para tareas Celery."""
@@ -39,7 +51,7 @@ def tenant_context(tenant: "Tenant") -> Iterator["Tenant"]:
     try:
         yield tenant
     finally:
-        _set_db_setting(DB_SETTING_TENANT, str(previous.pk) if previous else "")
+        _restore_db_setting(DB_SETTING_TENANT, str(previous.pk) if previous else "")
         _current_tenant.set(previous)
 
 
@@ -53,4 +65,4 @@ def platform_context() -> Iterator[None]:
     try:
         yield
     finally:
-        _set_db_setting(DB_SETTING_BYPASS, "")
+        _restore_db_setting(DB_SETTING_BYPASS, "")

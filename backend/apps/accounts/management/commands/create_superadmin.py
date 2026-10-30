@@ -1,5 +1,6 @@
 from getpass import getpass
 
+from django.conf import settings
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from django.core.management.base import BaseCommand, CommandError
@@ -34,8 +35,9 @@ class Command(BaseCommand):
             User.objects.create_superadmin(email, password, full_name=name)
         except IntegrityError as exc:
             raise CommandError(f"Ya existe un Super Admin con el correo {email}.") from exc
-        self.stdout.write(
-            self.style.SUCCESS(
-                f"Super Admin creado: {email}. En su primer login deberá activar el 2FA."
-            )
+        note = (
+            "En su primer login deberá activar el 2FA."
+            if settings.REQUIRE_TWO_FACTOR
+            else "El 2FA está desactivado aquí (REQUIRE_TWO_FACTOR=0): entra solo con contraseña."
         )
+        self.stdout.write(self.style.SUCCESS(f"Super Admin creado: {email}. {note}"))

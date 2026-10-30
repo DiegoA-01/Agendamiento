@@ -21,13 +21,31 @@ Cada negocio (tenant) se resuelve por su host (`<slug>.<BASE_DOMAIN>`). En local
 
 ## Primer Super Admin
 
-Pide la contraseña por consola (mínimo 10 caracteres). En su primer login deberá activar el 2FA con una app como Google Authenticator.
+Pide la contraseña por consola (mínimo 10 caracteres). Con el 2FA exigido, en su primer login deberá activarlo con una app como Google Authenticator.
+
+> **El 2FA está APAGADO en desarrollo para facilitar las pruebas** (`REQUIRE_TWO_FACTOR=0` en `.env`): el Super Admin entra solo con la contraseña. Producción **no arranca** con él apagado. **Hay que reactivarlo antes de entregar**: pon `REQUIRE_TWO_FACTOR=1` (o borra la línea) en `.env` y reinicia con `docker compose up -d api`. Ver `pormejorar.md` §33.
 
 ```bash
 docker compose exec api python manage.py create_superadmin --email tu@correo.com
 ```
 
 Los correos de recuperación de contraseña salen por consola en desarrollo (`docker compose logs api`).
+
+Si el Super Admin pierde su celular, desde el servidor se le quita el 2FA para que lo active de nuevo:
+
+```bash
+docker compose exec api python manage.py reset_2fa --email tu@correo.com
+```
+
+## Panel del Super Admin
+
+Entra a http://admin.localhost:8080 (en local, los navegadores resuelven `*.localhost` solos). Desde ahí:
+
+1. **Planes:** crea al menos uno (módulos y límites).
+2. **Empresas → Nueva empresa:** crea el negocio. Se genera su subdominio (`<slug>.localhost:8080`) y una contraseña temporal para el propietario, que se muestra una sola vez.
+3. El propietario entra en su subdominio, cambia la contraseña y ve su panel.
+
+Cada empresa tiene secciones de datos, tema (con control de contraste), módulos y dominios propios (se verifican con un registro DNS `TXT`). La sección **Auditoría** registra lo que hace el Super Admin.
 
 ## Tests y calidad
 
