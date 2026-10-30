@@ -1,0 +1,18 @@
+{
+  "dashboard": {
+    "menu": "Menú",
+    "comingSoon": "Esta sección llega en un próximo hito.",
+    "noSections": "Tu rol no tiene secciones disponibles en este negocio. Pide acceso al propietario.",
+    "nav": {
+      "agenda": "Agenda",
+      "appointments": "Citas",
+      "customers": "Clientes",
+      "services": "Servicios",
+      "team": "Equipo",
+      "resources": "Puestos",
+      "hours": "Horarios",
+      "reports": "Reportes",
+      "company": "Empresa"
+    }
+  }
+}

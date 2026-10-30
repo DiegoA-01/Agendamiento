@@ -1,10 +1,9 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
-import { NavLink, Outlet, useNavigate } from "react-router-dom";
-import { api } from "../../shared/api/client";
+import { NavLink, Outlet } from "react-router-dom";
 import { LanguageSwitcher } from "../../shared/ui/LanguageSwitcher";
 import { Button } from "../../shared/ui/primitives";
 import { useMe } from "../auth/useMe";
+import { useSignOut } from "../auth/useSignOut";
 
 const LINKS = [
   { to: "/empresas", label: "nav.tenants" },
@@ -15,16 +14,7 @@ const LINKS = [
 export function PlatformLayout() {
   const { t } = useTranslation();
   const me = useMe();
-  const navigate = useNavigate();
-  const queryClient = useQueryClient();
-
-  const signOut = useMutation({
-    mutationFn: () => api<void>("/api/v1/auth/logout/", { method: "POST" }),
-    onSuccess: () => {
-      queryClient.clear();
-      navigate("/login", { replace: true });
-    },
-  });
+  const signOut = useSignOut();
 
   return (
     <div className="min-h-screen bg-slate-50">

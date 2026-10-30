@@ -1,7 +1,6 @@
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
-import en from "./locales/en.json";
-import es from "./locales/es.json";
+import { translations } from "./resources";
 
 export const SUPPORTED_LANGUAGES = ["es", "en"] as const;
 export type Language = (typeof SUPPORTED_LANGUAGES)[number];
@@ -30,7 +29,10 @@ export function setLanguage(lang: Language) {
 }
 
 void i18n.use(initReactI18next).init({
-  resources: { es: { translation: es }, en: { translation: en } },
+  resources: {
+    es: { translation: translations.es },
+    en: { translation: translations.en },
+  },
   lng: initialLanguage(),
   fallbackLng: DEFAULT_LANGUAGE,
   interpolation: { escapeValue: false },

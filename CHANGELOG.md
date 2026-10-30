@@ -1,5 +1,15 @@
 # Changelog
 
+## Fase 0 — Contratos compartidos (frontend)
+
+Base del panel del negocio para trabajar M4 a M10 en paralelo sin choques (ver `docs/REPARTO.md`).
+
+- **Traducciones por área**: `locales/<idioma>/<area>.json` (`common`, `auth`, `platform`, `dashboard`). Un archivo nuevo se carga solo (`import.meta.glob`), sin registrarlo en ningún lado. Las claves no cambian (`t("tenants.x")` sigue igual). Un test falla si dos archivos usan la misma clave de primer nivel o si `es` y `en` no tienen los mismos archivos.
+- **Panel del negocio**: layout con el tema del negocio, menú lateral (botón "Menú" en el celular) y las rutas de la spec §13: `/agenda`, `/citas`, `/clientes`, `/servicios`, `/equipo`, `/puestos`, `/horarios`, `/reportes`, `/empresa`. Cada sección es una página provisional en su propia carpeta (`features/dashboard/<seccion>/`) y en su propio paquete (lazy). Cada frente reemplaza las suyas sin tocar `App.tsx`.
+- **El menú depende del rol y de los módulos** (matriz de la spec §5, en `features/dashboard/navigation.ts`, con tests por rol). Entrar por URL a una sección no permitida lleva al inicio del panel. `/panel` lleva a la primera sección visible.
+- Se elimina el panel provisional de M3. Cerrar sesión pasa a `useSignOut`, compartido con el panel del Super Admin.
+- Probado en el navegador como propietario y como profesional, en escritorio y a 375 px (sin desbordamiento horizontal).
+
 ## M3 — Super Admin
 
 - API del Super Admin bajo `/api/v1` (solo rol `superadmin` y solo en el host `admin.`; CSRF en escrituras): `tenants/` (CRUD, listado por cursor con búsqueda y filtro de estado), `tenants/{id}/suspend|activate/`, `theme/`, `modules/`, `domains/` (alta, `verify/`, baja), `plans/` (CRUD) y `audit-log/` (por cursor, con filtros).

@@ -4,8 +4,17 @@ import { I18nextProvider } from "react-i18next";
 import { describe, expect, it } from "vitest";
 import { LanguageSwitcher } from "../ui/LanguageSwitcher";
 import i18n, { DEFAULT_LANGUAGE, SUPPORTED_LANGUAGES } from "./index";
-import en from "./locales/en.json";
-import es from "./locales/es.json";
+import { localeFiles, mergeLocaleFiles, parseLocalePath, translations } from "./resources";
+
+const { es, en } = translations;
+
+function areas(lang: string): string[] {
+  return Object.keys(localeFiles)
+    .map(parseLocalePath)
+    .filter((file) => file.lang === lang)
+    .map((file) => file.area)
+    .sort();
+}
 
 function keys(obj: Record<string, unknown>, prefix = ""): string[] {
   return Object.entries(obj).flatMap(([k, v]) =>
@@ -24,6 +33,20 @@ describe("i18n", () => {
 
   it("es y en tienen exactamente las mismas claves", () => {
     expect(keys(en).sort()).toEqual(keys(es).sort());
+  });
+
+  it("es y en tienen los mismos archivos por área", () => {
+    expect(areas("en")).toEqual(areas("es"));
+    expect(areas("es")).toContain("common");
+  });
+
+  it("rechaza dos archivos que usan la misma clave de primer nivel", () => {
+    expect(() =>
+      mergeLocaleFiles({
+        "./locales/es/a.json": { nav: {} },
+        "./locales/es/b.json": { nav: {} },
+      }),
+    ).toThrow(/nav/);
   });
 
   it("traduce y cambia de idioma", async () => {
