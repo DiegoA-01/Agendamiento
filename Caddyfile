@@ -2,7 +2,7 @@
 # real; en local sirve HTTP en :80 (publicado en http://localhost:8080).
 # El TLS por subdominio de tenant y dominios propios se configura en M3.
 {$CADDY_SITE_ADDRESS::80} {
-	@backend path /api/* /healthz/ /healthz
+	@backend path /api/* /healthz/ /healthz /media/*
 	handle @backend {
 		reverse_proxy api:8000
 	}

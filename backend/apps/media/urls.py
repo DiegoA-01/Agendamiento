@@ -1,3 +1,7 @@
-from django.urls import URLPattern
+from django.urls import path
 
-urlpatterns: list[URLPattern] = []
+from .views import MediaUploadView
+
+urlpatterns = [
+    path("media/", MediaUploadView.as_view(), name="media-upload"),
+]

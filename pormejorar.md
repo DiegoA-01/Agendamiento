@@ -55,6 +55,8 @@ Los puntos marcados **Requiere aprobación** necesitan una decisión tuya o del 
 | 30 | Cerrar un negocio: exportar y borrar sus datos | Media | Antes de tener clientes reales |
 | 31 | Límites del plan sin aplicar | Media | M4 |
 | 32 | Revisión de accesibilidad automática | Baja | M10 |
+| 34 | Servir las imágenes subidas en producción | Alta | Antes de desplegar |
+| 35 | Imágenes que nadie usa | Baja | M10 |
 
 ---
 
@@ -479,3 +481,28 @@ Información para quien mantenga el proyecto, no son errores:
 5. Si pierdes el celular: `docker compose exec api python manage.py reset_2fa --email tu@correo.com`.
 
 **Ojo con cuentas que ya existen:** al reactivarlo, un Super Admin que **nunca** activó el 2FA tendrá que activarlo en su siguiente login. Un usuario que ya lo tenía activado vuelve a necesitar su código.
+
+## 34. Servir las imágenes subidas en producción
+
+**Qué es:** las imágenes (logo, fotos, servicios) se guardan como WebP en `MEDIA_ROOT` (`backend/mediafiles/`). En desarrollo las sirve Django en `/media/...` y Caddy le pasa esas rutas a la API. En producción Django no sirve archivos (`DEBUG` apagado), así que hoy las URLs darían 404.
+
+**Por qué importa:** la página de reservas mostraría el logo y las fotos rotos.
+
+**Cuándo:** antes de desplegar.
+
+**Cómo:**
+- Guardar `mediafiles` en un volumen de Docker compartido entre `api` y `caddy`.
+- En el `Caddyfile`, servir `/media/*` con `file_server` desde ese volumen, con caché larga (`Cache-Control: public, max-age=31536000, immutable`): cada imagen nueva tiene una ruta nueva, así que nunca cambia.
+- Incluir ese volumen en las copias de seguridad (punto 23).
+- Si más adelante se usa un almacenamiento externo (S3 o similar), sería una dependencia nueva: **requiere aprobación**.
+
+## 35. Imágenes que nadie usa
+
+**Qué es:** si alguien sube una foto y luego no guarda el formulario, o cambia el logo, la imagen anterior queda guardada sin que nada la use.
+
+**Por qué importa:** ocupa disco poco a poco. No es grave al principio.
+
+**Cuándo:** M10, o cuando el disco empiece a crecer.
+
+**Cómo:** una tarea periódica de Celery que borre las imágenes de más de un día que ningún modelo referencia (`Company.logo`, `Professional.photo`, `Service.image`).
+
