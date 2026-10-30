@@ -11,3 +11,5 @@
 - No implementar nada de la sección 12 (fuera de alcance).
 
 Antes de cualquier tarea, lee `docs/SPEC-FASE-1-MVP.md`.
+
+Somos dos personas trabajando en paralelo, cada una con su Claude. Antes de cualquier tarea, lee también `docs/REPARTO.md`. Pregunta en qué frente (A o B) se trabaja si no te lo dijeron. No toques apps ni migraciones del otro frente sin pedirlo.
