@@ -1,5 +1,15 @@
 # Changelog
 
+## M4 — Horarios y bloqueos (app `scheduling`, frente A)
+
+- `GET/PUT /api/v1/professionals/{id}/working-hours/`: lee o reemplaza la semana completa de un profesional (lista de franjas `weekday` 0 = lunes … 6 = domingo, `start_time`, `end_time`, en hora local). Varias franjas el mismo día representan un descanso; franjas que se traslapan dan `400 overlapping_hours`. Máximo 50 franjas por semana.
+- `time-blocks/` CRUD: bloqueos de un profesional **o** de un puesto (`professional_id` o `resource_id`, exactamente uno). Listado con paginación por cursor y filtros `professional_id`, `resource_id`, `start_at` y `end_at`.
+- Un bloqueo que choca con citas activas responde **`409 time_block_conflict`** con las citas en `fields.appointments` (`id`, `start_at`, `end_at`, `status`). Las citas canceladas o `no_show` no cuentan, y tocar el borde (bloqueo que termina cuando empieza la cita) no es choque.
+- Permisos de la matriz (§5): propietario, administrador y recepción gestionan todos los horarios y bloqueos; un profesional solo los suyos. Lo ajeno responde 404 (no 403); un profesional que intenta bloquear un puesto recibe 403.
+- Fechas en la zona horaria del negocio: una fecha sin zona se interpreta en hora local y las respuestas llevan el desfase (`2030-01-10T09:00:00-05:00`). En la base siguen en UTC.
+- Borrado lógico: reemplazar la semana y borrar un bloqueo marcan `deleted_at`.
+- Servicios públicos nuevos: `scheduling/services.py`, `booking.services.overlapping_appointments` y un `catalog/services.py` mínimo de solo lectura (`get_professional`, `get_resource`, `professional_for_user`), que el frente B amplía en B4.1.
+
 feat/m4-media
 ## M4 — Imágenes (app `media`)
 
