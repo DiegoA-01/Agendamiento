@@ -4,7 +4,9 @@ import uuid
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from django.core.exceptions import ImproperlyConfigured, ValidationError
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+from django.db.models import Q
 
 from .constants import MODULE_KEYS, RESERVED_SLUGS
 from .context import get_current_tenant
@@ -85,6 +87,40 @@ class Tenant(BaseModel):
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.ACTIVE)
     plan = models.ForeignKey(Plan, on_delete=models.PROTECT, related_name="tenants")
     theme = models.JSONField(default=dict, blank=True)
+
+    # Reglas de agenda del negocio (spec §8 y §9). Las leen la disponibilidad y la reserva pública.
+    slot_step_min = models.PositiveSmallIntegerField(  # cada cuánto se ofrecen horarios
+        default=15, validators=[MinValueValidator(5), MaxValueValidator(120)]
+    )
+    min_notice_min = models.PositiveIntegerField(  # anticipación mínima para reservar
+        default=60, validators=[MaxValueValidator(60 * 24 * 7)]
+    )
+    max_advance_days = models.PositiveSmallIntegerField(  # hasta cuántos días adelante
+        default=60, validators=[MinValueValidator(1), MaxValueValidator(365)]
+    )
+    cancel_min_hours = models.PositiveSmallIntegerField(  # ventana para cancelar por enlace
+        default=2, validators=[MaxValueValidator(24 * 7)]
+    )
+
+    class Meta:
+        # Los mismos rangos que los validadores, también en la base: un `update()` o un script no
+        # pasan por `full_clean()`.
+        constraints = [
+            models.CheckConstraint(
+                condition=Q(slot_step_min__gte=5, slot_step_min__lte=120),
+                name="tenant_slot_step_min_range",
+            ),
+            models.CheckConstraint(
+                condition=Q(min_notice_min__lte=60 * 24 * 7), name="tenant_min_notice_min_range"
+            ),
+            models.CheckConstraint(
+                condition=Q(max_advance_days__gte=1, max_advance_days__lte=365),
+                name="tenant_max_advance_days_range",
+            ),
+            models.CheckConstraint(
+                condition=Q(cancel_min_hours__lte=24 * 7), name="tenant_cancel_min_hours_range"
+            ),
+        ]
 
     def __str__(self) -> str:
         return self.name

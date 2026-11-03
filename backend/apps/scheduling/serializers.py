@@ -14,6 +14,23 @@ class WorkingHoursSerializer(serializers.Serializer):
         return attrs
 
 
+class AgendaSettingsSerializer(serializers.Serializer):
+    """Reglas de agenda del negocio. En PATCH todos los campos son opcionales."""
+
+    slot_step_min = serializers.IntegerField(
+        min_value=5, max_value=120, help_text="Cada cuántos minutos se ofrecen horarios."
+    )
+    min_notice_min = serializers.IntegerField(
+        min_value=0, max_value=60 * 24 * 7, help_text="Anticipación mínima para reservar."
+    )
+    max_advance_days = serializers.IntegerField(
+        min_value=1, max_value=365, help_text="Hasta cuántos días adelante se puede reservar."
+    )
+    cancel_min_hours = serializers.IntegerField(
+        min_value=0, max_value=24 * 7, help_text="Horas antes de la cita para cancelar por enlace."
+    )
+
+
 class TimeBlockSerializer(serializers.Serializer):
     id = serializers.UUIDField()
     professional_id = serializers.UUIDField(allow_null=True)

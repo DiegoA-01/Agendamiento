@@ -1,5 +1,11 @@
 # Changelog
 
+## Fase 0 (pendiente) — Configuración de agenda del negocio (frente A)
+
+- `Tenant` gana cuatro reglas de agenda (spec §8 y §9), con los valores por defecto de la spec: `slot_step_min` 15 (de 5 a 120), `min_notice_min` 60 (hasta 7 días), `max_advance_days` 60 (de 1 a 365) y `cancel_min_hours` 2 (hasta 7 días). Los rangos se validan en el modelo y también con restricciones en la base. Migración `tenancy/0002`.
+- `GET/PATCH /api/v1/agenda-settings/` en el host del negocio: el propietario las edita y el administrador solo las ve (son datos de empresa, matriz §5). Recepción y profesionales reciben 403.
+- Servicios públicos `tenancy.agenda_settings` y `tenancy.update_agenda_settings`, que leerán el motor de disponibilidad (M5) y la reserva pública (M6).
+
 ## M4 — Horarios y bloqueos (app `scheduling`, frente A)
 
 - `GET/PUT /api/v1/professionals/{id}/working-hours/`: lee o reemplaza la semana completa de un profesional (lista de franjas `weekday` 0 = lunes … 6 = domingo, `start_time`, `end_time`, en hora local). Varias franjas el mismo día representan un descanso; franjas que se traslapan dan `400 overlapping_hours`. Máximo 50 franjas por semana.
