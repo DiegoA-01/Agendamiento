@@ -146,3 +146,95 @@ export const THEME_KEYS: (keyof Theme)[] = [
   "surface",
   "text",
 ];
+
+// --- Panel del negocio: empresa, catálogo y equipo (M4) ----------------------------------------
+
+export interface ImageRef {
+  id: string;
+  urls: { thumb: string; medium: string; large: string };
+}
+
+export interface MediaFile extends ImageRef {
+  original_name: string;
+  width: number;
+  height: number;
+}
+
+export const SOCIAL_NETWORKS = ["instagram", "facebook", "tiktok", "whatsapp", "website"] as const;
+export type SocialNetwork = (typeof SOCIAL_NETWORKS)[number];
+
+export interface Company {
+  legal_name: string;
+  trade_name: string;
+  tax_id: string;
+  address: string;
+  city: string;
+  phone: string;
+  email: string;
+  logo: ImageRef | null;
+  terms_html: string;
+  privacy_html: string;
+  cookies_html: string;
+  social_links: Partial<Record<SocialNetwork, string>>;
+}
+
+export interface BusinessLocation {
+  id: string;
+  name: string;
+  address: string;
+  is_default: boolean;
+}
+
+export interface Category {
+  id: string;
+  name: string;
+  sort_order: number;
+}
+
+/** Montos como texto decimal (`"30000.00"`): nunca se convierten a número para guardar. */
+export interface Service {
+  id: string;
+  category_id: string;
+  name: string;
+  description: string;
+  duration_min: number;
+  buffer_min: number;
+  price: string;
+  is_active: boolean;
+  requires_resource: boolean;
+  image: ImageRef | null;
+}
+
+export interface Workstation {
+  id: string;
+  name: string;
+  kind: string;
+  is_active: boolean;
+  location_id: string;
+}
+
+export interface Specialty {
+  id: string;
+  name: string;
+}
+
+export interface Professional {
+  id: string;
+  display_name: string;
+  bio: string;
+  user_id: string | null;
+  location_id: string;
+  photo: ImageRef | null;
+  specialty_ids: string[];
+  default_commission_pct: string;
+  is_active: boolean;
+  accepts_online_booking: boolean;
+}
+
+export interface OfferedService {
+  service_id: string;
+  service_name?: string;
+  price_override: string | null;
+  commission_pct_override: string | null;
+  duration_override_min: number | null;
+}

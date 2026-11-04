@@ -36,6 +36,22 @@
 - Borrado lógico: reemplazar la semana y borrar un bloqueo marcan `deleted_at`.
 - Servicios públicos nuevos: `scheduling/services.py`, `booking.services.overlapping_appointments` y un `catalog/services.py` mínimo de solo lectura (`get_professional`, `get_resource`, `professional_for_user`), que el frente B amplía en B4.1.
 
+## M4 — Pantallas de empresa, servicios, puestos y equipo (frente B)
+
+- `/empresa`:
+  - Datos del negocio, logo (sube a `media/`), redes sociales y textos legales.
+  - El HTML legal se muestra como quedó guardado, ya limpio por el servidor.
+  - Nombre y dirección de la sede principal. La UI multisede sigue fuera de alcance (§12).
+- `/servicios`: categorías (crear, renombrar, borrar) y servicios agrupados por categoría con precio en la moneda del negocio, duración, tiempo de preparación, activo, si necesita puesto e imagen.
+- `/puestos`: crear, editar y borrar puestos.
+- `/equipo`:
+  - Fichas con foto, especialidades (se crean desde la misma ficha), comisión, activo y reserva en línea.
+  - Editor de **servicios que ofrece cada profesional** con precio, duración y comisión propios. Lo que se deja en blanco usa el valor general.
+- La interfaz se adapta a los permisos de `/me/`: quien solo puede ver recibe la pantalla en modo lectura, sin botones de edición. Los errores del servidor (`plan_limit_reached`, `category_in_use`, `location_in_use`, imagen inválida…) se muestran traducidos.
+- Compartido (solo se agregó código): `uploadFile` en `shared/api/client.ts`, tipos del catálogo en `shared/api/types.ts`, `TextAreaField` en `primitives.tsx` y nuevos códigos de error en `common.json`. Textos del área en `locales/{es,en}/catalog.json`.
+- 30 pruebas nuevas (validación de formularios, conversión a lo que espera la API, formato de montos y permisos).
+- Probado en el navegador como propietario y como recepcionista, en español y en inglés, en escritorio y a 375 px (sin desbordamiento horizontal).
+
 ## M4 — Equipo y servicios de cada profesional (app `catalog`, frente B)
 
 - `professionals/` CRUD:

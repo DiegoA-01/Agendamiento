@@ -77,7 +77,20 @@
     "slugReserved": "Ese subdominio está reservado.",
     "currencyFormat": "Usa 3 letras, por ejemplo COP.",
     "hostFormat": "Escribe un dominio válido, por ejemplo www.minegocio.com.",
-    "min1": "Debe ser al menos 1."
+    "min1": "Debe ser al menos 1.",
+    "moneyFormat": "Escribe un monto con hasta 2 decimales, por ejemplo 30000.",
+    "percentFormat": "Escribe un porcentaje de 0 a 100, con hasta 2 decimales.",
+    "urlFormat": "Escribe una dirección completa, por ejemplo https://instagram.com/tunegocio.",
+    "durationRange": "Debe estar entre 5 y 1440 minutos.",
+    "bufferRange": "Debe estar entre 0 y 240 minutos.",
+    "plan_limit_reached": "Tu plan no admite más. Pide al administrador de la plataforma un plan mayor.",
+    "default_location_required": "Siempre debe haber una sede principal.",
+    "location_in_use": "La sede tiene profesionales o puestos: muévelos antes de eliminarla.",
+    "category_in_use": "La categoría tiene servicios: muévelos o elimínalos antes.",
+    "file_too_large": "La imagen pesa más de 10 MB.",
+    "invalid_image": "El archivo no es una imagen válida.",
+    "unsupported_image": "Formato no permitido. Usa JPG, PNG o WebP.",
+    "image_too_large": "La imagen tiene demasiados píxeles."
   },
   "verticals": {
     "barbershop": "Barbería",
