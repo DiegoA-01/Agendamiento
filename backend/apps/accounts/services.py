@@ -23,6 +23,7 @@ from . import totp
 from .backends import BACKEND_PATH
 from .messages import PASSWORD_RESET
 from .models import User
+from .permissions import permissions_for_role
 
 # Roles a los que se les exige 2FA. Propietario: opcional por ahora (si lo activa, se le exige).
 REQUIRED_2FA_ROLES = frozenset({User.Role.SUPERADMIN})
@@ -234,4 +235,5 @@ def build_me(request: HttpRequest, user: User) -> dict[str, Any]:
         },
         "theme": tenant.theme if tenant is not None else {},
         "modules": sorted(tenancy.enabled_module_keys(tenant)) if tenant is not None else [],
+        "permissions": permissions_for_role(user.role),
     }

@@ -1,9 +1,30 @@
 # Changelog
 
+ feat/f0-public-routes
 ## Fase 0 (pendiente) — Rutas públicas del negocio
 
 - El host del negocio ya tiene las rutas públicas de la spec §13: `/reservar`, `/cita/:token`, `/terminos`, `/privacidad` y `/cookies`. Por ahora muestran su título traducido, el selector de idioma y "Esta página llega en el hito M6". Con esto `App.tsx` queda cerrado: M6 solo reemplaza el contenido de cada página.
 - Textos en `locales/{es,en}/booking.json` (área nueva `booking`).
+
+feat/f0-default-location
+## Fase 0 (pendiente) — Sede por defecto de cada negocio
+
+- `company.services.create_company` crea también la sede por defecto (`is_default=True`), con el nombre en el idioma del negocio: "Sede principal" o "Main location". Como el alta de empresas del Super Admin la usa, todo negocio nuevo nace con su sede y ya puede crear profesionales y puestos.
+- Migración de datos `company/0003`: da la sede por defecto a los negocios creados antes. Corre con el rol de la app (sujeto a RLS), activa el modo plataforma solo mientras dura y no duplica si se repite.
+- Nuevo `company.services.get_default_location(tenant)` para las demás apps.
+
+feat/f0-me-permissions
+## Fase 0 (pendiente) — `/me/` con los permisos del rol
+
+- `GET /api/v1/me/` agrega `permissions`: `{recurso: {"scope": "all" | "own", "actions": [...]}}`, calculado con `permissions_for_role` desde la misma matriz que valida la API (spec §5). Ejemplo para un profesional: `"appointments": {"scope": "own", "actions": ["complete", "no_show", "view"]}`. Solo guía a la interfaz; la API sigue validando cada petición.
+- El menú del panel deja de copiar los roles: cada sección declara el recurso que necesita ver (y si exige verlo todo, como `/clientes` y `/puestos`) y se muestra según esos permisos. Si cambia la matriz del backend, el menú cambia solo. Los menús por rol quedan igual que antes.
+
+## Fase 0 (pendiente) — Polling de Vite en Docker
+
+- `frontend/vite.config.ts` vigila los archivos por sondeo cuando `VITE_USE_POLLING=1`, y `docker-compose.yml` lo activa en el servicio `web`. En Docker sobre Windows la carpeta compartida no avisa los cambios, y sin esto el navegador seguía mostrando código viejo hasta recrear el contenedor. Fuera de Docker no cambia nada.
+ develop
+ develop
+ develop
 
 ## Fase 0 (pendiente) — Configuración de agenda del negocio (frente A)
 

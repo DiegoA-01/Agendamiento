@@ -60,6 +60,7 @@ services:
     build: ./frontend
     environment:
       VITE_API_PROXY_TARGET: http://api:8000
+      VITE_USE_POLLING: "1"  # ver frontend/vite.config.ts: detectar cambios en Windows
     volumes:
       - ./frontend:/app
       - web_node_modules:/app/node_modules

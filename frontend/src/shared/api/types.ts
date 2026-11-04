@@ -29,7 +29,26 @@ export interface Me {
   } | null;
   theme: Partial<Theme>;
   modules: ModuleKey[];
+  /** Lo que el rol puede hacer, calculado por el backend desde su matriz (spec §5). */
+  permissions: Permissions;
 }
+
+/** Recursos de la matriz de permisos del backend (`accounts/permissions.py`). */
+export type PermissionResource =
+  | "company"
+  | "staff_services"
+  | "schedules"
+  | "appointments"
+  | "commissions"
+  | "plan_modules"
+  | "platform";
+
+/** `all` = todos los registros del negocio; `own` = solo los propios. */
+export type PermissionScope = "all" | "own";
+
+export type Permissions = Partial<
+  Record<PermissionResource, { scope: PermissionScope; actions: string[] }>
+>;
 
 export interface TwoFactorSetup {
   secret: string;
