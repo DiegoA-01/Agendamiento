@@ -91,6 +91,17 @@ def scope_for(role: str, resource: str, action: str) -> str | None:
     return found.scope if found is not None and action in found.actions else None
 
 
+def permissions_for_role(role: str) -> dict[str, dict[str, object]]:
+    """Lo que un rol puede hacer, para que el frontend arme menús y botones sin copiar la matriz:
+    `{"appointments": {"scope": "own", "actions": ["complete", "no_show", "view"]}, ...}`.
+    Es solo para la interfaz: la API sigue validando cada petición con `permission_for`."""
+    return {
+        resource: {"scope": grants[role].scope, "actions": sorted(grants[role].actions)}
+        for resource, grants in MATRIX.items()
+        if role in grants
+    }
+
+
 def permission_for(resource: str, action: str) -> type[BasePermission]:
     """Clase de permiso DRF: `permission_classes = [permission_for(APPOINTMENTS, "view")]`."""
 
