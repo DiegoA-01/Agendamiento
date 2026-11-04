@@ -1,5 +1,12 @@
 # Changelog
 
+feat/f0-default-location
+## Fase 0 (pendiente) — Sede por defecto de cada negocio
+
+- `company.services.create_company` crea también la sede por defecto (`is_default=True`), con el nombre en el idioma del negocio: "Sede principal" o "Main location". Como el alta de empresas del Super Admin la usa, todo negocio nuevo nace con su sede y ya puede crear profesionales y puestos.
+- Migración de datos `company/0003`: da la sede por defecto a los negocios creados antes. Corre con el rol de la app (sujeto a RLS), activa el modo plataforma solo mientras dura y no duplica si se repite.
+- Nuevo `company.services.get_default_location(tenant)` para las demás apps.
+
 feat/f0-me-permissions
 ## Fase 0 (pendiente) — `/me/` con los permisos del rol
 
@@ -9,6 +16,7 @@ feat/f0-me-permissions
 ## Fase 0 (pendiente) — Polling de Vite en Docker
 
 - `frontend/vite.config.ts` vigila los archivos por sondeo cuando `VITE_USE_POLLING=1`, y `docker-compose.yml` lo activa en el servicio `web`. En Docker sobre Windows la carpeta compartida no avisa los cambios, y sin esto el navegador seguía mostrando código viejo hasta recrear el contenedor. Fuera de Docker no cambia nada.
+ develop
  develop
 
 ## Fase 0 (pendiente) — Configuración de agenda del negocio (frente A)
