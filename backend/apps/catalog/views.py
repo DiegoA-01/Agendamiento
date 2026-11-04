@@ -169,3 +169,111 @@ class ResourceDetailView(CatalogView):
     def delete(self, request, resource_id):
         catalog.delete_resource(catalog.get_resource_for(request.user, resource_id))
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+# --- Especialidades -----------------------------------------------------------------------------
+
+
+class SpecialtyListView(CatalogView):
+    @extend_schema(responses=serializers.SpecialtySerializer(many=True))
+    def get(self, request):
+        return Response(serializers.SpecialtySerializer(catalog.list_specialties(), many=True).data)
+
+    @extend_schema(
+        request=serializers.SpecialtySerializer, responses={201: serializers.SpecialtySerializer}
+    )
+    def post(self, request):
+        specialty = catalog.create_specialty(
+            **_validated(serializers.SpecialtySerializer, request.data)
+        )
+        return Response(
+            serializers.SpecialtySerializer(specialty).data, status=status.HTTP_201_CREATED
+        )
+
+
+class SpecialtyDetailView(CatalogView):
+    @extend_schema(
+        request=serializers.SpecialtySerializer, responses=serializers.SpecialtySerializer
+    )
+    def patch(self, request, specialty_id):
+        specialty = catalog.get_specialty(specialty_id)
+        data = _validated(serializers.SpecialtySerializer, request.data)
+        updated = catalog.update_specialty(specialty, **data)
+        return Response(serializers.SpecialtySerializer(updated).data)
+
+    @extend_schema(responses={204: None})
+    def delete(self, request, specialty_id):
+        catalog.delete_specialty(catalog.get_specialty(specialty_id))
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+# --- Equipo -------------------------------------------------------------------------------------
+
+
+def _professional_data(professional) -> dict:
+    (professional,) = catalog.with_specialties([professional])
+    return serializers.ProfessionalSerializer(professional).data
+
+
+class ProfessionalListView(CatalogView):
+    @extend_schema(responses=serializers.ProfessionalSerializer(many=True))
+    def get(self, request):
+        professionals = catalog.with_specialties(catalog.list_professionals(request.user))
+        return Response(serializers.ProfessionalSerializer(professionals, many=True).data)
+
+    @extend_schema(
+        request=serializers.ProfessionalSerializer,
+        responses={201: serializers.ProfessionalSerializer},
+    )
+    def post(self, request):
+        data = _validated(serializers.ProfessionalSerializer, request.data)
+        professional = catalog.create_professional(request.tenant, **data)
+        return Response(_professional_data(professional), status=status.HTTP_201_CREATED)
+
+
+class ProfessionalDetailView(CatalogView):
+    @extend_schema(responses=serializers.ProfessionalSerializer)
+    def get(self, request, professional_id):
+        professional = catalog.get_professional_for(request.user, professional_id)
+        return Response(_professional_data(professional))
+
+    @extend_schema(
+        request=serializers.ProfessionalSerializer(partial=True),
+        responses=serializers.ProfessionalSerializer,
+    )
+    def patch(self, request, professional_id):
+        professional = catalog.get_professional_for(request.user, professional_id)
+        changes = _validated(serializers.ProfessionalSerializer, request.data, partial=True)
+        updated = catalog.update_professional(request.tenant, professional, **changes)
+        return Response(_professional_data(updated))
+
+    @extend_schema(responses={204: None})
+    def delete(self, request, professional_id):
+        catalog.delete_professional(catalog.get_professional_for(request.user, professional_id))
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class ProfessionalServicesView(CatalogView):
+    """Servicios que ofrece un profesional. `PUT` reemplaza la lista completa (como los horarios):
+    lo que no venga se deja de ofrecer."""
+
+    def get_permissions(self):
+        # Asignar servicios es editar la ficha: PUT cuenta como `update`.
+        action = "view" if self.request.method == "GET" else "update"
+        return [IsTenantUser(), perms.permission_for(perms.STAFF_SERVICES, action)()]
+
+    @extend_schema(responses=serializers.OfferedServicesSerializer)
+    def get(self, request, professional_id):
+        professional = catalog.get_professional_for(request.user, professional_id)
+        offers = catalog.list_offered_services(professional)
+        return Response(serializers.OfferedServicesSerializer({"services": offers}).data)
+
+    @extend_schema(
+        request=serializers.OfferedServicesSerializer,
+        responses=serializers.OfferedServicesSerializer,
+    )
+    def put(self, request, professional_id):
+        professional = catalog.get_professional_for(request.user, professional_id)
+        data = _validated(serializers.OfferedServicesSerializer, request.data)
+        offers = catalog.replace_offered_services(professional, data["services"])
+        return Response(serializers.OfferedServicesSerializer({"services": offers}).data)

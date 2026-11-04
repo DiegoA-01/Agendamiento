@@ -179,6 +179,15 @@ def create_tenant_user(
     )
 
 
+def get_tenant_user(tenant, user_id) -> User | None:
+    """Cuenta vigente de ese negocio, o None (también si el id es inválido o de otro negocio).
+    La usa `catalog` para enlazar una ficha de profesional con su cuenta."""
+    try:
+        return User.objects.for_tenant(tenant).filter(pk=user_id).first()
+    except (DjangoValidationError, ValueError, TypeError):
+        return None
+
+
 def change_password(
     request: HttpRequest, user: User, current_password: str, new_password: str
 ) -> None:

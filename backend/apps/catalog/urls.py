@@ -17,4 +17,21 @@ urlpatterns = [
         views.ResourceDetailView.as_view(),
         name="resource-detail",
     ),
+    path("specialties/", views.SpecialtyListView.as_view(), name="specialty-list"),
+    path(
+        "specialties/<uuid:specialty_id>/",
+        views.SpecialtyDetailView.as_view(),
+        name="specialty-detail",
+    ),
+    path("professionals/", views.ProfessionalListView.as_view(), name="professional-list"),
+    path(
+        "professionals/<uuid:professional_id>/",
+        views.ProfessionalDetailView.as_view(),
+        name="professional-detail",
+    ),
+    path(
+        "professionals/<uuid:professional_id>/services/",
+        views.ProfessionalServicesView.as_view(),
+        name="professional-services",
+    ),
 ]
