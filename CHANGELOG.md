@@ -21,6 +21,16 @@
 - Servicios públicos nuevos: `scheduling/services.py`, `booking.services.overlapping_appointments` y un `catalog/services.py` mínimo de solo lectura (`get_professional`, `get_resource`, `professional_for_user`), que el frente B amplía en B4.1.
 
 feat/m4-media
+## M4 — Catálogo para el motor de disponibilidad (app `catalog`, frente B, tarea B4.1)
+
+Funciones públicas en `catalog/services.py` para el motor de disponibilidad y la creación de citas (M5, frente A). Todas buscan dentro del negocio activo.
+
+- `get_bookable_services(ids)`: servicios activos en el orden pedido y sin repetidos. Devuelve `None` si la lista está vacía o si un solo id no existe, está inactivo, borrado o es de otro negocio.
+- `professionals_for_services(services, online_only=False)`: profesionales activos que ofrecen **todos** los servicios, en orden alfabético (§8.2). Con `online_only=True` deja solo a quienes aceptan reservas en línea.
+- `quote(professional, services)`: precio, duración y comisión de cada servicio con los overrides del profesional (override > valor del servicio o comisión por defecto; un override en 0 se respeta). Devuelve el total, la duración total (suma de duraciones + el buffer del **último** servicio, §8.1) y si hace falta puesto. `None` si el profesional no ofrece alguno de los servicios. Sus valores son los que se congelan en `AppointmentItem`.
+- `requires_resource(services)` y `active_resources(location_id=None)` para exigir un puesto libre (§8.5).
+- 16 pruebas nuevas, incluido el aislamiento entre negocios.
+
 ## M4 — Imágenes (app `media`)
 
 - `POST /api/v1/media/` (multipart, campo `file`): sube una imagen JPG, PNG o WebP y responde `201` con `id`, tamaño original y las URLs de las tres variantes. Solo para quien puede editar la empresa o el catálogo (propietario y administrador) y solo en el host de un negocio.
