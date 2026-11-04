@@ -1,5 +1,9 @@
 # Changelog
 
+## Fase 0 (pendiente) — Polling de Vite en Docker
+
+- `frontend/vite.config.ts` vigila los archivos por sondeo cuando `VITE_USE_POLLING=1`, y `docker-compose.yml` lo activa en el servicio `web`. En Docker sobre Windows la carpeta compartida no avisa los cambios, y sin esto el navegador seguía mostrando código viejo hasta recrear el contenedor. Fuera de Docker no cambia nada.
+
 ## Fase 0 (pendiente) — Configuración de agenda del negocio (frente A)
 
 - `Tenant` gana cuatro reglas de agenda (spec §8 y §9), con los valores por defecto de la spec: `slot_step_min` 15 (de 5 a 120), `min_notice_min` 60 (hasta 7 días), `max_advance_days` 60 (de 1 a 365) y `cancel_min_hours` 2 (hasta 7 días). Los rangos se validan en el modelo y también con restricciones en la base. Migración `tenancy/0002`.
