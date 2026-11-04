@@ -5,6 +5,7 @@ import { AuthGate } from "../features/auth/AuthGate";
 import { ChangePasswordPage } from "../features/auth/ChangePasswordPage";
 import { LoginPage } from "../features/auth/LoginPage";
 import { ForgotPasswordPage, ResetPasswordPage } from "../features/auth/RecoverPages";
+import { publicRoutes } from "../features/booking/routes";
 import { dashboardRoutes } from "../features/dashboard/routes";
 import { isPlatformHost } from "../shared/host";
 import { Loading } from "../shared/ui/primitives";
@@ -58,6 +59,7 @@ function AppRoutes() {
   return (
     <Routes>
       <Route path="/" element={<HomePage />} />
+      {publicRoutes()}
       {accountRoutes()}
       {dashboardRoutes()}
       <Route path="*" element={<Navigate to="/" replace />} />
