@@ -1,5 +1,11 @@
 # Changelog
 
+## Fase 0 (pendiente) — Sede por defecto de cada negocio
+
+- `company.services.create_company` crea también la sede por defecto (`is_default=True`), con el nombre en el idioma del negocio: "Sede principal" o "Main location". Como el alta de empresas del Super Admin la usa, todo negocio nuevo nace con su sede y ya puede crear profesionales y puestos.
+- Migración de datos `company/0003`: da la sede por defecto a los negocios creados antes. Corre con el rol de la app (sujeto a RLS), activa el modo plataforma solo mientras dura y no duplica si se repite.
+- Nuevo `company.services.get_default_location(tenant)` para las demás apps.
+
 ## Fase 0 (pendiente) — Configuración de agenda del negocio (frente A)
 
 - `Tenant` gana cuatro reglas de agenda (spec §8 y §9), con los valores por defecto de la spec: `slot_step_min` 15 (de 5 a 120), `min_notice_min` 60 (hasta 7 días), `max_advance_days` 60 (de 1 a 365) y `cancel_min_hours` 2 (hasta 7 días). Los rangos se validan en el modelo y también con restricciones en la base. Migración `tenancy/0002`.
