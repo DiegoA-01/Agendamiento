@@ -1,5 +1,11 @@
 # Changelog
 
+ feat/f0-public-routes
+## Fase 0 (pendiente) — Rutas públicas del negocio
+
+- El host del negocio ya tiene las rutas públicas de la spec §13: `/reservar`, `/cita/:token`, `/terminos`, `/privacidad` y `/cookies`. Por ahora muestran su título traducido, el selector de idioma y "Esta página llega en el hito M6". Con esto `App.tsx` queda cerrado: M6 solo reemplaza el contenido de cada página.
+- Textos en `locales/{es,en}/booking.json` (área nueva `booking`).
+
 feat/f0-default-location
 ## Fase 0 (pendiente) — Sede por defecto de cada negocio
 
@@ -16,6 +22,7 @@ feat/f0-me-permissions
 ## Fase 0 (pendiente) — Polling de Vite en Docker
 
 - `frontend/vite.config.ts` vigila los archivos por sondeo cuando `VITE_USE_POLLING=1`, y `docker-compose.yml` lo activa en el servicio `web`. En Docker sobre Windows la carpeta compartida no avisa los cambios, y sin esto el navegador seguía mostrando código viejo hasta recrear el contenedor. Fuera de Docker no cambia nada.
+ develop
  develop
  develop
 
