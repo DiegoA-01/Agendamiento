@@ -1,13 +1,11 @@
 # Changelog
 
-feat/f0-default-location
 ## Fase 0 (pendiente) — Sede por defecto de cada negocio
 
 - `company.services.create_company` crea también la sede por defecto (`is_default=True`), con el nombre en el idioma del negocio: "Sede principal" o "Main location". Como el alta de empresas del Super Admin la usa, todo negocio nuevo nace con su sede y ya puede crear profesionales y puestos.
 - Migración de datos `company/0003`: da la sede por defecto a los negocios creados antes. Corre con el rol de la app (sujeto a RLS), activa el modo plataforma solo mientras dura y no duplica si se repite.
 - Nuevo `company.services.get_default_location(tenant)` para las demás apps.
 
-feat/f0-me-permissions
 ## Fase 0 (pendiente) — `/me/` con los permisos del rol
 
 - `GET /api/v1/me/` agrega `permissions`: `{recurso: {"scope": "all" | "own", "actions": [...]}}`, calculado con `permissions_for_role` desde la misma matriz que valida la API (spec §5). Ejemplo para un profesional: `"appointments": {"scope": "own", "actions": ["complete", "no_show", "view"]}`. Solo guía a la interfaz; la API sigue validando cada petición.
@@ -16,8 +14,6 @@ feat/f0-me-permissions
 ## Fase 0 (pendiente) — Polling de Vite en Docker
 
 - `frontend/vite.config.ts` vigila los archivos por sondeo cuando `VITE_USE_POLLING=1`, y `docker-compose.yml` lo activa en el servicio `web`. En Docker sobre Windows la carpeta compartida no avisa los cambios, y sin esto el navegador seguía mostrando código viejo hasta recrear el contenedor. Fuera de Docker no cambia nada.
- develop
- develop
 
 ## Fase 0 (pendiente) — Configuración de agenda del negocio (frente A)
 
@@ -35,7 +31,17 @@ feat/f0-me-permissions
 - Borrado lógico: reemplazar la semana y borrar un bloqueo marcan `deleted_at`.
 - Servicios públicos nuevos: `scheduling/services.py`, `booking.services.overlapping_appointments` y un `catalog/services.py` mínimo de solo lectura (`get_professional`, `get_resource`, `professional_for_user`), que el frente B amplía en B4.1.
 
-feat/m4-media
+## M4 — Empresa y sedes (app `company`, frente B)
+
+- `GET/PATCH /api/v1/company/`: datos de la empresa, logo (`logo_id` de una imagen subida en `media/`, del mismo negocio; `null` lo quita), redes sociales (`instagram`, `facebook`, `tiktok`, `whatsapp`, `website`) y textos legales.
+- **Textos legales limpios**: `terms_html`, `privacy_html` y `cookies_html` se guardan con solo formato básico (párrafos, negritas, listas, títulos y enlaces `http`, `https`, `mailto` o `tel`). Se quitan scripts, estilos, iframes, imágenes y atributos como `onclick`, porque esos textos se muestran en las páginas públicas. Usa la librería estándar, sin dependencias nuevas (`company/sanitize.py`).
+- `GET/POST /api/v1/locations/` y `GET/PATCH/DELETE /api/v1/locations/{id}/`:
+  - Respeta el límite de sedes del plan (`409 plan_limit_reached`).
+  - Siempre hay exactamente una sede por defecto: se puede elegir otra, pero no quitarla ni borrarla (`default_location_required`).
+  - No se borra una sede que usa un profesional o un puesto (`409 location_in_use`). El borrado es lógico.
+- Permisos de la matriz §5 (recurso `company`): el propietario edita, el administrador solo ve y los demás roles reciben 403. Una sede de otro negocio da 404.
+- `catalog.services.location_in_use(location_id)` para la regla anterior.
+- 42 pruebas nuevas (permisos por rol, limpieza del HTML, logo de otro negocio, límite del plan, sede por defecto y aislamiento).
 ## M4 — Catálogo para el motor de disponibilidad (app `catalog`, frente B, tarea B4.1)
 
 Funciones públicas en `catalog/services.py` para el motor de disponibilidad y la creación de citas (M5, frente A). Todas buscan dentro del negocio activo.
@@ -66,7 +72,6 @@ Base del panel del negocio para trabajar M4 a M10 en paralelo sin choques (ver `
 - **El menú depende del rol y de los módulos** (matriz de la spec §5, en `features/dashboard/navigation.ts`, con tests por rol). Entrar por URL a una sección no permitida lleva al inicio del panel. `/panel` lleva a la primera sección visible.
 - Se elimina el panel provisional de M3. Cerrar sesión pasa a `useSignOut`, compartido con el panel del Super Admin.
 - Probado en el navegador como propietario y como profesional, en escritorio y a 375 px (sin desbordamiento horizontal).
-develop
 
 ## Fase 0 — Contratos compartidos (backend)
 
@@ -86,7 +91,6 @@ Base para trabajar M4 a M10 en paralelo sin choques (ver `docs/REPARTO.md`).
 - Archivos subidos en `MEDIA_ROOT` (`backend/mediafiles/`, ignorado en git).
 - **Cambio de entorno:** hay que aplicar las migraciones nuevas (`docker compose up -d api` las aplica al arrancar).
 - Pendiente para M5 (frente A): la configuración de agenda por tenant (`slot_step_min`, `min_notice_min`, `max_advance_days`, `cancel_min_hours`).
-develop
 
 ## M3 — Super Admin
 

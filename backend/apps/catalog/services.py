@@ -29,6 +29,14 @@ def get_professional(professional_id) -> Professional | None:
     return Professional.objects.filter(pk=professional_id).first()
 
 
+def location_in_use(location_id) -> bool:
+    """Si alguna ficha vigente (profesional o puesto) usa la sede: no se puede borrar."""
+    return (
+        Professional.objects.filter(location_id=location_id).exists()
+        or Resource.objects.filter(location_id=location_id).exists()
+    )
+
+
 def get_resource(resource_id) -> Resource | None:
     if not _is_uuid(resource_id):
         return None
