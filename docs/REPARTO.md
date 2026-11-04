@@ -4,16 +4,20 @@ Plan para que dos personas, cada una con su Claude, avancen en paralelo sin pisa
 
 El camino crítico es **M4 → M5**: casi todo lo demás depende de citas y disponibilidad.
 
-## Estado actual (2026-10-30)
+## Estado actual (2026-11-03)
 
 | Pieza | Responsable | Estado |
 |---|---|---|
 | Fase 0 backend (apps, modelos, migraciones, RLS, fábricas) | Yehiron | **En `develop`** (PR #2) |
 | Fase 0 frontend (textos por área, esqueleto del dashboard) | Yehiron | **En `develop`** (PR #3) |
 | App `media` (WebP) | Yehiron | **En `develop`** (PR #4) |
-| Frente A, M4 (horarios y bloqueos) | Diego | Por empezar |
+| Frente A, M4 (horarios y bloqueos) | Diego | **En `develop`** (PR #6) |
+| Configuración de agenda en `Tenant` (punto 1 de abajo) | Diego | En curso |
+| Frente B, M4 (empresa, catálogo, equipo, puestos y sus pantallas) | Yehiron | Sin PR todavía |
 
-Pruebas sobre `develop` (`269e801`): 424 en el backend y 51 en el frontend, todas en verde.
+Pruebas sobre `develop`: 454 en el backend y 51 en el frontend, todas en verde.
+
+`main` sigue en M0 (`12343f6`). El 31 de octubre un PR se mezcló a `main` por error (GitHub propone `main` como base por defecto) y se devolvió a M0; ver la regla 11.
 
 **Pendiente que dejó la Fase 0** (ver la sección "Lo que falta de la Fase 0").
 
@@ -36,7 +40,7 @@ Detectado al revisar lo que entró en `develop`. Cada punto tiene un dueño prop
 
 | # | Qué falta | Por qué importa | Dueño propuesto | Bloquea |
 |---|---|---|---|---|
-| 1 | **Configuración de agenda en `Tenant`**: `slot_step_min` (15), `min_notice_min` (60), `max_advance_days` (60), `cancel_min_hours` (2), con sus rangos | La lee el motor de disponibilidad (§8) y la reserva pública (§9) | A (en `tenancy`) | M5 |
+| 1 | **Configuración de agenda en `Tenant`**: `slot_step_min` (15), `min_notice_min` (60), `max_advance_days` (60), `cancel_min_hours` (2), con sus rangos | La lee el motor de disponibilidad (§8) y la reserva pública (§9) | A (en `tenancy`), **en curso** | M5 |
 | 2 | **Sede por defecto al crear un negocio**: `Professional` y `Resource` exigen una `Location`, pero el alta de empresa (M3) no crea ninguna | Sin ella, en un negocio nuevo no se puede crear ningún profesional ni puesto | B (`company` o el alta en `platform_admin`) | **M4** |
 | 3 | **Rutas públicas** de la §13: `/reservar`, `/cita/:token`, `/terminos`, `/privacidad`, `/cookies` | Sin ellas `App.tsx` no queda cerrado y habrá que volver a editarlo | B | M6 |
 | 4 | **`/me/` con los permisos del rol**, calculados desde la matriz del backend | Hoy el menú del frontend copia los roles: si cambia la matriz, las dos copias se desincronizan | A (en `accounts`) | — |
@@ -82,3 +86,5 @@ Hay una versión de referencia de los puntos 1, 2, 4 y 5 en la rama **local** `f
 8. **Antes de empezar una tarea, `git fetch` y revisa las ramas y PRs abiertos.** Así nadie repite trabajo que el otro ya subió. (La Fase 0 llegó a hacerse dos veces por no revisarlo.)
 9. **Un PR apunta a `develop`, no a la rama de otro PR.** Si depende de un PR abierto, se espera su merge o se avisa en la descripción y se cambia el destino a `develop` antes de mezclar.
 10. **Después de hacer pull de cambios con migraciones o dependencias**, recrea los contenedores: `docker compose up -d --force-recreate api web worker beat`.
+11. **Antes de pulsar "Create pull request", revisa que diga `base: develop`.** GitHub propone `main` por defecto. Antes de mezclar, espera el CI en verde y la revisión del otro.
+12. **Si una app ajena necesita una función nueva para tu frente**, agrégala mínima (solo lectura) en su `services.py` y avísale al dueño en el PR. Ejemplo: `catalog/services.py` del PR #6, que el frente B amplía en B4.1.

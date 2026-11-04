@@ -28,3 +28,6 @@ Thumbs.db
 
 # archivos subidos en desarrollo
 backend/mediafiles/
+
+# grafo de graphify (local, se regenera)
+graphify-out/

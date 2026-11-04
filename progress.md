@@ -2,15 +2,15 @@
 
 Estado del SaaS de agendamiento y plan a seguir. Se actualiza al cerrar cada hito o cada PR importante.
 
-**Corte:** 2026-10-30 · `develop` en `269e801` · `main` en M0 (espera la revisión del encargado).
+**Corte:** 2026-11-03 · `develop` en `4e18cf7` · `main` en M0 (`12343f6`, espera la revisión del encargado).
 
 ---
 
 ## 1. Resumen en 30 segundos
 
-- **Hecho:** M0 a M3 (base, multi-negocio, cuentas y panel del Super Admin), la **Fase 0** (contratos compartidos) y la primera pieza de M4 (imágenes en WebP).
-- **En curso:** M4, que se divide en dos frentes que trabajan en paralelo.
-- **Siguiente para el frente A:** la API de horarios y bloqueos (tarea A4.1 en adelante).
+- **Hecho:** M0 a M3 (base, multi-negocio, cuentas y panel del Super Admin), la **Fase 0** (contratos compartidos) y dos piezas de M4: imágenes en WebP (frente B) y la API de horarios y bloqueos (frente A).
+- **En curso:** M4. El frente A termina su parte con la configuración de agenda en `Tenant`; el frente B tiene pendientes empresa, catálogo, equipo, puestos y sus pantallas.
+- **Siguiente para el frente A:** configuración de agenda en `Tenant`, `/me/` con permisos y después M5 (motor de disponibilidad).
 - **Bloqueante conocido para M4:** al crear un negocio no se crea su sede, y sin sede no se pueden crear profesionales (ver §5).
 - **Recordatorio obligatorio:** la verificación en dos pasos (2FA) está **apagada en desarrollo** y hay que reactivarla antes de entregar (`pormejorar.md` §33).
 
@@ -42,6 +42,7 @@ Estado del SaaS de agendamiento y plan a seguir. Se actualiza al cerrar cada hit
 | **M3** — Super Admin | API y panel: empresas, planes, tema con contraste WCAG, módulos, dominios propios verificados por DNS, suspensión, auditoría; propietario con contraseña temporal | Diego | En `develop` |
 | **Fase 0** — Contratos compartidos | Apps registradas, modelos de la §6 con migraciones y RLS, anti doble reserva, fábricas y textos divididos, esqueleto del dashboard | Yehiron (PR #2 y #3) | En `develop` |
 | **M4** (parcial) — Imágenes | App `media`: subida de imágenes convertidas a WebP con variantes de 200, 800 y 1600 px | Yehiron (PR #4) | En `develop` |
+| **M4** (parcial) — Horarios y bloqueos | `GET/PUT professionals/{id}/working-hours/`, CRUD `time-blocks/` con 409 si chocan con citas, alcance "solo lo propio" para el profesional, fechas en la zona del negocio | Diego (PR #6) | En `develop` |
 
 ### Qué hay en el código hoy
 
@@ -53,9 +54,9 @@ Estado del SaaS de agendamiento y plan a seguir. Se actualiza al cerrar cada hit
 | `accounts` | Usuarios, roles, sesión, 2FA, recuperación y cambio de contraseña, matriz de permisos |
 | `platform_admin` | API del Super Admin y registro de auditoría |
 | `company` | Datos de la empresa y sedes (`Location`) |
-| `catalog` | Categorías, servicios, especialidades, profesionales, servicios por profesional y puestos (solo modelos) |
-| `scheduling` | Horarios de trabajo y bloqueos de agenda (solo modelos) |
-| `booking` | Clientes, citas y servicios de cada cita, con la restricción anti doble reserva (solo modelos) |
+| `catalog` | Categorías, servicios, especialidades, profesionales, servicios por profesional y puestos (modelos y un `services.py` mínimo de lectura) |
+| `scheduling` | Horarios de trabajo y bloqueos de agenda, con su API (`working-hours/`, `time-blocks/`) |
+| `booking` | Clientes, citas y servicios de cada cita, con la restricción anti doble reserva (modelos y `overlapping_appointments`) |
 | `media` | Subida de imágenes a WebP (`POST /api/v1/media/`) |
 | `commissions`, `notifications`, `reports` | Registradas y vacías |
 
@@ -66,7 +67,7 @@ Estado del SaaS de agendamiento y plan a seguir. Se actualiza al cerrar cada hit
 - Textos en español e inglés, divididos por área.
 
 **Calidad:**
-- Pruebas: **424** en el backend y **51** en el frontend, todas en verde sobre `269e801`. Ruff, mypy, ESLint y tipos limpios.
+- Pruebas: **454** en el backend y **51** en el frontend, todas en verde sobre `develop`. Ruff, mypy, ESLint y tipos limpios.
 - Prueba guardiana: falla si una tabla de negocio queda sin RLS.
 - El CI valida además la documentación OpenAPI sin avisos.
 
@@ -111,7 +112,6 @@ La rama **local** `feat/f0-contratos` (no subida) tiene una versión de referenc
 - **Si el módulo `commissions` tiene pantalla propia** o se ve dentro de `/reportes`.
 
 ### Documentación por subir
-- `docs/REPARTO.md` actualizado y este `progress.md` están en la rama `docs/reparto-estado`, sin commit.
 - `docs/PLAN-DESARROLLO.md` (tareas numeradas) y `docs/CONTRATOS.md` solo existen en la rama local `feat/f0-contratos`. Hay que adaptarlos a la Fase 0 de Yehiron antes de subirlos.
 
 ---
@@ -122,7 +122,7 @@ El camino crítico es **M4 → M5**: casi todo lo demás depende de citas y disp
 
 | Hito | Frente A (Diego) | Frente B (Yehiron) | Criterio de aceptación |
 |---|---|---|---|
-| **M4** | Contrato OpenAPI de horarios y bloqueos (A4.1); API de horarios (A4.2); bloqueos con 409 si chocan con citas (A4.3); permisos "solo lo propio" (A4.4) | Sede por defecto; funciones del catálogo para A (B4.1); API de empresa, sedes, catálogo, profesionales y puestos; límites del plan; pantallas `/empresa`, `/servicios`, `/equipo`, `/puestos`, `/horarios` | CRUD completo con permisos; imágenes en WebP |
+| **M4** | ~~Horarios y bloqueos (A4.1 a A4.4)~~ hecho en el PR #6; configuración de agenda en `Tenant`; `/me/` con permisos | Sede por defecto; funciones del catálogo para A (B4.1); API de empresa, sedes, catálogo, profesionales y puestos; límites del plan; pantallas `/empresa`, `/servicios`, `/equipo`, `/puestos`, `/horarios` | CRUD completo con permisos; imágenes en WebP |
 | **M5** | Configuración de agenda; motor de disponibilidad (§8) con caché; crear cita con revalidación; estados y reprogramación; API de citas del dashboard; prueba de concurrencia | `seed_demo` (primera tarea, A lo necesita); terminar pantallas de M4; preparar mocks de M6 | 20 POST simultáneos al mismo hueco: 1 cita y 19 respuestas 409 |
 | **M6** | API pública: empresa, servicios, profesionales, días y horarios disponibles, crear cita (consentimiento, límites, honeypot) y gestión por token | Asistente `/reservar`, `/cita/:token`, páginas legales, banner de cookies | Reserva completa en móvil en menos de 60 s; la cancelación respeta la ventana |
 | **M7** | Endpoint SSE con el negocio activo dentro del streaming; API de clientes | `/agenda` en vista de día y semana con SSE, `/citas` y `/clientes` | Una cita creada en la web aparece en la agenda abierta sin recargar |
@@ -152,9 +152,10 @@ El camino crítico es **M4 → M5**: casi todo lo demás depende de citas y disp
 1. **2FA apagado en desarrollo.** Reactivarlo es obligatorio antes de entregar (`pormejorar.md` §33).
 2. **Claves foráneas entre negocios.** RLS impide *ver* datos de otro negocio pero no *enlazarlos*. Cada `services.py` debe buscar los ids recibidos dentro del negocio activo antes de usarlos.
 3. **Servidor de desarrollo.** Los contenedores usan `runserver`, que no sirve para producción (`pormejorar.md` §4).
-4. **Docker Desktop en Windows** se apaga con frecuencia. Si aparece el error de `dockerInference`: Quit, volver a abrir y, si sigue, `wsl --shutdown`.
-5. **Imágenes en producción.** Falta definir cómo se sirven los archivos subidos (`pormejorar.md` §34).
-6. **Copias de seguridad.** No existen todavía; deben estar antes de tener un negocio piloto (`pormejorar.md` §23).
+4. **PR con destino equivocado.** GitHub propone `main` como base: el PR #5 se mezcló ahí por error y `main` se devolvió a M0. El PC de Diego tiene un hook local `pre-push` que rechaza los push a `main` (conviene que Yehiron ponga el mismo), y hay que revisar "base: develop" antes de crear el PR (`docs/REPARTO.md`, regla 11).
+5. **Docker Desktop en Windows** se apaga con frecuencia. Si aparece el error de `dockerInference`: Quit, volver a abrir y, si sigue, `wsl --shutdown`.
+6. **Imágenes en producción.** Falta definir cómo se sirven los archivos subidos (`pormejorar.md` §34).
+7. **Copias de seguridad.** No existen todavía; deben estar antes de tener un negocio piloto (`pormejorar.md` §23).
 
 ---
 
