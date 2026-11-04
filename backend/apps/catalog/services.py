@@ -10,9 +10,15 @@ from collections.abc import Iterable
 from dataclasses import dataclass
 from decimal import ROUND_HALF_UP, Decimal
 
-from django.db.models import Count, Q
+from django.db import transaction
+from django.db.models import Count, Q, QuerySet
+from django.utils import timezone
 
-from .models import Professional, ProfessionalService, Resource, Service
+from apps.accounts import permissions as perms
+from apps.media import services as media
+from config.api import ApiError
+
+from .models import Professional, ProfessionalService, Resource, Service, ServiceCategory
 
 
 def _is_uuid(value) -> bool:
@@ -175,3 +181,213 @@ def _first(override, default):
 
 def _money(value: Decimal) -> Decimal:
     return Decimal(value).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+
+
+# --- Gestión del catálogo desde el panel (M4) ---------------------------------------------------
+#
+# Permisos: recurso `staff_services` de la matriz §5. Propietario y administrador hacen CRUD,
+# recepción solo ve y el profesional solo ve lo propio (los servicios que ofrece). Las vistas
+# revisan la acción; aquí se aplica el alcance.
+
+
+def _invalid(field: str, message: str) -> ApiError:
+    return ApiError("validation_error", "Datos inválidos.", 400, {field: [message]})
+
+
+def not_found(entity: str) -> ApiError:
+    return ApiError("not_found", f"{entity} no encontrado.", 404)
+
+
+def _own_professional_id(user):
+    """Ficha del profesional en sesión cuando su alcance es "solo lo propio"; None si ve todo."""
+    if perms.scope_for(user.role, perms.STAFF_SERVICES, "view") != perms.OWN:
+        return None
+    professional = professional_for_user(user)
+    # Sin ficha enlazada no tiene nada propio: un id que no existe filtra todo.
+    return professional.pk if professional else uuid.UUID(int=0)
+
+
+def _soft_delete(instance) -> None:
+    instance.deleted_at = timezone.now()
+    instance.save(update_fields=["deleted_at", "updated_at"])
+
+
+# Categorías
+
+
+def list_categories(user) -> QuerySet[ServiceCategory]:
+    categories = ServiceCategory.objects.order_by("sort_order", "name", "pk")
+    own = _own_professional_id(user)
+    if own is not None:
+        categories = categories.filter(
+            services__professional_links__professional_id=own,
+            services__professional_links__deleted_at__isnull=True,
+            services__deleted_at__isnull=True,
+        ).distinct()
+    return categories
+
+
+def get_category(user, category_id) -> ServiceCategory:
+    if not _is_uuid(category_id):
+        raise not_found("Categoría")
+    category = list_categories(user).filter(pk=category_id).first()
+    if category is None:
+        raise not_found("Categoría")
+    return category
+
+
+def create_category(*, name: str, sort_order: int = 0) -> ServiceCategory:
+    return ServiceCategory.objects.create(name=name, sort_order=sort_order)
+
+
+def update_category(category: ServiceCategory, **changes) -> ServiceCategory:
+    for field in ("name", "sort_order"):
+        if field in changes:
+            setattr(category, field, changes[field])
+    category.save()
+    return category
+
+
+def delete_category(category: ServiceCategory) -> None:
+    """Borrado lógico. Una categoría con servicios vigentes no se borra: se mueven antes."""
+    if Service.objects.filter(category=category).exists():
+        raise ApiError(
+            "category_in_use",
+            "La categoría tiene servicios: muévelos o elimínalos antes.",
+            409,
+        )
+    _soft_delete(category)
+
+
+# Servicios
+
+
+def list_services(user, *, category_id=None, is_active: bool | None = None) -> QuerySet[Service]:
+    services = Service.objects.select_related("category", "image").order_by(
+        "category__sort_order", "category__name", "name", "pk"
+    )
+    own = _own_professional_id(user)
+    if own is not None:
+        services = services.filter(
+            professional_links__professional_id=own,
+            professional_links__deleted_at__isnull=True,
+        ).distinct()
+    if category_id is not None:
+        if not _is_uuid(category_id):
+            return services.none()
+        services = services.filter(category_id=category_id)
+    if is_active is not None:
+        services = services.filter(is_active=is_active)
+    return services
+
+
+def get_service(user, service_id) -> Service:
+    if not _is_uuid(service_id):
+        raise not_found("Servicio")
+    service = list_services(user).filter(pk=service_id).first()
+    if service is None:
+        raise not_found("Servicio")
+    return service
+
+
+def _apply_service_changes(service: Service, changes: dict) -> None:
+    if "category_id" in changes:
+        category = ServiceCategory.objects.filter(pk=changes.pop("category_id")).first()
+        if category is None:
+            raise _invalid("category_id", "La categoría no existe.")
+        service.category = category
+    if "image_id" in changes:
+        image_id = changes.pop("image_id")
+        image = None if image_id is None else media.get_media(image_id)
+        if image_id is not None and image is None:
+            raise _invalid("image_id", "La imagen no existe.")
+        service.image = image
+    for field in (
+        "name",
+        "description",
+        "duration_min",
+        "buffer_min",
+        "price",
+        "is_active",
+        "requires_resource",
+    ):
+        if field in changes:
+            setattr(service, field, changes[field])
+
+
+def create_service(**data) -> Service:
+    service = Service()
+    _apply_service_changes(service, data)
+    service.save()
+    return service
+
+
+def update_service(service: Service, **changes) -> Service:
+    _apply_service_changes(service, changes)
+    service.save()
+    return service
+
+
+@transaction.atomic
+def delete_service(service: Service) -> None:
+    """Borrado lógico del servicio y de su oferta en cada profesional. Las citas pasadas lo
+    conservan (su `AppointmentItem` guarda precio y duración)."""
+    ProfessionalService.objects.filter(service=service).update(deleted_at=timezone.now())
+    _soft_delete(service)
+
+
+# Puestos
+
+
+def _require_all_scope(user) -> None:
+    """Los puestos no tienen "lo propio": quien solo ve lo suyo no los gestiona."""
+    if perms.scope_for(user.role, perms.STAFF_SERVICES, "view") != perms.ALL:
+        raise ApiError("permission_denied", "No tienes permiso para esta acción.", 403)
+
+
+def list_resources(user) -> QuerySet[Resource]:
+    _require_all_scope(user)
+    return Resource.objects.select_related("location").order_by("name", "pk")
+
+
+def get_resource_for(user, resource_id) -> Resource:
+    resource = (
+        list_resources(user).filter(pk=resource_id).first() if _is_uuid(resource_id) else None
+    )
+    if resource is None:
+        raise not_found("Puesto")
+    return resource
+
+
+def _resource_location(tenant, location_id):
+    from apps.company import services as company  # company importa este módulo
+
+    if location_id is None:
+        return company.get_default_location(tenant)
+    location = company.find_location(location_id)
+    if location is None:
+        raise _invalid("location_id", "La sede no existe.")
+    return location
+
+
+def create_resource(tenant, *, name: str, kind: str = "", is_active: bool = True, location_id=None):
+    return Resource.objects.create(
+        location=_resource_location(tenant, location_id),
+        name=name,
+        kind=kind,
+        is_active=is_active,
+    )
+
+
+def update_resource(tenant, resource: Resource, **changes) -> Resource:
+    if "location_id" in changes:
+        resource.location = _resource_location(tenant, changes.pop("location_id"))
+    for field in ("name", "kind", "is_active"):
+        if field in changes:
+            setattr(resource, field, changes[field])
+    resource.save()
+    return resource
+
+
+def delete_resource(resource: Resource) -> None:
+    _soft_delete(resource)

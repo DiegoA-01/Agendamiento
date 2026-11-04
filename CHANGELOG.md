@@ -31,6 +31,21 @@
 - Borrado lógico: reemplazar la semana y borrar un bloqueo marcan `deleted_at`.
 - Servicios públicos nuevos: `scheduling/services.py`, `booking.services.overlapping_appointments` y un `catalog/services.py` mínimo de solo lectura (`get_professional`, `get_resource`, `professional_for_user`), que el frente B amplía en B4.1.
 
+## M4 — Categorías, servicios y puestos (app `catalog`, frente B)
+
+- CRUD de `categories/`, `services/` y `resources/` (con `GET/PATCH/DELETE` por id). Borrado lógico.
+- Permisos de la matriz §5 (recurso `staff_services`): propietario y administrador hacen CRUD y recepción solo ve. El profesional solo ve **lo propio**: los servicios que ofrece y sus categorías; un servicio ajeno da 404. Los puestos no tienen "lo propio": el profesional recibe 403.
+- Servicios:
+  - Precio como texto decimal (`"30000.00"`), mínimo 0 y con 2 decimales.
+  - Duración de 5 a 1440 minutos y buffer de 0 a 240.
+  - `image_id` de `media/`, del mismo negocio.
+  - Filtros `category_id` e `is_active`.
+  - Borrar un servicio lo quita también de cada profesional; las citas pasadas conservan su precio y duración en `AppointmentItem`.
+- Una categoría con servicios no se borra (`409 category_in_use`).
+- Un puesto sin `location_id` va a la sede por defecto. Una categoría, imagen o sede de otro negocio da 400 en el campo, y un registro de otro negocio da 404.
+- `company.services.find_location(id)` para validar la sede sin lanzar error.
+- 48 pruebas nuevas.
+
 ## M4 — Empresa y sedes (app `company`, frente B)
 
 - `GET/PATCH /api/v1/company/`: datos de la empresa, logo (`logo_id` de una imagen subida en `media/`, del mismo negocio; `null` lo quita), redes sociales (`instagram`, `facebook`, `tiktok`, `whatsapp`, `website`) y textos legales.
