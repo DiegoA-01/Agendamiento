@@ -36,6 +36,19 @@
 - Borrado lógico: reemplazar la semana y borrar un bloqueo marcan `deleted_at`.
 - Servicios públicos nuevos: `scheduling/services.py`, `booking.services.overlapping_appointments` y un `catalog/services.py` mínimo de solo lectura (`get_professional`, `get_resource`, `professional_for_user`), que el frente B amplía en B4.1.
 
+## M4 — Equipo y servicios de cada profesional (app `catalog`, frente B)
+
+- `professionals/` CRUD:
+  - Ficha con `display_name`, `bio`, foto (`photo_id` de `media/`), especialidades (`specialty_ids`), comisión por defecto (0 a 100, dos decimales), `is_active` y `accepts_online_booking`.
+  - Cuenta enlazada (`user_id`): debe ser del mismo negocio y solo puede tener una ficha.
+  - Sede: sin indicarla se usa la sede por defecto.
+- **Límite del plan** (`max_professionals`): `409 plan_limit_reached`. Borrar una ficha (borrado lógico) libera el cupo y deja de ofrecer sus servicios.
+- `GET/PUT professionals/{id}/services/`: servicios que ofrece el profesional con sus overrides (precio, comisión, duración). `PUT` reemplaza la lista completa: conserva el id de los que siguen, crea los nuevos y da de baja los que faltan. Es lo que lee `catalog.services.quote` para el motor de disponibilidad.
+- `specialties/` (listar, crear, renombrar, borrar). Borrar una especialidad la quita de las fichas.
+- Permisos de la matriz §5 (`staff_services`): propietario y administrador editan, recepción ve y el profesional ve **solo su ficha** (otra da 404). Asignar servicios cuenta como editar.
+- `accounts.services.get_tenant_user(tenant, user_id)`: búsqueda de solo lectura en `accounts` para enlazar la cuenta (regla 12 del reparto).
+- 21 pruebas nuevas.
+
 ## M4 — Categorías, servicios y puestos (app `catalog`, frente B)
 
 - CRUD de `categories/`, `services/` y `resources/` (con `GET/PATCH/DELETE` por id). Borrado lógico.

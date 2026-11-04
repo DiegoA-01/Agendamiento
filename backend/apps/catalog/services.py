@@ -18,7 +18,15 @@ from apps.accounts import permissions as perms
 from apps.media import services as media
 from config.api import ApiError
 
-from .models import Professional, ProfessionalService, Resource, Service, ServiceCategory
+from .models import (
+    Professional,
+    ProfessionalService,
+    ProfessionalSpecialty,
+    Resource,
+    Service,
+    ServiceCategory,
+    Specialty,
+)
 
 
 def _is_uuid(value) -> bool:
@@ -359,7 +367,7 @@ def get_resource_for(user, resource_id) -> Resource:
     return resource
 
 
-def _resource_location(tenant, location_id):
+def _location_or_default(tenant, location_id):
     from apps.company import services as company  # company importa este módulo
 
     if location_id is None:
@@ -372,7 +380,7 @@ def _resource_location(tenant, location_id):
 
 def create_resource(tenant, *, name: str, kind: str = "", is_active: bool = True, location_id=None):
     return Resource.objects.create(
-        location=_resource_location(tenant, location_id),
+        location=_location_or_default(tenant, location_id),
         name=name,
         kind=kind,
         is_active=is_active,
@@ -381,7 +389,7 @@ def create_resource(tenant, *, name: str, kind: str = "", is_active: bool = True
 
 def update_resource(tenant, resource: Resource, **changes) -> Resource:
     if "location_id" in changes:
-        resource.location = _resource_location(tenant, changes.pop("location_id"))
+        resource.location = _location_or_default(tenant, changes.pop("location_id"))
     for field in ("name", "kind", "is_active"):
         if field in changes:
             setattr(resource, field, changes[field])
@@ -391,3 +399,208 @@ def update_resource(tenant, resource: Resource, **changes) -> Resource:
 
 def delete_resource(resource: Resource) -> None:
     _soft_delete(resource)
+
+
+# Especialidades
+
+
+def list_specialties() -> QuerySet[Specialty]:
+    return Specialty.objects.order_by("name", "pk")
+
+
+def get_specialty(specialty_id) -> Specialty:
+    specialty = (
+        list_specialties().filter(pk=specialty_id).first() if _is_uuid(specialty_id) else None
+    )
+    if specialty is None:
+        raise not_found("Especialidad")
+    return specialty
+
+
+def create_specialty(*, name: str) -> Specialty:
+    return Specialty.objects.create(name=name)
+
+
+def update_specialty(specialty: Specialty, *, name: str) -> Specialty:
+    specialty.name = name
+    specialty.save()
+    return specialty
+
+
+@transaction.atomic
+def delete_specialty(specialty: Specialty) -> None:
+    ProfessionalSpecialty.objects.filter(specialty=specialty).delete()
+    _soft_delete(specialty)
+
+
+# Equipo (profesionales)
+
+
+def list_professionals(user) -> QuerySet[Professional]:
+    professionals = Professional.objects.select_related("photo", "location").order_by(
+        "display_name", "pk"
+    )
+    own = _own_professional_id(user)
+    if own is not None:
+        professionals = professionals.filter(pk=own)
+    return professionals
+
+
+def get_professional_for(user, professional_id) -> Professional:
+    professional = (
+        list_professionals(user).filter(pk=professional_id).first()
+        if _is_uuid(professional_id)
+        else None
+    )
+    if professional is None:
+        raise not_found("Profesional")
+    return professional
+
+
+def with_specialties(professionals: Iterable[Professional]) -> list[Professional]:
+    """Agrega `specialty_id_list` a cada ficha (para serializar) con una sola consulta."""
+    professionals = list(professionals)
+    by_professional: dict[uuid.UUID, list[uuid.UUID]] = {p.pk: [] for p in professionals}
+    links = ProfessionalSpecialty.objects.filter(professional__in=professionals).order_by(
+        "specialty__name"
+    )
+    for professional_id, specialty_id in links.values_list("professional_id", "specialty_id"):
+        by_professional[professional_id].append(specialty_id)
+    for professional in professionals:
+        professional.specialty_id_list = by_professional[professional.pk]
+    return professionals
+
+
+def _set_specialties(professional: Professional, ids: list) -> None:
+    wanted = list(dict.fromkeys(ids))
+    found = set(Specialty.objects.filter(pk__in=wanted).values_list("pk", flat=True))
+    if len(found) != len(wanted):
+        raise _invalid("specialty_ids", "Alguna especialidad no existe.")
+    ProfessionalSpecialty.objects.filter(professional=professional).exclude(
+        specialty_id__in=wanted
+    ).delete()
+    current = set(
+        ProfessionalSpecialty.objects.filter(professional=professional).values_list(
+            "specialty_id", flat=True
+        )
+    )
+    for specialty_id in wanted:
+        if specialty_id not in current:
+            ProfessionalSpecialty.objects.create(
+                professional=professional, specialty_id=specialty_id
+            )
+
+
+def _apply_professional_changes(tenant, professional: Professional, changes: dict) -> None:
+    from apps.accounts import services as accounts  # accounts no depende de catalog
+
+    if "user_id" in changes:
+        user_id = changes.pop("user_id")
+        account = None if user_id is None else accounts.get_tenant_user(tenant, user_id)
+        if user_id is not None and account is None:
+            raise _invalid("user_id", "La cuenta no existe en este negocio.")
+        taken = (
+            account is not None
+            and Professional.objects.filter(user_id=account.pk).exclude(pk=professional.pk).exists()
+        )
+        if taken:
+            raise _invalid("user_id", "Esa cuenta ya tiene una ficha de profesional.")
+        professional.user = account
+    if "location_id" in changes:
+        professional.location = _location_or_default(tenant, changes.pop("location_id"))
+    elif professional.location_id is None:
+        professional.location = _location_or_default(tenant, None)
+    if "photo_id" in changes:
+        photo_id = changes.pop("photo_id")
+        photo = None if photo_id is None else media.get_media(photo_id)
+        if photo_id is not None and photo is None:
+            raise _invalid("photo_id", "La imagen no existe.")
+        professional.photo = photo
+    for field in (
+        "display_name",
+        "bio",
+        "default_commission_pct",
+        "is_active",
+        "accepts_online_booking",
+    ):
+        if field in changes:
+            setattr(professional, field, changes[field])
+
+
+@transaction.atomic
+def create_professional(tenant, **data) -> Professional:
+    """Alta en el equipo, dentro del límite del plan (`max_professionals`)."""
+    if Professional.objects.count() >= tenant.plan.max_professionals:
+        raise ApiError(
+            "plan_limit_reached",
+            "Tu plan no admite más profesionales.",
+            409,
+            {"max_professionals": [str(tenant.plan.max_professionals)]},
+        )
+    specialties = data.pop("specialty_ids", None)
+    professional = Professional()
+    _apply_professional_changes(tenant, professional, data)
+    professional.save()
+    if specialties is not None:
+        _set_specialties(professional, specialties)
+    return professional
+
+
+@transaction.atomic
+def update_professional(tenant, professional: Professional, **changes) -> Professional:
+    specialties = changes.pop("specialty_ids", None)
+    _apply_professional_changes(tenant, professional, changes)
+    professional.save()
+    if specialties is not None:
+        _set_specialties(professional, specialties)
+    return professional
+
+
+@transaction.atomic
+def delete_professional(professional: Professional) -> None:
+    """Borrado lógico de la ficha y de los servicios que ofrecía. Libera el cupo del plan y la
+    cuenta enlazada (que puede enlazarse a otra ficha)."""
+    ProfessionalService.objects.filter(professional=professional).update(deleted_at=timezone.now())
+    _soft_delete(professional)
+
+
+# Servicios de cada profesional (con overrides)
+
+
+def list_offered_services(professional: Professional) -> QuerySet[ProfessionalService]:
+    return (
+        ProfessionalService.objects.filter(professional=professional)
+        .select_related("service")
+        .order_by("service__name", "pk")
+    )
+
+
+@transaction.atomic
+def replace_offered_services(professional: Professional, offers: list[dict]):
+    """Reemplaza la lista completa de servicios que ofrece el profesional, con sus overrides.
+
+    Los que ya estaban se actualizan (se conserva su id), los nuevos se crean y los que faltan se
+    dan de baja (borrado lógico).
+    """
+    ids = [offer["service_id"] for offer in offers]
+    if len(set(ids)) != len(ids):
+        raise _invalid("services", "Hay servicios repetidos.")
+    found = set(Service.objects.filter(pk__in=ids).values_list("pk", flat=True))
+    missing = [str(value) for value in ids if value not in found]
+    if missing:
+        raise _invalid("services", f"Servicios inexistentes: {', '.join(missing)}.")
+
+    current = {link.service_id: link for link in list_offered_services(professional)}
+    for service_id, link in current.items():
+        if service_id not in found:
+            link.deleted_at = timezone.now()
+            link.save(update_fields=["deleted_at", "updated_at"])
+    for offer in offers:
+        link = current.get(offer["service_id"]) or ProfessionalService(
+            professional=professional, service_id=offer["service_id"]
+        )
+        link.price_override = offer.get("price_override")
+        link.commission_pct_override = offer.get("commission_pct_override")
+        link.duration_override_min = offer.get("duration_override_min")
+        link.save()
+    return list_offered_services(professional)
