@@ -1,9 +1,15 @@
 # Changelog
 
+feat/f0-me-permissions
 ## Fase 0 (pendiente) — `/me/` con los permisos del rol
 
 - `GET /api/v1/me/` agrega `permissions`: `{recurso: {"scope": "all" | "own", "actions": [...]}}`, calculado con `permissions_for_role` desde la misma matriz que valida la API (spec §5). Ejemplo para un profesional: `"appointments": {"scope": "own", "actions": ["complete", "no_show", "view"]}`. Solo guía a la interfaz; la API sigue validando cada petición.
 - El menú del panel deja de copiar los roles: cada sección declara el recurso que necesita ver (y si exige verlo todo, como `/clientes` y `/puestos`) y se muestra según esos permisos. Si cambia la matriz del backend, el menú cambia solo. Los menús por rol quedan igual que antes.
+
+## Fase 0 (pendiente) — Polling de Vite en Docker
+
+- `frontend/vite.config.ts` vigila los archivos por sondeo cuando `VITE_USE_POLLING=1`, y `docker-compose.yml` lo activa en el servicio `web`. En Docker sobre Windows la carpeta compartida no avisa los cambios, y sin esto el navegador seguía mostrando código viejo hasta recrear el contenedor. Fuera de Docker no cambia nada.
+ develop
 
 ## Fase 0 (pendiente) — Configuración de agenda del negocio (frente A)
 
