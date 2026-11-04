@@ -43,6 +43,19 @@ feat/f0-me-permissions
 - Servicios públicos nuevos: `scheduling/services.py`, `booking.services.overlapping_appointments` y un `catalog/services.py` mínimo de solo lectura (`get_professional`, `get_resource`, `professional_for_user`), que el frente B amplía en B4.1.
 
 feat/m4-media
+ feat/m4-company-api
+## M4 — Empresa y sedes (app `company`, frente B)
+
+- `GET/PATCH /api/v1/company/`: datos de la empresa, logo (`logo_id` de una imagen subida en `media/`, del mismo negocio; `null` lo quita), redes sociales (`instagram`, `facebook`, `tiktok`, `whatsapp`, `website`) y textos legales.
+- **Textos legales limpios**: `terms_html`, `privacy_html` y `cookies_html` se guardan con solo formato básico (párrafos, negritas, listas, títulos y enlaces `http`, `https`, `mailto` o `tel`). Se quitan scripts, estilos, iframes, imágenes y atributos como `onclick`, porque esos textos se muestran en las páginas públicas. Usa la librería estándar, sin dependencias nuevas (`company/sanitize.py`).
+- `GET/POST /api/v1/locations/` y `GET/PATCH/DELETE /api/v1/locations/{id}/`:
+  - Respeta el límite de sedes del plan (`409 plan_limit_reached`).
+  - Siempre hay exactamente una sede por defecto: se puede elegir otra, pero no quitarla ni borrarla (`default_location_required`).
+  - No se borra una sede que usa un profesional o un puesto (`409 location_in_use`). El borrado es lógico.
+- Permisos de la matriz §5 (recurso `company`): el propietario edita, el administrador solo ve y los demás roles reciben 403. Una sede de otro negocio da 404.
+- `catalog.services.location_in_use(location_id)` para la regla anterior.
+- 42 pruebas nuevas (permisos por rol, limpieza del HTML, logo de otro negocio, límite del plan, sede por defecto y aislamiento).
+
 ## M4 — Catálogo para el motor de disponibilidad (app `catalog`, frente B, tarea B4.1)
 
 Funciones públicas en `catalog/services.py` para el motor de disponibilidad y la creación de citas (M5, frente A). Todas buscan dentro del negocio activo.
@@ -52,6 +65,7 @@ Funciones públicas en `catalog/services.py` para el motor de disponibilidad y l
 - `quote(professional, services)`: precio, duración y comisión de cada servicio con los overrides del profesional (override > valor del servicio o comisión por defecto; un override en 0 se respeta). Devuelve el total, la duración total (suma de duraciones + el buffer del **último** servicio, §8.1) y si hace falta puesto. `None` si el profesional no ofrece alguno de los servicios. Sus valores son los que se congelan en `AppointmentItem`.
 - `requires_resource(services)` y `active_resources(location_id=None)` para exigir un puesto libre (§8.5).
 - 16 pruebas nuevas, incluido el aislamiento entre negocios.
+develop
 
 ## M4 — Imágenes (app `media`)
 
