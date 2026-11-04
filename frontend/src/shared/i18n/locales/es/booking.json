@@ -1,0 +1,22 @@
+{
+  "booking": {
+    "comingSoon": "Esta página llega en el hito {{milestone}}.",
+    "pages": {
+      "book": {
+        "title": "Reservar una cita"
+      },
+      "manage": {
+        "title": "Tu cita"
+      },
+      "terms": {
+        "title": "Términos y condiciones"
+      },
+      "privacy": {
+        "title": "Política de privacidad"
+      },
+      "cookies": {
+        "title": "Política de cookies"
+      }
+    }
+  }
+}

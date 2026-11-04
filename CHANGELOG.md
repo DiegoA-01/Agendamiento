@@ -1,5 +1,10 @@
 # Changelog
 
+## Fase 0 (pendiente) — Rutas públicas del negocio
+
+- El host del negocio ya tiene las rutas públicas de la spec §13: `/reservar`, `/cita/:token`, `/terminos`, `/privacidad` y `/cookies`. Por ahora muestran su título traducido, el selector de idioma y "Esta página llega en el hito M6". Con esto `App.tsx` queda cerrado: M6 solo reemplaza el contenido de cada página.
+- Textos en `locales/{es,en}/booking.json` (área nueva `booking`).
+
 ## Fase 0 (pendiente) — Configuración de agenda del negocio (frente A)
 
 - `Tenant` gana cuatro reglas de agenda (spec §8 y §9), con los valores por defecto de la spec: `slot_step_min` 15 (de 5 a 120), `min_notice_min` 60 (hasta 7 días), `max_advance_days` 60 (de 1 a 365) y `cancel_min_hours` 2 (hasta 7 días). Los rangos se validan en el modelo y también con restricciones en la base. Migración `tenancy/0002`.
