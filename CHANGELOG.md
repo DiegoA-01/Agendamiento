@@ -75,6 +75,7 @@
 - Permisos de la matriz §5 (recurso `company`): el propietario edita, el administrador solo ve y los demás roles reciben 403. Una sede de otro negocio da 404.
 - `catalog.services.location_in_use(location_id)` para la regla anterior.
 - 42 pruebas nuevas (permisos por rol, limpieza del HTML, logo de otro negocio, límite del plan, sede por defecto y aislamiento).
+
 ## M4 — Catálogo para el motor de disponibilidad (app `catalog`, frente B, tarea B4.1)
 
 Funciones públicas en `catalog/services.py` para el motor de disponibilidad y la creación de citas (M5, frente A). Todas buscan dentro del negocio activo.
