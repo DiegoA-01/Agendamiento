@@ -8,6 +8,9 @@ from rest_framework.permissions import BasePermission
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from apps.accounts import permissions as perms
+from apps.tenancy import services as tenancy
+
 from . import serializers
 from . import services as scheduling
 
@@ -45,6 +48,28 @@ CONFLICT_RESPONSE = OpenApiResponse(
     serializers.TimeBlockConflictSerializer,
     description="El bloqueo choca con citas activas (`time_block_conflict`).",
 )
+
+
+class AgendaSettingsView(TenantView):
+    """Reglas de agenda del negocio. Son datos de la empresa: el propietario las edita y el
+    administrador las ve (matriz §5)."""
+
+    def get_permissions(self):
+        action = "view" if self.request.method == "GET" else "update"
+        return [IsTenantUser(), perms.permission_for(perms.COMPANY, action)()]
+
+    @extend_schema(responses=serializers.AgendaSettingsSerializer)
+    def get(self, request):
+        return Response(tenancy.agenda_settings(request.tenant))
+
+    @extend_schema(
+        request=serializers.AgendaSettingsSerializer(partial=True),
+        responses=serializers.AgendaSettingsSerializer,
+    )
+    def patch(self, request):
+        data = serializers.AgendaSettingsSerializer(data=request.data, partial=True)
+        data.is_valid(raise_exception=True)
+        return Response(tenancy.update_agenda_settings(request.tenant, **data.validated_data))
 
 
 class WorkingHoursView(TenantView):

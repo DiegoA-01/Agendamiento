@@ -22,6 +22,7 @@ __all__ = [
     "activate_tenant",
     "add_custom_domain",
     "admin_host",
+    "agenda_settings",
     "create_plan",
     "create_tenant",
     "delete_plan",
@@ -47,6 +48,7 @@ __all__ = [
     "suspend_tenant",
     "sync_modules_from_plan",
     "tenant_context",
+    "update_agenda_settings",
     "update_plan",
     "update_tenant",
     "verify_domain",
@@ -213,6 +215,27 @@ def update_tenant(tenant: Tenant, **changes: Any) -> Tenant:
         if plan_changed:
             sync_modules_from_plan(tenant)
     return tenant
+
+
+AGENDA_SETTINGS_FIELDS = ("slot_step_min", "min_notice_min", "max_advance_days", "cancel_min_hours")
+
+
+def agenda_settings(tenant: Tenant) -> dict[str, int]:
+    """Reglas de agenda del negocio: las usan la disponibilidad (M5) y la reserva pública (M6)."""
+    return {field: getattr(tenant, field) for field in AGENDA_SETTINGS_FIELDS}
+
+
+def update_agenda_settings(tenant: Tenant, **changes: int) -> dict[str, int]:
+    unknown = set(changes) - set(AGENDA_SETTINGS_FIELDS)
+    if unknown:
+        raise ApiError(
+            "validation_error", "Campos no editables.", 400, {k: ["No editable"] for k in unknown}
+        )
+    for field, value in changes.items():
+        setattr(tenant, field, value)
+    _validated(tenant)
+    tenant.save(update_fields=[*changes, "updated_at"])
+    return agenda_settings(tenant)
 
 
 def suspend_tenant(tenant: Tenant) -> Tenant:
