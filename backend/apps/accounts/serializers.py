@@ -58,6 +58,8 @@ class MeSerializer(serializers.Serializer):
     tenant = MeTenantSerializer(allow_null=True)
     theme = serializers.DictField()
     modules = serializers.ListField(child=serializers.CharField())
+    # {recurso: {"scope": "all" | "own", "actions": [...]}}; solo guía a la interfaz.
+    permissions = serializers.DictField(child=serializers.DictField())
 
 
 class TwoFactorSetupResponseSerializer(serializers.Serializer):

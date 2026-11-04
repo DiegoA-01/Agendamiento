@@ -1,4 +1,4 @@
-import type { Me, ModuleKey, Role } from "../../shared/api/types";
+import type { Me, ModuleKey, PermissionResource } from "../../shared/api/types";
 
 export type DashboardSection =
   | "agenda"
@@ -15,42 +15,47 @@ export interface DashboardLink {
   section: DashboardSection;
   /** Ruta de la spec §13 (en español, como la ve el usuario). */
   path: string;
-  roles: readonly Role[];
+  /** Recurso de la matriz que hay que poder ver para que aparezca el enlace. */
+  resource: PermissionResource;
+  /** Si es `true`, hace falta verlo todo: quien solo ve lo propio no recibe el enlace. */
+  allRecords?: boolean;
   /** Si se indica, basta con que el negocio tenga habilitado uno de estos módulos. */
   modules?: readonly ModuleKey[];
 }
 
-const STAFF: readonly Role[] = ["owner", "admin", "receptionist", "professional"];
-
-/** Secciones del panel, en el orden del menú. Quién ve cada una sale de la matriz de la spec §5;
- *  el backend vuelve a validar todo, esto solo evita mostrar enlaces que darían 403. */
+/** Secciones del panel, en el orden del menú. Quién ve cada una sale de los permisos que manda
+ *  `/me/` (la misma matriz con la que el backend valida); esto solo evita mostrar enlaces que
+ *  darían 403. */
 export const DASHBOARD_LINKS: readonly DashboardLink[] = [
-  { section: "agenda", path: "/agenda", roles: STAFF, modules: ["booking"] },
-  { section: "appointments", path: "/citas", roles: STAFF, modules: ["booking"] },
+  { section: "agenda", path: "/agenda", resource: "appointments", modules: ["booking"] },
+  { section: "appointments", path: "/citas", resource: "appointments", modules: ["booking"] },
   {
     section: "customers",
     path: "/clientes",
-    roles: ["owner", "admin", "receptionist"],
+    resource: "appointments",
+    allRecords: true,
     modules: ["booking"],
   },
-  { section: "services", path: "/servicios", roles: STAFF },
-  { section: "team", path: "/equipo", roles: STAFF },
-  { section: "resources", path: "/puestos", roles: ["owner", "admin", "receptionist"] },
-  { section: "hours", path: "/horarios", roles: STAFF },
+  { section: "services", path: "/servicios", resource: "staff_services" },
+  { section: "team", path: "/equipo", resource: "staff_services" },
+  { section: "resources", path: "/puestos", resource: "staff_services", allRecords: true },
+  { section: "hours", path: "/horarios", resource: "schedules" },
   {
     section: "reports",
     path: "/reportes",
-    roles: ["owner", "admin", "professional"],
+    resource: "commissions",
     modules: ["reports", "commissions"],
   },
-  { section: "company", path: "/empresa", roles: ["owner", "admin"] },
+  { section: "company", path: "/empresa", resource: "company" },
 ];
 
-export function canSee(me: Pick<Me, "role" | "modules">, link: DashboardLink): boolean {
-  if (!link.roles.includes(me.role)) return false;
+export function canSee(me: Pick<Me, "permissions" | "modules">, link: DashboardLink): boolean {
+  const grant = me.permissions[link.resource];
+  if (!grant?.actions.includes("view")) return false;
+  if (link.allRecords && grant.scope !== "all") return false;
   return !link.modules || link.modules.some((key) => me.modules.includes(key));
 }
 
-export function visibleLinks(me: Pick<Me, "role" | "modules">): DashboardLink[] {
+export function visibleLinks(me: Pick<Me, "permissions" | "modules">): DashboardLink[] {
   return DASHBOARD_LINKS.filter((link) => canSee(me, link));
 }
