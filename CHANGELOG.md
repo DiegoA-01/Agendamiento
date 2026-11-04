@@ -1,5 +1,10 @@
 # Changelog
 
+## Fase 0 (pendiente) — Rutas públicas del negocio
+
+- El host del negocio ya tiene las rutas públicas de la spec §13: `/reservar`, `/cita/:token`, `/terminos`, `/privacidad` y `/cookies`. Por ahora muestran su título traducido, el selector de idioma y "Esta página llega en el hito M6". Con esto `App.tsx` queda cerrado: M6 solo reemplaza el contenido de cada página.
+- Textos en `locales/{es,en}/booking.json` (área nueva `booking`).
+
 ## Fase 0 (pendiente) — Sede por defecto de cada negocio
 
 - `company.services.create_company` crea también la sede por defecto (`is_default=True`), con el nombre en el idioma del negocio: "Sede principal" o "Main location". Como el alta de empresas del Super Admin la usa, todo negocio nuevo nace con su sede y ya puede crear profesionales y puestos.

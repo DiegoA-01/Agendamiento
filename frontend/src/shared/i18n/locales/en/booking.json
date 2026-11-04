@@ -1,0 +1,22 @@
+{
+  "booking": {
+    "comingSoon": "This page arrives in milestone {{milestone}}.",
+    "pages": {
+      "book": {
+        "title": "Book an appointment"
+      },
+      "manage": {
+        "title": "Your appointment"
+      },
+      "terms": {
+        "title": "Terms and conditions"
+      },
+      "privacy": {
+        "title": "Privacy policy"
+      },
+      "cookies": {
+        "title": "Cookie policy"
+      }
+    }
+  }
+}
