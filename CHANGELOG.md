@@ -23,6 +23,18 @@
 - Servicios públicos nuevos: `scheduling/services.py`, `booking.services.overlapping_appointments` y un `catalog/services.py` mínimo de solo lectura (`get_professional`, `get_resource`, `professional_for_user`), que el frente B amplía en B4.1.
 
 feat/m4-media
+## M4 — Empresa y sedes (app `company`, frente B)
+
+- `GET/PATCH /api/v1/company/`: datos de la empresa, logo (`logo_id` de una imagen subida en `media/`, del mismo negocio; `null` lo quita), redes sociales (`instagram`, `facebook`, `tiktok`, `whatsapp`, `website`) y textos legales.
+- **Textos legales limpios**: `terms_html`, `privacy_html` y `cookies_html` se guardan con solo formato básico (párrafos, negritas, listas, títulos y enlaces `http`, `https`, `mailto` o `tel`). Se quitan scripts, estilos, iframes, imágenes y atributos como `onclick`, porque esos textos se muestran en las páginas públicas. Usa la librería estándar, sin dependencias nuevas (`company/sanitize.py`).
+- `GET/POST /api/v1/locations/` y `GET/PATCH/DELETE /api/v1/locations/{id}/`:
+  - Respeta el límite de sedes del plan (`409 plan_limit_reached`).
+  - Siempre hay exactamente una sede por defecto: se puede elegir otra, pero no quitarla ni borrarla (`default_location_required`).
+  - No se borra una sede que usa un profesional o un puesto (`409 location_in_use`). El borrado es lógico.
+- Permisos de la matriz §5 (recurso `company`): el propietario edita, el administrador solo ve y los demás roles reciben 403. Una sede de otro negocio da 404.
+- `catalog.services.location_in_use(location_id)` para la regla anterior.
+- 42 pruebas nuevas (permisos por rol, limpieza del HTML, logo de otro negocio, límite del plan, sede por defecto y aislamiento).
+
 ## M4 — Imágenes (app `media`)
 
 - `POST /api/v1/media/` (multipart, campo `file`): sube una imagen JPG, PNG o WebP y responde `201` con `id`, tamaño original y las URLs de las tres variantes. Solo para quien puede editar la empresa o el catálogo (propietario y administrador) y solo en el host de un negocio.
