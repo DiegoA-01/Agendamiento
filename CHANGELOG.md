@@ -62,7 +62,6 @@ Funciones públicas en `catalog/services.py` para el motor de disponibilidad y l
 - En desarrollo Django sirve `/media/...` y Caddy enruta esas rutas a la API. En producción falta servirlas desde Caddy (`pormejorar.md` §34).
 - Sin dependencias nuevas (Pillow ya estaba en la lista).
 
-feat/fase0-frontend
 ## Fase 0 — Contratos compartidos (frontend)
 
 Base del panel del negocio para trabajar M4 a M10 en paralelo sin choques (ver `docs/REPARTO.md`).
