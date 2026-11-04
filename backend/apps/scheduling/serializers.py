@@ -90,3 +90,27 @@ class TimeBlockConflictSerializer(serializers.Serializer):
     code = serializers.CharField()
     detail = serializers.CharField()
     fields = TimeBlockConflictFieldsSerializer()
+
+
+class AvailabilityQuerySerializer(serializers.Serializer):
+    service_ids = serializers.ListField(child=serializers.UUIDField(), min_length=1, max_length=10)
+    professional_id = serializers.UUIDField(required=False, allow_null=True, default=None)
+
+
+class SlotsQuerySerializer(AvailabilityQuerySerializer):
+    date = serializers.DateField()
+
+
+class DaysQuerySerializer(AvailabilityQuerySerializer):
+    month = serializers.RegexField(r"^\d{4}-(0[1-9]|1[0-2])$", help_text="YYYY-MM")
+
+
+class SlotSerializer(serializers.Serializer):
+    start = serializers.DateTimeField()
+    end = serializers.DateTimeField()
+    period = serializers.ChoiceField(choices=["morning", "afternoon", "evening"])
+    professional_ids = serializers.ListField(child=serializers.UUIDField())
+
+
+class DaysSerializer(serializers.Serializer):
+    days = serializers.ListField(child=serializers.DateField())

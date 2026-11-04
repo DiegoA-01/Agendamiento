@@ -1,5 +1,20 @@
 # Changelog
 
+## M5 — Motor de disponibilidad, citas y estados (frente A)
+
+- **Motor de disponibilidad** (`scheduling/availability.py`, spec §8): tiempo libre = horario del día (zona del negocio) menos bloqueos menos citas activas; inicios cada `slot_step_min` alineados desde la medianoche donde cabe la duración total (overrides del profesional + buffer del último servicio); si un servicio exige puesto, debe quedar uno libre en la sede del profesional. Franjas `morning` (< 12:00), `afternoon` y `evening` (≥ 18:00).
+  - Reserva pública: anticipación mínima (`min_notice_min`), días hacia adelante (`max_advance_days`) y solo profesionales con reserva en línea. El panel solo impide el pasado.
+  - "Cualquiera": une los horarios de todos los que ofrecen los servicios.
+  - Caché en Redis del tiempo libre por (negocio, profesional, fecha), con una versión por negocio que sube con cada cambio de citas, horarios o bloqueos.
+- `GET /api/v1/availability/slots/?service_ids=&professional_id=&date=` y `GET /api/v1/availability/days/?service_ids=&professional_id=&month=YYYY-MM` para el panel (quien puede crear citas).
+- **Citas** (`appointments/`): listar con filtros (rango, profesional, estado, cliente) y paginación por cursor; crear con un cliente existente (`customer_id`) o nuevo (`customer`, se busca por celular normalizado a E.164); ver; `PATCH` del puesto.
+  - Nacen `confirmed`, con precio, duración y comisión congelados en `AppointmentItem`.
+  - La creación revalida el horario y la restricción de exclusión es la garantía final: si el hueco se ocupa, `409 slot_taken` con hasta 5 horarios sugeridos.
+  - "Cualquiera" asigna al profesional libre con menos citas ese día (empate: orden alfabético); si otro ganó el hueco, prueba con el siguiente.
+- **Estados** (spec §7): `confirm`, `start`, `complete`, `cancel` (con motivo), `no-show` y `reschedule` (crea la cita nueva enlazada con `rescheduled_from`; si el horario nuevo no está libre, nada cambia). Transiciones inválidas: `409 invalid_transition`. Cancelar y no-show liberan el hueco.
+- Permisos (matriz §5): owner, admin y recepción hacen todo; el profesional solo ve sus citas y puede completarlas o marcar no-show (lo ajeno da 404). Todo exige el módulo `booking` del plan (`403 module_disabled`).
+- **Aceptación**: 20 POST simultáneos al mismo hueco crean 1 cita y 19 reciben 409 (`tests/booking/test_concurrency.py`, con hilos y transacciones reales). La prueba destapó una carrera al crear el mismo cliente dos veces a la vez, ya corregida.
+
 ## Fase 0 (pendiente) — Rutas públicas del negocio
 
 - El host del negocio ya tiene las rutas públicas de la spec §13: `/reservar`, `/cita/:token`, `/terminos`, `/privacidad` y `/cookies`. Por ahora muestran su título traducido, el selector de idioma y "Esta página llega en el hito M6". Con esto `App.tsx` queda cerrado: M6 solo reemplaza el contenido de cada página.

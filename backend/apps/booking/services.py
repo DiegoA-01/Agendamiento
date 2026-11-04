@@ -1,10 +1,57 @@
-"""API pública de la app booking para otras apps. M5 agrega la creación de citas y sus estados."""
+"""API pública de la app booking: clientes, citas y sus estados (M5).
+
+La disponibilidad la calcula `scheduling.availability`; aquí se crea la cita. La creación vuelve a
+validar el horario dentro de la transacción, pero la garantía final contra la doble reserva es la
+restricción de exclusión de PostgreSQL: si dos peticiones pasan la validación a la vez, solo una
+inserta y la otra recibe `409 slot_taken` con horarios sugeridos (spec §8).
+"""
 
 import datetime as dt
+import re
+import uuid
+from zoneinfo import ZoneInfo
 
-from django.db.models import QuerySet
+from django.db import IntegrityError, transaction
+from django.db.models import Count, QuerySet
+from django.utils import timezone
 
-from .models import ACTIVE_STATUSES, Appointment
+from apps.accounts import permissions as perms
+from apps.catalog import services as catalog
+from config.api import ApiError
+
+from .models import ACTIVE_STATUSES, Appointment, AppointmentItem, Customer
+
+Status = Appointment.Status
+
+# Transiciones válidas (spec §7). Lo que no está aquí responde 409.
+TRANSITIONS = {
+    "confirm": ({Status.PENDING}, Status.CONFIRMED),
+    "start": ({Status.CONFIRMED}, Status.IN_PROGRESS),
+    "complete": ({Status.IN_PROGRESS}, Status.COMPLETED),
+    "cancel": ({Status.PENDING, Status.CONFIRMED}, Status.CANCELLED),
+    "no_show": ({Status.CONFIRMED}, Status.NO_SHOW),
+    "reschedule": ({Status.PENDING, Status.CONFIRMED}, Status.RESCHEDULED),
+}
+SUGGESTIONS = 5
+
+
+def _availability():
+    # Import diferido: `scheduling.availability` usa `overlapping_appointments` de este módulo.
+    from apps.scheduling import availability
+
+    return availability
+
+
+def _is_uuid(value) -> bool:
+    try:
+        uuid.UUID(str(value))
+    except ValueError:
+        return False
+    return True
+
+
+def not_found(entity: str) -> ApiError:
+    return ApiError("not_found", f"{entity} no encontrada.", 404)
 
 
 def overlapping_appointments(
@@ -27,3 +74,337 @@ def overlapping_appointments(
     if resource_id is not None:
         appointments = appointments.filter(resource_id=resource_id)
     return appointments.order_by("start_at")
+
+
+# --- Clientes -----------------------------------------------------------------------------------
+
+_E164 = re.compile(r"^\+[1-9]\d{7,14}$")
+
+
+def normalize_phone(raw: str, *, default_country_code: str = "57") -> str:
+    """Celular a E.164. `300 123 4567` y `(300) 123-4567` quedan `+573001234567`."""
+    digits = re.sub(r"[^\d+]", "", raw or "")
+    if digits.startswith("00"):
+        digits = "+" + digits[2:]
+    if not digits.startswith("+"):
+        digits = f"+{default_country_code}{digits.lstrip('0')}"
+    if not _E164.match(digits):
+        raise ApiError(
+            "validation_error",
+            "Datos inválidos.",
+            400,
+            {"phone": ["Usa un celular válido, por ejemplo 300 123 4567."]},
+        )
+    return digits
+
+
+def get_or_create_customer(
+    *, full_name: str, phone: str, email: str = "", marketing_consent: bool = False
+) -> Customer:
+    """El cliente se identifica por su celular (único por negocio). Si ya existe, se actualizan
+    nombre y correo con lo último que escribió; el consentimiento de datos se registra ahora."""
+    phone = normalize_phone(phone)
+    customer = Customer.objects.filter(phone=phone).first()
+    if customer is None:
+        try:
+            with transaction.atomic():
+                return Customer.objects.create(
+                    full_name=full_name,
+                    phone=phone,
+                    email=email,
+                    marketing_consent=marketing_consent,
+                    data_consent_at=timezone.now(),
+                )
+        except IntegrityError:
+            # Otra petición creó el mismo celular un instante antes (dos reservas a la vez).
+            customer = Customer.objects.get(phone=phone)
+    customer.full_name = full_name or customer.full_name
+    customer.email = email or customer.email
+    customer.marketing_consent = customer.marketing_consent or marketing_consent
+    customer.save(update_fields=["full_name", "email", "marketing_consent", "updated_at"])
+    return customer
+
+
+def get_customer(customer_id) -> Customer:
+    customer = Customer.objects.filter(pk=customer_id).first() if _is_uuid(customer_id) else None
+    if customer is None:
+        raise ApiError("validation_error", "Datos inválidos.", 400, {"customer_id": ["No existe."]})
+    return customer
+
+
+# --- Crear citas --------------------------------------------------------------------------------
+
+
+def _suggestions(tenant, services, professionals, start: dt.datetime, *, public: bool) -> list:
+    availability = _availability()
+    day = timezone.localdate(start, ZoneInfo(tenant.timezone))
+    slots = availability.slots_for_day(
+        tenant,
+        services,
+        day,
+        professionals,
+        window=availability.booking_window(tenant, public=public),
+        use_cache=False,
+    )
+    return [slot.start.isoformat() for slot in slots[:SUGGESTIONS]]
+
+
+def _slot_taken(tenant, services, professionals, start, *, public: bool) -> ApiError:
+    return ApiError(
+        "slot_taken",
+        "Ese horario ya no está disponible.",
+        409,
+        {"suggestions": _suggestions(tenant, services, professionals, start, public=public)},
+    )
+
+
+def _appointments_that_day(professional_ids, start: dt.datetime, tz: ZoneInfo) -> dict:
+    day = timezone.localdate(start, tz)
+    day_start = dt.datetime.combine(day, dt.time.min, tzinfo=tz)
+    counts = (
+        Appointment.objects.filter(
+            professional_id__in=professional_ids,
+            status__in=ACTIVE_STATUSES,
+            start_at__gte=day_start,
+            start_at__lt=day_start + dt.timedelta(days=1),
+        )
+        .values("professional_id")
+        .annotate(total=Count("id"))
+    )
+    return {row["professional_id"]: row["total"] for row in counts}
+
+
+def _pick_professional(tenant, services, candidates, start, *, public: bool):
+    """Profesionales libres en `start`, del que menos citas tiene ese día al que más (empate:
+    orden alfabético, que es el orden de `candidates`). Spec §8.7."""
+    availability = _availability()
+    slots = availability.slots_for_day(
+        tenant,
+        services,
+        timezone.localdate(start, ZoneInfo(tenant.timezone)),
+        candidates,
+        window=availability.booking_window(tenant, public=public),
+        use_cache=False,
+    )
+    free_ids = next((set(slot.professional_ids) for slot in slots if slot.start == start), set())
+    free = [p for p in candidates if p.pk in free_ids]
+    load = _appointments_that_day([p.pk for p in free], start, ZoneInfo(tenant.timezone))
+    return sorted(free, key=lambda p: load.get(p.pk, 0))
+
+
+def create_appointment(
+    tenant,
+    *,
+    service_ids,
+    start_at: dt.datetime,
+    customer: Customer,
+    professional_id=None,
+    source: str = Appointment.Source.DASHBOARD,
+    created_by=None,
+    rescheduled_from: Appointment | None = None,
+) -> Appointment:
+    """Crea una cita confirmada (spec §7: web y panel nacen `confirmed`).
+
+    `professional_id=None` es "cualquiera": se asigna el profesional libre con menos citas ese día.
+    La reserva web aplica las reglas del negocio (anticipación mínima, días hacia adelante y solo
+    profesionales con reserva en línea).
+    """
+    availability = _availability()
+    public = source == Appointment.Source.WEB
+    services = availability.resolve_services(service_ids)
+    candidates = availability.candidates(services, professional_id, public=public)
+    start_at = start_at.astimezone(ZoneInfo(tenant.timezone))
+
+    for professional in _pick_professional(tenant, services, candidates, start_at, public=public):
+        quote = catalog.quote(professional, services)
+        if quote is None:
+            continue
+        end_at = start_at + dt.timedelta(minutes=quote.total_duration_min)
+        resource = None
+        if quote.requires_resource:
+            resource = availability.free_resource_for(tenant, professional, start_at, end_at)
+            if resource is None:
+                continue
+        try:
+            with transaction.atomic():
+                appointment = Appointment.objects.create(
+                    customer=customer,
+                    professional=professional,
+                    resource=resource,
+                    location_id=professional.location_id,
+                    start_at=start_at,
+                    end_at=end_at,
+                    status=Status.CONFIRMED,
+                    source=source,
+                    price_total=quote.total_price,
+                    created_by=created_by,
+                    rescheduled_from=rescheduled_from,
+                )
+                AppointmentItem.objects.bulk_create(
+                    [
+                        AppointmentItem(
+                            tenant_id=tenant.pk,
+                            appointment=appointment,
+                            service_id=item.service_id,
+                            professional=professional,
+                            price_charged=item.price,
+                            duration_min=item.duration_min,
+                            commission_pct_snapshot=item.commission_pct,
+                        )
+                        for item in quote.items
+                    ]
+                )
+        except IntegrityError:
+            # Otra petición ganó el hueco entre la validación y el insert (restricción de
+            # exclusión). Con "cualquiera" se intenta con el siguiente profesional libre.
+            continue
+        availability.invalidate(tenant.pk)
+        return appointment
+
+    raise _slot_taken(tenant, services, candidates, start_at, public=public)
+
+
+# --- Consultar y cambiar citas ------------------------------------------------------------------
+
+
+def _own_professional_id(user):
+    own = catalog.professional_for_user(user)
+    return own.pk if own is not None else None
+
+
+def _scope(user, action: str) -> str:
+    scope = perms.scope_for(user.role, perms.APPOINTMENTS, action)
+    if scope is None:
+        raise ApiError("permission_denied", "No tienes permiso para esta acción.", 403)
+    return scope
+
+
+def require_permission(user, action: str) -> None:
+    """403 si el rol no puede hacer `action` sobre citas (matriz §5)."""
+    _scope(user, action)
+
+
+def list_appointments(
+    user,
+    *,
+    start_at=None,
+    end_at=None,
+    professional_id=None,
+    status=None,
+    customer_id=None,
+) -> QuerySet[Appointment]:
+    """Citas visibles para `user`. Un profesional solo ve las suyas (spec §5)."""
+    appointments = Appointment.objects.select_related("customer").prefetch_related("items")
+    if _scope(user, "view") == perms.OWN:
+        appointments = appointments.filter(professional_id=_own_professional_id(user))
+    if start_at is not None:
+        appointments = appointments.filter(end_at__gt=start_at)
+    if end_at is not None:
+        appointments = appointments.filter(start_at__lt=end_at)
+    if professional_id is not None:
+        appointments = appointments.filter(professional_id=professional_id)
+    if status:
+        appointments = appointments.filter(status__in=status)
+    if customer_id is not None:
+        appointments = appointments.filter(customer_id=customer_id)
+    return appointments.order_by("start_at", "id")
+
+
+def get_appointment(user, appointment_id, action: str = "view") -> Appointment:
+    """La cita, o 404 si no existe o es de otro profesional (404, no 403: spec §5)."""
+    scope = _scope(user, action)
+    appointment = (
+        Appointment.objects.select_related("customer")
+        .prefetch_related("items")
+        .filter(pk=appointment_id)
+        .first()
+        if _is_uuid(appointment_id)
+        else None
+    )
+    if appointment is None or (
+        scope == perms.OWN and appointment.professional_id != _own_professional_id(user)
+    ):
+        raise not_found("Cita")
+    return appointment
+
+
+def _transition(appointment: Appointment, action: str) -> None:
+    allowed, target = TRANSITIONS[action]
+    if appointment.status not in allowed:
+        raise ApiError(
+            "invalid_transition",
+            f"Una cita en estado '{appointment.status}' no puede pasar a '{target}'.",
+            409,
+        )
+    appointment.status = target
+
+
+def change_status(user, appointment_id, action: str, *, reason: str = "") -> Appointment:
+    """confirm, start, complete, cancel y no_show (spec §7). Inválidas: 409."""
+    appointment = get_appointment(user, appointment_id, action)
+    _transition(appointment, action)
+    fields = ["status", "updated_at"]
+    if action == "cancel":
+        appointment.cancelled_at = timezone.now()
+        appointment.cancel_reason = reason
+        fields += ["cancelled_at", "cancel_reason"]
+    appointment.save(update_fields=fields)
+    _availability().invalidate(appointment.tenant_id)
+    return appointment
+
+
+def reschedule(
+    user, tenant, appointment_id, *, start_at: dt.datetime, professional_id=None
+) -> Appointment:
+    """Mueve la cita: la original queda `rescheduled` y se crea otra enlazada con
+    `rescheduled_from` (spec §7). Mismos servicios y cliente. Todo o nada: si el nuevo horario no
+    está libre, la cita original no cambia."""
+    original = get_appointment(user, appointment_id, "reschedule")
+    _transition(original, "reschedule")
+    service_ids = [str(item.service_id) for item in original.items.all()]
+    with transaction.atomic():
+        # Primero se libera el hueco actual: así se puede mover a un horario que se traslapa.
+        original.save(update_fields=["status", "updated_at"])
+        return create_appointment(
+            tenant,
+            service_ids=service_ids,
+            start_at=start_at,
+            customer=original.customer,
+            professional_id=professional_id or original.professional_id,
+            source=original.source,
+            created_by=user,
+            rescheduled_from=original,
+        )
+
+
+def update_appointment(user, appointment_id, *, resource_id=...) -> Appointment:
+    """Cambios que no mueven la cita. Hoy: el puesto (`resource_id`, o `None` para quitarlo).
+    Para cambiar fecha, hora o profesional se usa `reschedule`."""
+    appointment = get_appointment(user, appointment_id, "update")
+    if resource_id is ...:
+        return appointment
+    if appointment.status not in ACTIVE_STATUSES:
+        raise ApiError("invalid_transition", "Solo se cambia el puesto de una cita activa.", 409)
+    if resource_id is None:
+        appointment.resource = None
+    else:
+        resource = catalog.get_resource(resource_id)
+        if resource is None or not resource.is_active:
+            raise ApiError(
+                "validation_error", "Datos inválidos.", 400, {"resource_id": ["No existe."]}
+            )
+        if resource.location_id != appointment.location_id:
+            raise ApiError(
+                "validation_error",
+                "Datos inválidos.",
+                400,
+                {"resource_id": ["El puesto es de otra sede."]},
+            )
+        appointment.resource = resource
+    try:
+        with transaction.atomic():
+            appointment.save(update_fields=["resource", "updated_at"])
+    except IntegrityError as exc:
+        raise ApiError("resource_taken", "El puesto está ocupado en ese horario.", 409) from exc
+    _availability().invalidate(appointment.tenant_id)
+    return appointment
