@@ -2,6 +2,7 @@
 
 from typing import Any
 
+from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.utils import timezone
 
@@ -92,8 +93,16 @@ def list_locations():
     return Location.objects.order_by("-is_default", "name", "pk")
 
 
+def find_location(location_id) -> Location | None:
+    """Sede vigente del tenant activo, o None (también si el id es inválido o de otro negocio)."""
+    try:
+        return Location.objects.filter(pk=location_id).first()
+    except (ValidationError, ValueError, TypeError):
+        return None
+
+
 def get_location(location_id) -> Location:
-    location = Location.objects.filter(pk=location_id).first()
+    location = find_location(location_id)
     if location is None:
         raise ApiError("not_found", "Sede no encontrada.", 404)
     return location
