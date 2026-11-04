@@ -1,5 +1,10 @@
 # Changelog
 
+## Fase 0 (pendiente) — `/me/` con los permisos del rol
+
+- `GET /api/v1/me/` agrega `permissions`: `{recurso: {"scope": "all" | "own", "actions": [...]}}`, calculado con `permissions_for_role` desde la misma matriz que valida la API (spec §5). Ejemplo para un profesional: `"appointments": {"scope": "own", "actions": ["complete", "no_show", "view"]}`. Solo guía a la interfaz; la API sigue validando cada petición.
+- El menú del panel deja de copiar los roles: cada sección declara el recurso que necesita ver (y si exige verlo todo, como `/clientes` y `/puestos`) y se muestra según esos permisos. Si cambia la matriz del backend, el menú cambia solo. Los menús por rol quedan igual que antes.
+
 ## Fase 0 (pendiente) — Configuración de agenda del negocio (frente A)
 
 - `Tenant` gana cuatro reglas de agenda (spec §8 y §9), con los valores por defecto de la spec: `slot_step_min` 15 (de 5 a 120), `min_notice_min` 60 (hasta 7 días), `max_advance_days` 60 (de 1 a 365) y `cancel_min_hours` 2 (hasta 7 días). Los rangos se validan en el modelo y también con restricciones en la base. Migración `tenancy/0002`.
