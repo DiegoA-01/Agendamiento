@@ -90,7 +90,13 @@
     "file_too_large": "La imagen pesa más de 10 MB.",
     "invalid_image": "El archivo no es una imagen válida.",
     "unsupported_image": "Formato no permitido. Usa JPG, PNG o WebP.",
-    "image_too_large": "La imagen tiene demasiados píxeles."
+    "image_too_large": "La imagen tiene demasiados píxeles.",
+    "hours_required": "Completa la hora de inicio y de fin.",
+    "hours_endBeforeStart": "Debe ser posterior al inicio.",
+    "hours_overlap": "Se cruza con otra franja del mismo día.",
+    "overlapping_hours": "Hay franjas que se cruzan el mismo día.",
+    "too_many_intervals": "Son demasiadas franjas en la semana.",
+    "time_block_conflict": "Hay citas en ese rango. Muévelas o cancélalas antes de bloquear:"
   },
   "verticals": {
     "barbershop": "Barbería",

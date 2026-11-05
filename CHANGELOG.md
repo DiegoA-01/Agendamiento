@@ -64,6 +64,14 @@
 - Borrado lógico: reemplazar la semana y borrar un bloqueo marcan `deleted_at`.
 - Servicios públicos nuevos: `scheduling/services.py`, `booking.services.overlapping_appointments` y un `catalog/services.py` mínimo de solo lectura (`get_professional`, `get_resource`, `professional_for_user`), que el frente B amplía en B4.1.
 
+## M4 — Pantalla de horarios y bloqueos (frente B)
+
+- `/horarios`: elige el profesional (el profesional ve solo el suyo) y edita su **semana**: franjas por día con descansos, "copiar el lunes de martes a viernes" y total de horas semanales. Avisa antes de guardar si una franja está vacía, termina antes de empezar o se cruza con otra del mismo día; el servidor valida lo mismo.
+- **Bloqueos de agenda** del profesional: lista de los próximos, crear (desde, hasta, motivo) y borrar. Las fechas se envían sin zona y el servidor las interpreta en la hora del negocio; se muestran en la zona del negocio. Si el bloqueo choca con citas, se muestra el `409 time_block_conflict` traducido con la lista de citas en conflicto.
+- Quien solo puede ver recibe la pantalla en modo lectura. Un profesional cuya cuenta no está enlazada a una ficha recibe un aviso para pedir que la enlacen.
+- Lógica de la semana en `hours/week.ts`, con 5 pruebas.
+- Probado en el navegador: semana con descanso, aviso de franjas cruzadas, bloqueo rechazado por una cita (409) y bloqueo creado y borrado; escritorio y 375 px.
+
 ## M4 — Pantallas de empresa, servicios, puestos y equipo (frente B)
 
 - `/empresa`:
