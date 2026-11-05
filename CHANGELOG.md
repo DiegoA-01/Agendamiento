@@ -22,6 +22,17 @@
 - `catalog.services.active_services()` (lectura, para el listado público).
 - Variables nuevas documentadas en `.env.example`.
 
+## M5 — Negocio de demostración (`seed_demo`, frente B)
+
+- `manage.py seed_demo --vertical barbershop|salon|nails [--slug] [--password]` (spec §16):
+  - Crea el negocio (`demo-<vertical>` por defecto) con su subdominio, la empresa, la sede y el propietario (`propietario@<slug>.test`).
+  - Crea 3 profesionales y 6 servicios del vertical en 2 categorías. El tercer profesional solo ofrece 4 servicios, así "cualquiera" no siempre devuelve a los 3.
+  - Horario de lunes a sábado de 9:00 a 19:00 y 6 citas de muestra en los próximos 3 días hábiles.
+  - Usa el plan `Demo` con todos los módulos.
+- Todo pasa por los `services.py` de cada app (las mismas reglas que la API) y en una sola transacción: si algo falla no queda nada a medias.
+- No sobrescribe un subdominio que ya existe. Si no se da `--password`, la genera y la muestra una sola vez.
+- Vive en `platform_admin` porque crea negocios. Documentado en el `README`. 7 pruebas, incluido que el propietario entra y la reserva pública lista los 6 servicios.
+
 ## M5 — Motor de disponibilidad, citas y estados (frente A)
 
 - **Motor de disponibilidad** (`scheduling/availability.py`, spec §8): tiempo libre = horario del día (zona del negocio) menos bloqueos menos citas activas; inicios cada `slot_step_min` alineados desde la medianoche donde cabe la duración total (overrides del profesional + buffer del último servicio); si un servicio exige puesto, debe quedar uno libre en la sede del profesional. Franjas `morning` (< 12:00), `afternoon` y `evening` (≥ 18:00).
