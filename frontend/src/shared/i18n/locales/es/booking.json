@@ -1,6 +1,5 @@
 {
   "booking": {
-    "comingSoon": "Esta página llega en el hito {{milestone}}.",
     "pages": {
       "book": {
         "title": "Reservar una cita"
@@ -17,6 +16,89 @@
       "cookies": {
         "title": "Política de cookies"
       }
+    },
+    "cta": "Reservar cita",
+    "disabled": "Por ahora este negocio no recibe reservas en línea. Comunícate directamente para agendar.",
+    "legalNav": "Información legal",
+    "staffLogin": "Acceso del equipo",
+    "legalEmpty": "{{name}} aún no ha publicado este texto.",
+    "cookies": {
+      "label": "Aviso de cookies",
+      "text": "Usamos solo cookies necesarias para que la reserva funcione de forma segura y recordamos el idioma que elijas. No usamos cookies de publicidad ni de analítica.",
+      "ok": "Entendido"
+    },
+    "summary": {
+      "when": "Cuándo",
+      "with": "Con",
+      "where": "Dónde",
+      "services": "Servicios",
+      "total": "Total",
+      "referencePrice": "Precio de referencia",
+      "priceMayVary": "El precio final puede variar según quién te atienda; lo verás en la confirmación."
+    },
+    "status": {
+      "pending": "Pendiente",
+      "confirmed": "Confirmada",
+      "in_progress": "En curso",
+      "completed": "Completada",
+      "cancelled": "Cancelada",
+      "no_show": "No asistió",
+      "rescheduled": "Reprogramada"
+    },
+    "manage": {
+      "notFound": "No encontramos esta cita. Revisa que el enlace esté completo.",
+      "hello": "Hola, {{name}}. Estos son los datos de tu cita.",
+      "cancelled": "Tu cita quedó cancelada.",
+      "cancelUntil": "Puedes cancelar en línea hasta el {{deadline}}.",
+      "cancel": "Cancelar cita",
+      "confirmCancel": "¿Seguro que quieres cancelar esta cita?",
+      "reason": "Motivo",
+      "confirmCancelButton": "Sí, cancelar",
+      "keep": "No, conservarla",
+      "tooLate": "Ya no se puede cancelar en línea. Si no puedes asistir, comunícate con el negocio.",
+      "bookAnother": "Reservar otra cita"
+    },
+    "wizard": {
+      "stepOf": "Paso {{step}} de {{total}}",
+      "steps": {
+        "services": "¿Qué te quieres hacer?",
+        "professional": "¿Con quién?",
+        "date": "Elige el día",
+        "time": "Elige la hora",
+        "details": "Tus datos"
+      },
+      "continue": "Continuar",
+      "confirm": "Confirmar reserva",
+      "booking": "Reservando…",
+      "selection_one": "{{count}} servicio",
+      "selection_other": "{{count}} servicios",
+      "noServices": "Este negocio aún no tiene servicios para reservar en línea.",
+      "noProfessionals": "Nadie ofrece todos esos servicios juntos. Prueba con menos servicios.",
+      "anyone": "Cualquiera",
+      "anyoneHint": "Te asignamos a quien esté libre.",
+      "prevMonth": "Mes anterior",
+      "nextMonth": "Mes siguiente",
+      "noDaysThisMonth": "No hay días disponibles este mes. Prueba con el siguiente.",
+      "noSlots": "Ya no quedan horarios ese día. Elige otro.",
+      "periods": {
+        "morning": "Mañana",
+        "afternoon": "Tarde",
+        "evening": "Noche"
+      },
+      "fullName": "Nombre completo",
+      "phone": "Celular",
+      "phoneHint": "Te identificamos por tu celular; no necesitas cuenta.",
+      "phoneInvalid": "Escribe un número de celular válido.",
+      "email": "Correo",
+      "acceptPolicy": "Autorizo el tratamiento de mis datos personales para gestionar mi cita.",
+      "readPolicy": "Leer la política de tratamiento de datos",
+      "acceptRequired": "Debes autorizar el tratamiento de datos para reservar.",
+      "marketing": "Quiero recibir recordatorios y novedades por WhatsApp",
+      "marketingHint": "Opcional. Puedes cancelarlo cuando quieras.",
+      "done": "¡Listo, tu cita está reservada!",
+      "doneHint": "Guarda el enlace de tu cita para verla o cancelarla.",
+      "manageLink": "Ver o cancelar mi cita",
+      "saveLink": "Si cierras esta página, encontrarás el enlace en el mensaje de confirmación."
     }
   }
 }

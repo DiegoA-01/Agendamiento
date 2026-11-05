@@ -1,5 +1,32 @@
 # Changelog
 
+## M6 — Reserva pública: pantallas (frente B)
+
+- `/` (host del negocio): portada mínima con logo, nombre, dirección, teléfono, redes y el botón **Reservar cita**. Si el negocio no recibe reservas, lo dice.
+- `/reservar`: asistente de 5 pasos, mobile-first:
+  1. **Servicios.** Varios a la vez (máximo 10), con total de tiempo y precio.
+  2. **Profesional.** "Cualquiera" o alguien que ofrezca todos los servicios.
+  3. **Día.** Calendario del mes, de lunes a domingo, con solo los días disponibles.
+  4. **Hora.** Agrupada en mañana, tarde y noche.
+  5. **Datos.** Nombre, celular y correo opcional. La autorización de datos (Ley 1581) viene **sin marcar** y es obligatoria, con enlace a la política. El consentimiento de WhatsApp es opcional. Incluye el honeypot `website`.
+  - Al confirmar se muestra el resumen y el enlace para gestionar la cita.
+  - `409 slot_taken` ofrece los horarios sugeridos para elegir otro sin volver atrás; `429 rate_limited` y los errores de campo se muestran traducidos.
+  - Fechas y horas en la zona del negocio; "hoy" también se calcula en esa zona.
+  - El foco pasa al título de cada paso y el botón principal queda fijo abajo en el celular.
+- `/cita/:token`: estado, fecha, profesional, sede, servicios y total. Permite cancelar con motivo opcional hasta el plazo del negocio, que se muestra; pasado el plazo explica que hay que comunicarse con el negocio. Un enlace inválido da un aviso claro.
+- `/terminos`, `/privacidad` y `/cookies`: el texto del negocio (HTML ya limpio en el servidor), o un aviso si aún no lo publicó.
+- Marco público con el tema del negocio, logo, enlaces legales y el idioma del negocio si el visitante no eligió otro.
+- Aviso de cookies informativo: solo hay cookies necesarias y el idioma, nada que aceptar o rechazar.
+- Cada página pública va en su propio paquete (lazy).
+- `formatMoney` pasa a `shared/money.ts` porque lo usan el panel y la reserva.
+- 12 pruebas nuevas: calendario (meses, bisiesto, "hoy" en la zona del negocio), suma de precios en centavos, agrupación de horarios, celular y cuerpo de la reserva.
+- Probado en el navegador a 375 px:
+  - Reserva completa con el negocio `demo` en menos de un minuto.
+  - Validaciones antes de enviar.
+  - Página de la cita dentro y fuera del plazo de cancelación, y cancelación.
+  - Página legal y aviso de cookies, en español y en inglés.
+- El total antes de confirmar se muestra como **precio de referencia**: la API pública no expone el precio propio de cada profesional, y el valor real sale en la confirmación.
+
 ## M7 — Eventos en tiempo real y clientes (API, frente A)
 
 - **`GET /api/v1/events/`** (Server-Sent Events, spec §9): la agenda abierta recibe `appointment.created`, `appointment.updated` y `appointment.cancelled` con `{id, status, start_at, end_at, professional_id, resource_id}`. El navegador lo abre con `new EventSource("/api/v1/events/")` y la misma sesión; reconecta solo (`retry: 3000`) y recibe un comentario cada 15 s para que ningún proxy corte la conexión.

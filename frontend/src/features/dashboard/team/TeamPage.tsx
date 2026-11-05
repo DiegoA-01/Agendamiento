@@ -28,7 +28,7 @@ import {
 import { useMe } from "../../auth/useMe";
 import { KEYS, useOffers, useProfessionals, useServices, useSpecialties } from "../shared/api";
 import { ImageField } from "../shared/ImageField";
-import { formatMoney } from "../shared/money";
+import { formatMoney } from "../../../shared/money";
 import {
   offersPayload,
   offersSchema,

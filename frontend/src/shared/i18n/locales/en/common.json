@@ -90,7 +90,14 @@
     "file_too_large": "The image is larger than 10 MB.",
     "invalid_image": "The file is not a valid image.",
     "unsupported_image": "Format not allowed. Use JPG, PNG or WebP.",
-    "image_too_large": "The image has too many pixels."
+    "image_too_large": "The image has too many pixels.",
+    "slot_taken": "That time was just taken. Choose another:",
+    "rate_limited": "Too many attempts. Wait a while and try again.",
+    "cancel_window_closed": "The online cancellation deadline has passed. Please contact the business.",
+    "captcha_required": "Complete the security check.",
+    "captcha_failed": "We could not verify you are not a robot. Try again.",
+    "invalid_transition": "This appointment can no longer be changed.",
+    "resource_taken": "The workstation is already taken at that time."
   },
   "verticals": {
     "barbershop": "Barbershop",

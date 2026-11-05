@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { Company, OfferedService, Service } from "../../../shared/api/types";
-import { formatMoney } from "./money";
+import { formatMoney } from "../../../shared/money";
 import {
   companyPayload,
   companySchema,
