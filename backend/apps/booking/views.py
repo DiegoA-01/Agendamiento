@@ -1,3 +1,4 @@
+import json
 from zoneinfo import ZoneInfo
 
 from django.http import StreamingHttpResponse
@@ -7,6 +8,7 @@ from drf_spectacular.utils import OpenApiParameter, OpenApiResponse, extend_sche
 from rest_framework import status
 from rest_framework.pagination import CursorPagination
 from rest_framework.permissions import BasePermission
+from rest_framework.renderers import BaseRenderer, JSONRenderer
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -194,6 +196,17 @@ class RescheduleView(BookingView):
 # --- Tiempo real (M7) ---------------------------------------------------------------------------
 
 
+class EventStreamRenderer(BaseRenderer):
+    """Acepta la cabecera de EventSource; los errores previos al flujo salen como JSON."""
+
+    media_type = "text/event-stream"
+    format = "event-stream"
+    charset = "utf-8"
+
+    def render(self, data, accepted_media_type=None, renderer_context=None):
+        return json.dumps(data).encode()
+
+
 class EventsView(BookingView):
     """Server-Sent Events con los cambios de citas del negocio, para la agenda abierta.
 
@@ -202,6 +215,8 @@ class EventsView(BookingView):
     `data` = `{id, status, start_at, end_at, professional_id, resource_id}`. Un profesional solo
     recibe los de sus citas.
     """
+
+    renderer_classes = [JSONRenderer, EventStreamRenderer]
 
     @extend_schema(
         responses={(200, "text/event-stream"): OpenApiTypes.STR},

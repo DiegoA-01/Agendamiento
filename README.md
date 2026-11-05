@@ -47,6 +47,16 @@ Entra a http://admin.localhost:8080 (en local, los navegadores resuelven `*.loca
 
 Cada empresa tiene secciones de datos, tema (con control de contraste), módulos y dominios propios (se verifican con un registro DNS `TXT`). La sección **Auditoría** registra lo que hace el Super Admin.
 
+## Negocio de demostración
+
+Crea un negocio listo para probar (equipo, servicios, horarios y citas de muestra):
+
+```bash
+docker compose exec api python manage.py seed_demo --vertical barbershop
+```
+
+`--vertical` admite `barbershop`, `salon` y `nails`. El subdominio por defecto es `demo-<vertical>` (por ejemplo http://demo-barbershop.localhost:8080) y se cambia con `--slug`. La contraseña del propietario se muestra una sola vez; para fijarla, usa `--password`.
+
 ## Tests y calidad
 
 ```bash
