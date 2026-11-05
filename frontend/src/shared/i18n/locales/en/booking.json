@@ -1,6 +1,5 @@
 {
   "booking": {
-    "comingSoon": "This page arrives in milestone {{milestone}}.",
     "pages": {
       "book": {
         "title": "Book an appointment"
@@ -17,6 +16,89 @@
       "cookies": {
         "title": "Cookie policy"
       }
+    },
+    "cta": "Book an appointment",
+    "disabled": "This business is not taking online bookings right now. Please contact them directly.",
+    "legalNav": "Legal information",
+    "staffLogin": "Staff sign in",
+    "legalEmpty": "{{name}} has not published this text yet.",
+    "cookies": {
+      "label": "Cookie notice",
+      "text": "We only use cookies needed for booking to work securely, and we remember the language you choose. We do not use advertising or analytics cookies.",
+      "ok": "Got it"
+    },
+    "summary": {
+      "when": "When",
+      "with": "With",
+      "where": "Where",
+      "services": "Services",
+      "total": "Total",
+      "referencePrice": "Reference price",
+      "priceMayVary": "The final price may vary depending on who serves you; you will see it in the confirmation."
+    },
+    "status": {
+      "pending": "Pending",
+      "confirmed": "Confirmed",
+      "in_progress": "In progress",
+      "completed": "Completed",
+      "cancelled": "Cancelled",
+      "no_show": "No-show",
+      "rescheduled": "Rescheduled"
+    },
+    "manage": {
+      "notFound": "We could not find this appointment. Check that the link is complete.",
+      "hello": "Hi, {{name}}. Here are your appointment details.",
+      "cancelled": "Your appointment was cancelled.",
+      "cancelUntil": "You can cancel online until {{deadline}}.",
+      "cancel": "Cancel appointment",
+      "confirmCancel": "Are you sure you want to cancel this appointment?",
+      "reason": "Reason",
+      "confirmCancelButton": "Yes, cancel",
+      "keep": "No, keep it",
+      "tooLate": "It can no longer be cancelled online. If you cannot make it, please contact the business.",
+      "bookAnother": "Book another appointment"
+    },
+    "wizard": {
+      "stepOf": "Step {{step}} of {{total}}",
+      "steps": {
+        "services": "What would you like?",
+        "professional": "With whom?",
+        "date": "Choose the day",
+        "time": "Choose the time",
+        "details": "Your details"
+      },
+      "continue": "Continue",
+      "confirm": "Confirm booking",
+      "booking": "Booking…",
+      "selection_one": "{{count}} service",
+      "selection_other": "{{count}} services",
+      "noServices": "This business has no services to book online yet.",
+      "noProfessionals": "Nobody offers all those services together. Try fewer services.",
+      "anyone": "Anyone",
+      "anyoneHint": "We assign whoever is free.",
+      "prevMonth": "Previous month",
+      "nextMonth": "Next month",
+      "noDaysThisMonth": "No days available this month. Try the next one.",
+      "noSlots": "No times left that day. Choose another.",
+      "periods": {
+        "morning": "Morning",
+        "afternoon": "Afternoon",
+        "evening": "Evening"
+      },
+      "fullName": "Full name",
+      "phone": "Mobile phone",
+      "phoneHint": "We identify you by your phone; no account needed.",
+      "phoneInvalid": "Enter a valid mobile number.",
+      "email": "Email",
+      "acceptPolicy": "I authorize the processing of my personal data to manage my appointment.",
+      "readPolicy": "Read the data processing policy",
+      "acceptRequired": "You must authorize data processing to book.",
+      "marketing": "I want to receive reminders and news on WhatsApp",
+      "marketingHint": "Optional. You can opt out anytime.",
+      "done": "Done, your appointment is booked!",
+      "doneHint": "Keep your appointment link to view or cancel it.",
+      "manageLink": "View or cancel my appointment",
+      "saveLink": "If you close this page, you will find the link in the confirmation message."
     }
   }
 }

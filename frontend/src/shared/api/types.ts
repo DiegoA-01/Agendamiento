@@ -263,4 +263,79 @@ export interface ConflictingAppointment {
   start_at: string;
   end_at: string;
   status: string;
+
+// --- Reserva pública (API del frente A, M6) ----------------------------------------------------
+
+export type ImageUrls = Partial<ImageRef["urls"]>;
+
+export interface PublicCompany {
+  name: string;
+  vertical: Vertical;
+  language: Language;
+  timezone: string;
+  currency: string;
+  theme: Partial<Theme>;
+  logo: ImageUrls | null;
+  address: string;
+  city: string;
+  phone: string;
+  email: string;
+  social_links: Partial<Record<SocialNetwork, string>>;
+  terms_html: string;
+  privacy_html: string;
+  cookies_html: string;
+  cancel_min_hours: number;
+  booking_enabled: boolean;
+}
+
+export interface PublicService {
+  id: string;
+  name: string;
+  description: string;
+  duration_min: number;
+  price: string;
+  image: ImageUrls | null;
+}
+
+export interface PublicCategory {
+  id: string;
+  name: string;
+  services: PublicService[];
+}
+
+export interface PublicProfessional {
+  id: string;
+  display_name: string;
+  bio: string;
+  photo: ImageUrls | null;
+}
+
+export type SlotPeriod = "morning" | "afternoon" | "evening";
+
+export interface Slot {
+  start: string;
+  end: string;
+  period: SlotPeriod;
+  professional_ids: string[];
+}
+
+export type AppointmentStatus =
+  "pending" | "confirmed" | "in_progress" | "completed" | "cancelled" | "no_show" | "rescheduled";
+
+export interface PublicAppointment {
+  status: AppointmentStatus;
+  start_at: string;
+  end_at: string;
+  professional: string;
+  location: string;
+  address: string;
+  customer_name: string;
+  items: { name: string; duration_min: number; price: string }[];
+  price_total: string;
+  can_cancel: boolean;
+  cancel_deadline: string;
+}
+
+export interface PublicBooked extends PublicAppointment {
+  manage_url: string;
 }

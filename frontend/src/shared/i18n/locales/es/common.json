@@ -96,7 +96,14 @@
     "hours_overlap": "Se cruza con otra franja del mismo día.",
     "overlapping_hours": "Hay franjas que se cruzan el mismo día.",
     "too_many_intervals": "Son demasiadas franjas en la semana.",
-    "time_block_conflict": "Hay citas en ese rango. Muévelas o cancélalas antes de bloquear:"
+    "time_block_conflict": "Hay citas en ese rango. Muévelas o cancélalas antes de bloquear:",
+    "slot_taken": "Ese horario se acaba de ocupar. Elige otro:",
+    "rate_limited": "Hiciste demasiados intentos. Espera un rato e inténtalo de nuevo.",
+    "cancel_window_closed": "Ya pasó el plazo para cancelar en línea. Comunícate con el negocio.",
+    "captcha_required": "Completa la verificación de seguridad.",
+    "captcha_failed": "No pudimos verificar que no eres un robot. Inténtalo de nuevo.",
+    "invalid_transition": "Esta cita ya no se puede cambiar.",
+    "resource_taken": "El puesto ya está ocupado en ese horario."
   },
   "verticals": {
     "barbershop": "Barbería",
