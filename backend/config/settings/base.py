@@ -108,6 +108,20 @@ MEDIA_MAX_UPLOAD_BYTES = 10 * 1024 * 1024
 # REACTIVAR antes de entregar: ver pormejorar.md.
 REQUIRE_TWO_FACTOR = env_bool("REQUIRE_TWO_FACTOR", True)
 
+# Reserva pública (M6, spec §9). Límites por hora contra reservas basura.
+PUBLIC_BOOKING_LIMIT_PER_IP = int(os.environ.get("PUBLIC_BOOKING_LIMIT_PER_IP", "10"))
+PUBLIC_BOOKING_LIMIT_PER_PHONE = int(os.environ.get("PUBLIC_BOOKING_LIMIT_PER_PHONE", "5"))
+# Proxies propios delante de Django (Caddy = 1). La IP del cliente es la que el último de ellos
+# agregó a X-Forwarded-For; con 0 se usa REMOTE_ADDR. Nunca más alto que los proxies reales: un
+# cliente podría falsear la cabecera para saltarse el límite.
+TRUSTED_PROXY_COUNT = int(os.environ.get("TRUSTED_PROXY_COUNT", "1"))
+# Captcha opcional (Turnstile, hCaptcha o reCAPTCHA: todos validan con un POST secret+response).
+PUBLIC_BOOKING_CAPTCHA = env_bool("PUBLIC_BOOKING_CAPTCHA", False)
+CAPTCHA_VERIFY_URL = os.environ.get(
+    "CAPTCHA_VERIFY_URL", "https://challenges.cloudflare.com/turnstile/v0/siteverify"
+)
+CAPTCHA_SECRET = os.environ.get("CAPTCHA_SECRET", "")
+
 # Cuentas. Sesión por cookie HttpOnly + CSRF (ver docs/adr/0001-autenticacion-por-sesion.md).
 AUTH_USER_MODEL = "accounts.User"
 AUTHENTICATION_BACKENDS = ["apps.accounts.backends.AccountsBackend"]

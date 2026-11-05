@@ -108,6 +108,15 @@ def professionals_for_services(
     )
 
 
+def active_services() -> list[Service]:
+    """Servicios activos con su categoría e imagen, en el orden del menú (reserva pública, M6)."""
+    return list(
+        Service.objects.select_related("category", "image")
+        .filter(is_active=True)
+        .order_by("category__sort_order", "category__name", "name", "pk")
+    )
+
+
 def requires_resource(services: Iterable[Service]) -> bool:
     """Si la cita necesita un puesto libre además del profesional (spec §8.5)."""
     return any(service.requires_resource for service in services)

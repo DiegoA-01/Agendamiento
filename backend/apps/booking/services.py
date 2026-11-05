@@ -42,6 +42,11 @@ def _availability():
     return availability
 
 
+def invalidate_availability(tenant_id) -> None:
+    """Descarta la disponibilidad en caché del negocio después de cambiar una cita."""
+    _availability().invalidate(tenant_id)
+
+
 def _is_uuid(value) -> bool:
     try:
         uuid.UUID(str(value))
