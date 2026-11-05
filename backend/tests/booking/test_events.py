@@ -2,6 +2,7 @@
 aparece en la agenda abierta sin recargar; aquí, el evento llega al flujo SSE de la agenda."""
 
 import functools
+import json
 from unittest import mock
 
 import pytest
@@ -30,7 +31,7 @@ def shop():
 
 
 def open_agenda(shop, client):
-    response = client.get("/api/v1/events/")
+    response = client.get("/api/v1/events/", HTTP_ACCEPT="text/event-stream")
     assert response.status_code == 200
     assert response["Content-Type"] == "text/event-stream"
     chunks = iter(response.streaming_content)
@@ -44,6 +45,23 @@ def next_event(chunks) -> str:
         if text.startswith("event: "):
             return text
     raise AssertionError("El evento no llegó.")
+
+
+def test_events_accept_the_browser_event_stream_header(shop):
+    """EventSource envía este Accept: debe abrir el flujo sin recibir un 406."""
+    staff, _ = shop.client()
+    response = staff.get("/api/v1/events/", HTTP_ACCEPT="text/event-stream")
+    assert response.status_code == 200
+    assert response["Content-Type"] == "text/event-stream"
+    response.close()
+
+
+def test_events_with_event_stream_accept_need_a_session(shop):
+    """La cabecera de EventSource conserva el error de sesión en JSON."""
+    anonymous = APIClient(HTTP_HOST=host(shop.tenant.slug))
+    response = anonymous.get("/api/v1/events/", HTTP_ACCEPT="text/event-stream")
+    assert response.status_code == 401
+    assert json.loads(response.content)["code"] == "not_authenticated"
 
 
 def test_a_web_booking_reaches_the_open_agenda(shop, django_capture_on_commit_callbacks):
