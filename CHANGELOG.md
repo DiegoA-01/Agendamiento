@@ -1,5 +1,14 @@
 # Changelog
 
+## M8 — Tareas de Celery con el negocio activo (frente A)
+
+- `apps/tenancy/tasks.py`, base para las tareas de notificaciones del frente B (spec §4.5):
+  - **`TenantTask`**: la tarea recibe el id del negocio como primer argumento y corre dentro de `tenant_context`, así el ORM y RLS ven solo ese negocio, igual que en una petición. Al terminar (bien, con error o con reintento) el worker queda sin negocio: la siguiente tarea del mismo proceso no hereda el anterior. Si el negocio no existe o está suspendido, la tarea no corre.
+  - **`delay_on_commit(task, tenant, ...)`**: encola cuando la transacción se confirma; el worker nunca procesa una cita que no se guardó.
+  - **`tenancy.for_each_active_tenant`**: tarea para Celery Beat que encola otra tarea una vez por negocio activo (cada uno con su contexto; un error en uno no frena a los demás). Solo acepta tareas con `TenantTask`.
+- Uso, en el docstring del módulo. Verificado con el worker real de Docker: registra y ejecuta la tarea.
+- 8 pruebas: aislamiento por ORM y por SQL directo (RLS), tareas seguidas sin herencia, contexto anidado, error que libera el negocio, negocios suspendidos, encolado tras commit y recorrido por negocios.
+
 ## M7 — Corrección: el flujo de eventos fallaba en el navegador
 
 - `GET /api/v1/events/` respondía **406** a los navegadores. `EventSource` siempre manda `Accept: text/event-stream` y la vista solo aceptaba JSON, así que la agenda nunca recibía eventos.
