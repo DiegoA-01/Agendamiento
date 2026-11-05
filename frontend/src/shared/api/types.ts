@@ -238,3 +238,137 @@ export interface OfferedService {
   commission_pct_override: string | null;
   duration_override_min: number | null;
 }
+
+// --- Horarios y bloqueos (API del frente A, M4) ------------------------------------------------
+
+/** Franja semanal en hora local del negocio. 0 = lunes ... 6 = domingo. */
+export interface WorkingHours {
+  weekday: number;
+  start_time: string;
+  end_time: string;
+}
+
+export interface TimeBlock {
+  id: string;
+  professional_id: string | null;
+  resource_id: string | null;
+  start_at: string;
+  end_at: string;
+  reason: string;
+  created_at: string;
+}
+
+export interface ConflictingAppointment {
+  id: string;
+  start_at: string;
+  end_at: string;
+  status: string;
+}
+
+// --- Reserva pública (API del frente A, M6) ----------------------------------------------------
+
+export type ImageUrls = Partial<ImageRef["urls"]>;
+
+export interface PublicCompany {
+  name: string;
+  vertical: Vertical;
+  language: Language;
+  timezone: string;
+  currency: string;
+  theme: Partial<Theme>;
+  logo: ImageUrls | null;
+  address: string;
+  city: string;
+  phone: string;
+  email: string;
+  social_links: Partial<Record<SocialNetwork, string>>;
+  terms_html: string;
+  privacy_html: string;
+  cookies_html: string;
+  cancel_min_hours: number;
+  booking_enabled: boolean;
+}
+
+export interface PublicService {
+  id: string;
+  name: string;
+  description: string;
+  duration_min: number;
+  price: string;
+  image: ImageUrls | null;
+}
+
+export interface PublicCategory {
+  id: string;
+  name: string;
+  services: PublicService[];
+}
+
+export interface PublicProfessional {
+  id: string;
+  display_name: string;
+  bio: string;
+  photo: ImageUrls | null;
+}
+
+export type SlotPeriod = "morning" | "afternoon" | "evening";
+
+export interface Slot {
+  start: string;
+  end: string;
+  period: SlotPeriod;
+  professional_ids: string[];
+}
+
+export type AppointmentStatus =
+  "pending" | "confirmed" | "in_progress" | "completed" | "cancelled" | "no_show" | "rescheduled";
+
+export interface PublicAppointment {
+  status: AppointmentStatus;
+  start_at: string;
+  end_at: string;
+  professional: string;
+  location: string;
+  address: string;
+  customer_name: string;
+  items: { name: string; duration_min: number; price: string }[];
+  price_total: string;
+  can_cancel: boolean;
+  cancel_deadline: string;
+}
+
+export interface PublicBooked extends PublicAppointment {
+  manage_url: string;
+}
+
+// --- Panel de agenda (M7) ---------------------------------------------------------------------
+export interface CustomerRecord {
+  id: string;
+  full_name: string;
+  phone: string;
+  email: string;
+  birthday: string | null;
+  notes: string;
+  marketing_consent: boolean;
+  data_consent_at: string;
+  appointments_count: number;
+  created_at: string;
+}
+
+export interface Appointment {
+  id: string;
+  status: AppointmentStatus;
+  source: "web" | "dashboard";
+  start_at: string;
+  end_at: string;
+  professional_id: string;
+  resource_id: string | null;
+  location_id: string;
+  customer: Pick<CustomerRecord, "id" | "full_name" | "phone" | "email">;
+  items: { service_id: string; price_charged: string; duration_min: number }[];
+  price_total: string;
+  cancelled_at: string | null;
+  cancel_reason: string;
+  rescheduled_from_id: string | null;
+  created_at: string;
+}

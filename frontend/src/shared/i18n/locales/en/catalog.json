@@ -109,6 +109,42 @@
       "durationOverride": "Own duration (min)",
       "commissionOverride": "Own commission (%)",
       "deleteConfirm": "Remove {{name}} from the team? They will stop receiving appointments."
+    },
+    "hours": {
+      "intro": "Each professional's weekly schedule and the days or hours they are not available.",
+      "professional": "Professional",
+      "noTeam": "First add your team in",
+      "week": "Weekly schedule",
+      "weekTotal": "{{hours}} h {{minutes}} min per week",
+      "copyMonday": "Copy Monday to Tuesday–Friday",
+      "closed": "Not working",
+      "from": "From",
+      "to": "To",
+      "addFirst": "Add hours",
+      "addBreak": "Add a block (after a break)",
+      "remove": "Remove",
+      "removeInterval": "Remove this block",
+      "save": "Save schedule",
+      "days": {
+        "0": "Monday",
+        "1": "Tuesday",
+        "2": "Wednesday",
+        "3": "Thursday",
+        "4": "Friday",
+        "5": "Saturday",
+        "6": "Sunday"
+      },
+      "blocks": "Time off",
+      "blocksHint": "Vacations, doctor visits or any time they do not see customers. Upcoming ones are shown.",
+      "newBlock": "New time off",
+      "noBlocks": "No upcoming time off.",
+      "blockStart": "From",
+      "blockEnd": "To",
+      "blockReason": "Reason",
+      "blockReasonPlaceholder": "Vacation",
+      "blockSave": "Block time",
+      "deleteBlockConfirm": "Delete this time off? Those hours become available again.",
+      "noProfile": "Your account is not linked to a professional profile yet. Ask the owner to link it."
     }
   }
 }

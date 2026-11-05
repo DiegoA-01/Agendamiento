@@ -23,7 +23,7 @@ import {
 import { useMe } from "../../auth/useMe";
 import { KEYS, useCategories, useServices } from "../shared/api";
 import { ImageField } from "../shared/ImageField";
-import { formatMoney } from "../shared/money";
+import { formatMoney } from "../../../shared/money";
 import {
   categorySchema,
   serviceSchema,

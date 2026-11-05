@@ -13,6 +13,9 @@ import type {
 
 /** Claves de caché del catálogo: al guardar, se invalida la clave de lo que cambió. */
 export const KEYS = {
+  appointments: ["appointments"],
+  customers: ["customers"],
+  slots: ["appointment-slots"],
   company: ["company"],
   locations: ["locations"],
   categories: ["categories"],
@@ -21,6 +24,8 @@ export const KEYS = {
   specialties: ["specialties"],
   professionals: ["professionals"],
   offers: (professionalId: string) => ["professionals", professionalId, "services"],
+  workingHours: (professionalId: string) => ["professionals", professionalId, "working-hours"],
+  timeBlocks: (professionalId: string) => ["time-blocks", professionalId],
 } as const;
 
 export const useCompany = () =>
