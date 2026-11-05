@@ -1,5 +1,11 @@
 # Changelog
 
+## M7 — Corrección: el flujo de eventos fallaba en el navegador
+
+- `GET /api/v1/events/` respondía **406** a los navegadores. `EventSource` siempre manda `Accept: text/event-stream` y la vista solo aceptaba JSON, así que la agenda nunca recibía eventos.
+- Se arregla con un `EventStreamRenderer` en `EventsView`: acepta ese `Accept` y los errores previos al flujo (401, 403) siguen saliendo como JSON.
+- Las pruebas de `test_events.py` ahora piden el flujo como el navegador, y hay dos pruebas de regresión: 200 con sesión y 401 en JSON sin sesión. Sin el arreglo, 5 pruebas fallan con 406.
+
 ## M7 — Eventos en tiempo real y clientes (API, frente A)
 
 - **`GET /api/v1/events/`** (Server-Sent Events, spec §9): la agenda abierta recibe `appointment.created`, `appointment.updated` y `appointment.cancelled` con `{id, status, start_at, end_at, professional_id, resource_id}`. El navegador lo abre con `new EventSource("/api/v1/events/")` y la misma sesión; reconecta solo (`retry: 3000`) y recibe un comentario cada 15 s para que ningún proxy corte la conexión.
