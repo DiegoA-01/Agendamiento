@@ -1,5 +1,18 @@
 # Changelog
 
+## M6 — Reserva pública (API, frente A)
+
+- Endpoints sin sesión en el host del negocio (spec §9), con fechas en su zona horaria:
+  - `GET /api/v1/public/company/`: nombre, logo, tema, idioma, contacto, redes, textos legales, `cancel_min_hours` y si recibe reservas. Responde aunque el módulo `booking` esté apagado; nunca expone NIT ni razón social.
+  - `GET /api/v1/public/services/`: servicios activos agrupados por categoría.
+  - `GET /api/v1/public/professionals/?service_ids=`: solo quienes ofrecen todos los servicios y aceptan reserva en línea.
+  - `GET /api/v1/public/availability/days/` y `slots/`: el motor de M5 con las reglas del negocio (anticipación mínima y días hacia adelante). Con "cualquiera" no se revela quién atiende.
+  - `POST /api/v1/public/appointments/`: crea la cita `confirmed` con origen `web`; exige `accept_data_policy: true` (Ley 1581) y devuelve `manage_url` (`/cita/<token>`). Hueco ocupado: `409 slot_taken` con sugerencias.
+  - `GET /api/v1/public/appointments/{token}/` y `POST …/{token}/cancel/`: ver y cancelar por enlace, solo hasta `cancel_min_hours` antes (`409 cancel_window_closed`).
+- Protecciones: honeypot (`website` debe ir vacío), captcha opcional (`PUBLIC_BOOKING_CAPTCHA`, compatible con Turnstile/hCaptcha/reCAPTCHA, sin dependencias nuevas) y límites por hora por negocio: 10 POST por IP y 5 por celular (`429 rate_limited`). La IP sale de `X-Forwarded-For` según `TRUSTED_PROXY_COUNT` (Caddy = 1), así que detrás del proxy cada cliente tiene su propio contador y una IP falsa antepuesta no salta el límite.
+- `catalog.services.active_services()` (lectura, para el listado público).
+- Variables nuevas documentadas en `.env.example`.
+
 ## M5 — Motor de disponibilidad, citas y estados (frente A)
 
 - **Motor de disponibilidad** (`scheduling/availability.py`, spec §8): tiempo libre = horario del día (zona del negocio) menos bloqueos menos citas activas; inicios cada `slot_step_min` alineados desde la medianoche donde cabe la duración total (overrides del profesional + buffer del último servicio); si un servicio exige puesto, debe quedar uno libre en la sede del profesional. Franjas `morning` (< 12:00), `afternoon` y `evening` (≥ 18:00).
