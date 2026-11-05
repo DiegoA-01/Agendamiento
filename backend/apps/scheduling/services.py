@@ -20,6 +20,7 @@ from apps.booking import services as booking
 from apps.catalog import services as catalog
 from config.api import ApiError
 
+from . import availability
 from .models import TimeBlock, WorkingHours
 
 # Tope de franjas por semana en un PUT: sobra para cualquier horario real (7 días con descansos)
@@ -98,6 +99,7 @@ def replace_working_hours(professional, intervals: Iterable[dict]) -> QuerySet[W
         get_working_hours(professional).update(deleted_at=timezone.now())
         for interval in intervals:
             WorkingHours.objects.create(professional=professional, **interval)
+    availability.invalidate(professional.tenant_id)
     return get_working_hours(professional)
 
 
@@ -195,6 +197,7 @@ def create_time_block(
             raise not_found("Puesto")
     _check_no_appointments(block)
     block.save()
+    availability.invalidate(block.tenant_id)
     return block
 
 
@@ -213,6 +216,7 @@ def update_time_block(user, block_id, **changes) -> TimeBlock:
         )
     _check_no_appointments(block)
     block.save()
+    availability.invalidate(block.tenant_id)
     return block
 
 
@@ -220,3 +224,4 @@ def delete_time_block(user, block_id) -> None:
     block = get_time_block(user, block_id, "delete")
     block.deleted_at = timezone.now()
     block.save(update_fields=["deleted_at", "updated_at"])
+    availability.invalidate(block.tenant_id)

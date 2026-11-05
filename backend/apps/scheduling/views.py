@@ -10,8 +10,10 @@ from rest_framework.views import APIView
 
 from apps.accounts import permissions as perms
 from apps.tenancy import services as tenancy
+from apps.tenancy.constants import MODULE_BOOKING
+from config.api import ApiError
 
-from . import serializers
+from . import availability, serializers
 from . import services as scheduling
 
 
@@ -144,3 +146,65 @@ class TimeBlockDetailView(TenantView):
     def delete(self, request, block_id):
         scheduling.delete_time_block(request.user, block_id)
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class AvailabilityView(TenantView):
+    """Horarios libres para agendar desde el panel. Exige el módulo `booking` y poder crear citas;
+    la reserva pública (M6) usa el mismo motor con las reglas del negocio."""
+
+    def get_permissions(self):
+        return [IsTenantUser(), perms.permission_for(perms.APPOINTMENTS, "create")()]
+
+    def initial(self, request, *args, **kwargs):
+        super().initial(request, *args, **kwargs)
+        if not tenancy.is_module_enabled(request.tenant, MODULE_BOOKING):
+            raise ApiError("module_disabled", "El módulo 'booking' no está habilitado.", 403)
+
+    def query(self, serializer_class):
+        params = self.request.query_params
+        data = {**params.dict(), "service_ids": params.getlist("service_ids")}
+        query = serializer_class(data=data)
+        query.is_valid(raise_exception=True)
+        return query.validated_data
+
+
+AVAILABILITY_PARAMS = [
+    OpenApiParameter("service_ids", str, many=True, required=True),
+    OpenApiParameter("professional_id", str, description="Vacío = cualquiera"),
+]
+
+
+class AvailabilitySlotsView(AvailabilityView):
+    @extend_schema(
+        parameters=[*AVAILABILITY_PARAMS, OpenApiParameter("date", str, required=True)],
+        responses=serializers.SlotSerializer(many=True),
+    )
+    def get(self, request):
+        query = self.query(serializers.SlotsQuerySerializer)
+        slots = availability.get_available_slots(
+            request.tenant,
+            query["service_ids"],
+            query["date"],
+            query["professional_id"],
+            public=False,
+        )
+        return Response(serializers.SlotSerializer(slots, many=True).data)
+
+
+class AvailabilityDaysView(AvailabilityView):
+    @extend_schema(
+        parameters=[*AVAILABILITY_PARAMS, OpenApiParameter("month", str, required=True)],
+        responses=serializers.DaysSerializer,
+    )
+    def get(self, request):
+        query = self.query(serializers.DaysQuerySerializer)
+        year, month = (int(part) for part in query["month"].split("-"))
+        days = availability.get_available_days(
+            request.tenant,
+            query["service_ids"],
+            year,
+            month,
+            query["professional_id"],
+            public=False,
+        )
+        return Response({"days": days})
