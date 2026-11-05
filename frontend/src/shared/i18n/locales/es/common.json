@@ -103,7 +103,9 @@
     "captcha_required": "Completa la verificación de seguridad.",
     "captcha_failed": "No pudimos verificar que no eres un robot. Inténtalo de nuevo.",
     "invalid_transition": "Esta cita ya no se puede cambiar.",
-    "resource_taken": "El puesto ya está ocupado en ese horario."
+    "resource_taken": "El puesto ya está ocupado en ese horario.",
+    "customer_exists": "Ya existe un cliente con ese celular.",
+    "phoneFormat": "Escribe un celular válido (7 a 15 dígitos)."
   },
   "verticals": {
     "barbershop": "Barbería",

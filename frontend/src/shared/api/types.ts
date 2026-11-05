@@ -340,3 +340,35 @@ export interface PublicAppointment {
 export interface PublicBooked extends PublicAppointment {
   manage_url: string;
 }
+
+// --- Panel de agenda (M7) ---------------------------------------------------------------------
+export interface CustomerRecord {
+  id: string;
+  full_name: string;
+  phone: string;
+  email: string;
+  birthday: string | null;
+  notes: string;
+  marketing_consent: boolean;
+  data_consent_at: string;
+  appointments_count: number;
+  created_at: string;
+}
+
+export interface Appointment {
+  id: string;
+  status: AppointmentStatus;
+  source: "web" | "dashboard";
+  start_at: string;
+  end_at: string;
+  professional_id: string;
+  resource_id: string | null;
+  location_id: string;
+  customer: Pick<CustomerRecord, "id" | "full_name" | "phone" | "email">;
+  items: { service_id: string; price_charged: string; duration_min: number }[];
+  price_total: string;
+  cancelled_at: string | null;
+  cancel_reason: string;
+  rescheduled_from_id: string | null;
+  created_at: string;
+}

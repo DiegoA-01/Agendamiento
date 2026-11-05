@@ -27,6 +27,25 @@
   - Página legal y aviso de cookies, en español y en inglés.
 - El total antes de confirmar se muestra como **precio de referencia**: la API pública no expone el precio propio de cada profesional, y el valor real sale en la confirmación.
 
+## M7 — Agenda, citas y clientes: pantallas (frente B)
+
+- `/agenda`:
+  - Vista **día** (columna por profesional) y **semana** (columna por día, de lunes a domingo), con anterior, hoy y siguiente, y filtro por profesional.
+  - Las citas simultáneas van en carriles. La grilla abre a las 7:00, con cabeceras fijas.
+  - En el celular la vista día es una lista y la semana se desplaza dentro de su caja.
+- **Tiempo real**: `useAppointmentEvents` abre `EventSource("/api/v1/events/")`; con cada `appointment.created|updated|cancelled` refresca las citas y los horarios libres. Muestra "En vivo" o "Reconectando…".
+- `/citas`:
+  - Lista por cursor con filtros de fechas (hoy + 7 días por defecto), profesional y estados. Desde `/clientes` se llega filtrado por cliente, con un filtro quitable.
+  - Formulario de **nueva cita** compartido con la agenda: servicios, profesional o "cualquiera", día y horario libre, y un cliente existente (búsqueda) o nuevo. `409 slot_taken` ofrece las sugerencias.
+  - Panel de detalle con las **acciones** que permiten el estado (spec §7) y el rol: confirmar, iniciar, completar, marcar inasistencia, cancelar con motivo y reprogramar.
+- `/clientes`:
+  - Búsqueda con debounce por nombre o celular, lista por cursor, crear, editar y borrar.
+  - La autorización de datos (Ley 1581) viene sin marcar y es obligatoria.
+  - `409 customer_exists` se marca en el campo celular, y hay un enlace "Ver citas".
+- Fechas y horas en la zona del negocio. Textos en `locales/{es,en}/agenda.json`.
+- Lógica en módulos con pruebas (`agenda/calendar.ts`, `appointments/transitions.ts`, `appointments/schemas.ts`): 14 pruebas nuevas.
+- Implementado con Codex y revisado y probado en el navegador (ver el PR).
+
 ## M7 — Eventos en tiempo real y clientes (API, frente A)
 
 - **`GET /api/v1/events/`** (Server-Sent Events, spec §9): la agenda abierta recibe `appointment.created`, `appointment.updated` y `appointment.cancelled` con `{id, status, start_at, end_at, professional_id, resource_id}`. El navegador lo abre con `new EventSource("/api/v1/events/")` y la misma sesión; reconecta solo (`retry: 3000`) y recibe un comentario cada 15 s para que ningún proxy corte la conexión.

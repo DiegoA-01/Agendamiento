@@ -103,7 +103,9 @@
     "captcha_required": "Complete the security check.",
     "captcha_failed": "We could not verify you are not a robot. Try again.",
     "invalid_transition": "This appointment can no longer be changed.",
-    "resource_taken": "The workstation is already taken at that time."
+    "resource_taken": "The workstation is already taken at that time.",
+    "customer_exists": "A customer with this mobile phone already exists.",
+    "phoneFormat": "Enter a valid mobile phone (7 to 15 digits)."
   },
   "verticals": {
     "barbershop": "Barbershop",
