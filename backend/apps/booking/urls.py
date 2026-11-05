@@ -13,6 +13,13 @@ urlpatterns = [
     path(f"{ITEM}cancel/", views.CancelView.as_view(), name="appointment-cancel"),
     path(f"{ITEM}no-show/", views.NoShowView.as_view(), name="appointment-no-show"),
     path(f"{ITEM}reschedule/", views.RescheduleView.as_view(), name="appointment-reschedule"),
+    path("events/", views.EventsView.as_view(), name="events"),
+    path("customers/", views.CustomerListCreateView.as_view(), name="customer-list"),
+    path(
+        "customers/<uuid:customer_id>/",
+        views.CustomerDetailView.as_view(),
+        name="customer-detail",
+    ),
 ]
 
 # Reserva pública (M6): sin sesión, el negocio sale del host.

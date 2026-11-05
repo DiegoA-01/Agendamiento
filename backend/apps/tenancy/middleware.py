@@ -22,8 +22,9 @@ class TenantMiddleware:
     - Host con `Domain` verificado: activa ese tenant (ContextVar + RLS).
     - Cualquier otro host: 404.
 
-    Ojo (M7, SSE): el tenant se desactiva al volver la vista; una respuesta en streaming que
-    consulte la base después de eso no tendría tenant. El endpoint SSE deberá reactivarlo.
+    Ojo con el streaming: el tenant se desactiva al volver la vista, así que una respuesta en
+    streaming que consultara la base después no tendría tenant. Por eso el SSE de `events/`
+    (`booking/events.py`) decide negocio y alcance antes de empezar y solo lee de Redis.
     """
 
     def __init__(self, get_response: Callable[[HttpRequest], HttpResponse]) -> None:

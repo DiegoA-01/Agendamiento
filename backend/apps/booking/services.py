@@ -12,13 +12,14 @@ import uuid
 from zoneinfo import ZoneInfo
 
 from django.db import IntegrityError, transaction
-from django.db.models import Count, QuerySet
+from django.db.models import Count, Q, QuerySet
 from django.utils import timezone
 
 from apps.accounts import permissions as perms
 from apps.catalog import services as catalog
 from config.api import ApiError
 
+from . import events
 from .models import ACTIVE_STATUSES, Appointment, AppointmentItem, Customer
 
 Status = Appointment.Status
@@ -264,6 +265,7 @@ def create_appointment(
             # exclusión). Con "cualquiera" se intenta con el siguiente profesional libre.
             continue
         availability.invalidate(tenant.pk)
+        events.notify(events.CREATED, appointment)
         return appointment
 
     raise _slot_taken(tenant, services, candidates, start_at, public=public)
@@ -282,6 +284,14 @@ def _scope(user, action: str) -> str:
     if scope is None:
         raise ApiError("permission_denied", "No tienes permiso para esta acción.", 403)
     return scope
+
+
+def own_professional_scope(user):
+    """Ficha del profesional si su alcance de citas es "solo lo propio"; None si ve todas."""
+    if _scope(user, "view") != perms.OWN:
+        return None
+    # Sin ficha enlazada no tiene citas propias: un id que no existe no deja pasar nada.
+    return _own_professional_id(user) or uuid.UUID(int=0)
 
 
 def require_permission(user, action: str) -> None:
@@ -355,6 +365,7 @@ def change_status(user, appointment_id, action: str, *, reason: str = "") -> App
         fields += ["cancelled_at", "cancel_reason"]
     appointment.save(update_fields=fields)
     _availability().invalidate(appointment.tenant_id)
+    events.notify(events.CANCELLED if action == "cancel" else events.UPDATED, appointment)
     return appointment
 
 
@@ -370,6 +381,7 @@ def reschedule(
     with transaction.atomic():
         # Primero se libera el hueco actual: así se puede mover a un horario que se traslapa.
         original.save(update_fields=["status", "updated_at"])
+        events.notify(events.UPDATED, original)
         return create_appointment(
             tenant,
             service_ids=service_ids,
@@ -412,4 +424,100 @@ def update_appointment(user, appointment_id, *, resource_id=...) -> Appointment:
     except IntegrityError as exc:
         raise ApiError("resource_taken", "El puesto está ocupado en ese horario.", 409) from exc
     _availability().invalidate(appointment.tenant_id)
+    events.notify(events.UPDATED, appointment)
     return appointment
+
+
+# --- Clientes del panel (M7) --------------------------------------------------------------------
+#
+# Los clientes no tienen fila propia en la matriz §5: los gestiona quien ve TODAS las citas
+# (propietario, administrador y recepción). El profesional, con alcance "solo lo propio", no.
+
+CUSTOMER_FIELDS = ("full_name", "email", "phone", "birthday", "notes", "marketing_consent")
+
+
+def _require_customers(user, action: str) -> None:
+    if _scope(user, action) != perms.ALL:
+        raise ApiError("permission_denied", "No tienes permiso para esta acción.", 403)
+
+
+def list_customers(user, *, search: str = "") -> QuerySet[Customer]:
+    """Clientes del negocio, con su número de citas. `search` busca en nombre o celular."""
+    _require_customers(user, "view")
+    customers = Customer.objects.annotate(appointments_count=Count("appointments"))
+    search = search.strip()
+    if search:
+        digits = re.sub(r"\D", "", search)
+        match = Q(full_name__icontains=search)
+        if len(digits) >= 3:
+            match |= Q(phone__contains=digits)
+        customers = customers.filter(match)
+    return customers.order_by("full_name", "id")
+
+
+def get_customer_for(user, customer_id, action: str = "view") -> Customer:
+    _require_customers(user, action)
+    customer = (
+        Customer.objects.annotate(appointments_count=Count("appointments"))
+        .filter(pk=customer_id)
+        .first()
+        if _is_uuid(customer_id)
+        else None
+    )
+    if customer is None:
+        raise ApiError("not_found", "Cliente no encontrado.", 404)
+    return customer
+
+
+def _phone_taken(phone: str, exclude_id=None) -> bool:
+    others = Customer.objects.filter(phone=phone)
+    if exclude_id is not None:
+        others = others.exclude(pk=exclude_id)
+    return others.exists()
+
+
+def _taken_error() -> ApiError:
+    return ApiError(
+        "customer_exists",
+        "Ya hay un cliente con ese celular.",
+        409,
+        {"phone": ["Ya hay un cliente con ese celular."]},
+    )
+
+
+def create_customer(user, **data) -> Customer:
+    """Alta desde el panel. Quien lo registra confirma que el cliente autorizó el tratamiento de
+    sus datos (Ley 1581): la vista exige `data_consent=true` y aquí se guarda la fecha."""
+    _require_customers(user, "create")
+    data["phone"] = normalize_phone(data["phone"])
+    if _phone_taken(data["phone"]):
+        raise _taken_error()
+    try:
+        with transaction.atomic():
+            customer = Customer.objects.create(data_consent_at=timezone.now(), **data)
+    except IntegrityError as exc:
+        raise _taken_error() from exc
+    return get_customer_for(user, customer.pk)
+
+
+def update_customer(user, customer_id, **changes) -> Customer:
+    customer = get_customer_for(user, customer_id, "update")
+    if "phone" in changes:
+        changes["phone"] = normalize_phone(changes["phone"])
+        if _phone_taken(changes["phone"], exclude_id=customer.pk):
+            raise _taken_error()
+    for field, value in changes.items():
+        setattr(customer, field, value)
+    try:
+        with transaction.atomic():
+            customer.save(update_fields=[*changes, "updated_at"])
+    except IntegrityError as exc:
+        raise _taken_error() from exc
+    return get_customer_for(user, customer.pk)
+
+
+def delete_customer(user, customer_id) -> None:
+    """Borrado lógico: sus citas pasadas se conservan (reportes y comisiones)."""
+    customer = get_customer_for(user, customer_id, "delete")
+    customer.deleted_at = timezone.now()
+    customer.save(update_fields=["deleted_at", "updated_at"])

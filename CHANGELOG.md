@@ -1,5 +1,14 @@
 # Changelog
 
+## M7 — Eventos en tiempo real y clientes (API, frente A)
+
+- **`GET /api/v1/events/`** (Server-Sent Events, spec §9): la agenda abierta recibe `appointment.created`, `appointment.updated` y `appointment.cancelled` con `{id, status, start_at, end_at, professional_id, resource_id}`. El navegador lo abre con `new EventSource("/api/v1/events/")` y la misma sesión; reconecta solo (`retry: 3000`) y recibe un comentario cada 15 s para que ningún proxy corte la conexión.
+  - Redis pub/sub, un canal por negocio. Cada cambio de cita (panel, web, cancelación por enlace, reprogramación, puesto) publica **después del commit**: la agenda nunca ve una cita que se deshizo. Si Redis falla, la cita igual se guarda.
+  - El profesional solo recibe los eventos de sus citas. Exige sesión y el módulo `booking`.
+  - El flujo no consulta la base: negocio y alcance se deciden antes de empezar (el tenant ya no está activo durante el streaming).
+- **Clientes** `customers/` (CRUD): búsqueda por nombre o celular (`?q=`), número de citas, cumpleaños y notas. Alta con `data_consent: true` (Ley 1581). Un celular pertenece a un solo cliente (`409 customer_exists`). Borrado lógico: sus citas se conservan. Solo quien ve todas las citas (propietario, administrador y recepción); el profesional recibe 403.
+- **Aceptación**: una reserva hecha en la web llega como evento al flujo SSE de la agenda abierta (`tests/booking/test_events.py`). Falta la pantalla `/agenda` del frente B para verlo en el navegador.
+
 ## M6 — Reserva pública (API, frente A)
 
 - Endpoints sin sesión en el host del negocio (spec §9), con fechas en su zona horaria:
