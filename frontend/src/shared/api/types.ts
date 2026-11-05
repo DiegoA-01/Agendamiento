@@ -263,6 +263,7 @@ export interface ConflictingAppointment {
   start_at: string;
   end_at: string;
   status: string;
+}
 
 // --- Reserva pública (API del frente A, M6) ----------------------------------------------------
 
