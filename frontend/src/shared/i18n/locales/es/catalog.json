@@ -109,6 +109,42 @@
       "durationOverride": "Duración propia (min)",
       "commissionOverride": "Comisión propia (%)",
       "deleteConfirm": "¿Eliminar a {{name}} del equipo? Dejará de recibir citas."
+    },
+    "hours": {
+      "intro": "Horario semanal de cada profesional y los días u horas en que no atiende.",
+      "professional": "Profesional",
+      "noTeam": "Primero agrega a tu equipo en",
+      "week": "Horario semanal",
+      "weekTotal": "{{hours}} h {{minutes}} min a la semana",
+      "copyMonday": "Copiar el lunes de martes a viernes",
+      "closed": "No trabaja",
+      "from": "Desde",
+      "to": "Hasta",
+      "addFirst": "Agregar horario",
+      "addBreak": "Agregar franja (después de un descanso)",
+      "remove": "Quitar",
+      "removeInterval": "Quitar esta franja",
+      "save": "Guardar horario",
+      "days": {
+        "0": "Lunes",
+        "1": "Martes",
+        "2": "Miércoles",
+        "3": "Jueves",
+        "4": "Viernes",
+        "5": "Sábado",
+        "6": "Domingo"
+      },
+      "blocks": "Bloqueos de agenda",
+      "blocksHint": "Vacaciones, citas médicas o cualquier rato en que no recibe clientes. Se muestran los próximos.",
+      "newBlock": "Nuevo bloqueo",
+      "noBlocks": "No hay bloqueos próximos.",
+      "blockStart": "Desde",
+      "blockEnd": "Hasta",
+      "blockReason": "Motivo",
+      "blockReasonPlaceholder": "Vacaciones",
+      "blockSave": "Bloquear",
+      "deleteBlockConfirm": "¿Eliminar este bloqueo? Esas horas vuelven a quedar disponibles.",
+      "noProfile": "Tu cuenta aún no está enlazada a una ficha de profesional. Pídele al propietario que la enlace."
     }
   }
 }

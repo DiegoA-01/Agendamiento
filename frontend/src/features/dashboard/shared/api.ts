@@ -21,6 +21,8 @@ export const KEYS = {
   specialties: ["specialties"],
   professionals: ["professionals"],
   offers: (professionalId: string) => ["professionals", professionalId, "services"],
+  workingHours: (professionalId: string) => ["professionals", professionalId, "working-hours"],
+  timeBlocks: (professionalId: string) => ["time-blocks", professionalId],
 } as const;
 
 export const useCompany = () =>

@@ -238,3 +238,29 @@ export interface OfferedService {
   commission_pct_override: string | null;
   duration_override_min: number | null;
 }
+
+// --- Horarios y bloqueos (API del frente A, M4) ------------------------------------------------
+
+/** Franja semanal en hora local del negocio. 0 = lunes ... 6 = domingo. */
+export interface WorkingHours {
+  weekday: number;
+  start_time: string;
+  end_time: string;
+}
+
+export interface TimeBlock {
+  id: string;
+  professional_id: string | null;
+  resource_id: string | null;
+  start_at: string;
+  end_at: string;
+  reason: string;
+  created_at: string;
+}
+
+export interface ConflictingAppointment {
+  id: string;
+  start_at: string;
+  end_at: string;
+  status: string;
+}
