@@ -90,3 +90,39 @@ class SlotTakenSerializer(serializers.Serializer):
     code = serializers.CharField()
     detail = serializers.CharField()
     fields = SlotTakenFieldsSerializer()
+
+
+class CustomerDetailSerializer(serializers.Serializer):
+    id = serializers.UUIDField()
+    full_name = serializers.CharField()
+    phone = serializers.CharField(help_text="E.164, p. ej. +573001234567")
+    email = serializers.EmailField(allow_blank=True)
+    birthday = serializers.DateField(allow_null=True)
+    notes = serializers.CharField(allow_blank=True)
+    marketing_consent = serializers.BooleanField()
+    data_consent_at = serializers.DateTimeField()
+    appointments_count = serializers.IntegerField()
+    created_at = serializers.DateTimeField()
+
+
+class CustomerWriteSerializer(serializers.Serializer):
+    full_name = serializers.CharField(max_length=150)
+    phone = serializers.CharField(max_length=30)
+    email = serializers.EmailField(required=False, allow_blank=True)
+    birthday = serializers.DateField(required=False, allow_null=True)
+    notes = serializers.CharField(required=False, allow_blank=True)
+    marketing_consent = serializers.BooleanField(required=False)
+
+
+class CustomerCreateSerializer(CustomerWriteSerializer):
+    data_consent = serializers.BooleanField(
+        write_only=True,
+        help_text="Confirma que el cliente autorizó el tratamiento de sus datos (Ley 1581).",
+    )
+
+    def validate_data_consent(self, value):
+        if not value:
+            raise serializers.ValidationError(
+                "El cliente debe autorizar el tratamiento de sus datos."
+            )
+        return value

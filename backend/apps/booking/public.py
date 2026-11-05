@@ -17,6 +17,7 @@ from django.utils import timezone
 
 from config.api import ApiError
 
+from . import events
 from . import services as booking
 from .models import Appointment
 
@@ -154,4 +155,5 @@ def cancel(tenant, token: str, *, reason: str = "") -> Appointment:
     appointment.cancel_reason = reason or "Cancelada por el cliente"
     appointment.save(update_fields=["status", "cancelled_at", "cancel_reason", "updated_at"])
     booking.invalidate_availability(appointment.tenant_id)
+    events.notify(events.CANCELLED, appointment)
     return appointment

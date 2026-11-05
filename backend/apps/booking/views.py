@@ -1,6 +1,8 @@
 from zoneinfo import ZoneInfo
 
+from django.http import StreamingHttpResponse
 from django.utils import timezone
+from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiParameter, OpenApiResponse, extend_schema
 from rest_framework import status
 from rest_framework.pagination import CursorPagination
@@ -12,7 +14,7 @@ from apps.tenancy import services as tenancy
 from apps.tenancy.constants import MODULE_BOOKING
 from config.api import ApiError
 
-from . import serializers
+from . import events, serializers
 from . import services as booking
 
 
@@ -187,3 +189,91 @@ class RescheduleView(BookingView):
             request.user, request.tenant, appointment_id, **data.validated_data
         )
         return Response(_data(appointment), status=status.HTTP_201_CREATED)
+
+
+# --- Tiempo real (M7) ---------------------------------------------------------------------------
+
+
+class EventsView(BookingView):
+    """Server-Sent Events con los cambios de citas del negocio, para la agenda abierta.
+
+    El navegador lo abre con `new EventSource("/api/v1/events/")` (misma sesión por cookie).
+    Eventos: `appointment.created`, `appointment.updated` y `appointment.cancelled`, con
+    `data` = `{id, status, start_at, end_at, professional_id, resource_id}`. Un profesional solo
+    recibe los de sus citas.
+    """
+
+    @extend_schema(
+        responses={(200, "text/event-stream"): OpenApiTypes.STR},
+        description="Flujo SSE; no termina mientras el navegador lo tenga abierto.",
+    )
+    def get(self, request):
+        booking.require_permission(request.user, "view")
+        professional_id = booking.own_professional_scope(request.user)
+        response = StreamingHttpResponse(
+            events.stream(request.tenant.pk, professional_id=professional_id),
+            content_type="text/event-stream",
+        )
+        response["Cache-Control"] = "no-cache"
+        response["X-Accel-Buffering"] = "no"  # que ningún proxy acumule los eventos
+        return response
+
+
+# --- Clientes (M7) ------------------------------------------------------------------------------
+
+
+class ByNamePagination(CursorPagination):
+    page_size = 50
+    page_size_query_param = "page_size"
+    max_page_size = 200
+    ordering = ("full_name", "id")
+
+
+class CustomerListCreateView(BookingView):
+    @extend_schema(
+        parameters=[OpenApiParameter("q", str, description="Busca por nombre o celular")],
+        responses=serializers.CustomerDetailSerializer(many=True),
+    )
+    def get(self, request):
+        customers = booking.list_customers(request.user, search=request.query_params.get("q", ""))
+        paginator = ByNamePagination()
+        page = paginator.paginate_queryset(customers, request, view=self)
+        return paginator.get_paginated_response(
+            serializers.CustomerDetailSerializer(page, many=True).data
+        )
+
+    @extend_schema(
+        request=serializers.CustomerCreateSerializer,
+        responses={201: serializers.CustomerDetailSerializer},
+    )
+    def post(self, request):
+        data = serializers.CustomerCreateSerializer(data=request.data)
+        data.is_valid(raise_exception=True)
+        values = dict(data.validated_data)
+        values.pop("data_consent")
+        customer = booking.create_customer(request.user, **values)
+        return Response(
+            serializers.CustomerDetailSerializer(customer).data, status=status.HTTP_201_CREATED
+        )
+
+
+class CustomerDetailView(BookingView):
+    @extend_schema(responses=serializers.CustomerDetailSerializer)
+    def get(self, request, customer_id):
+        customer = booking.get_customer_for(request.user, customer_id)
+        return Response(serializers.CustomerDetailSerializer(customer).data)
+
+    @extend_schema(
+        request=serializers.CustomerWriteSerializer(partial=True),
+        responses=serializers.CustomerDetailSerializer,
+    )
+    def patch(self, request, customer_id):
+        data = serializers.CustomerWriteSerializer(data=request.data, partial=True)
+        data.is_valid(raise_exception=True)
+        customer = booking.update_customer(request.user, customer_id, **data.validated_data)
+        return Response(serializers.CustomerDetailSerializer(customer).data)
+
+    @extend_schema(responses={204: None})
+    def delete(self, request, customer_id):
+        booking.delete_customer(request.user, customer_id)
+        return Response(status=status.HTTP_204_NO_CONTENT)
