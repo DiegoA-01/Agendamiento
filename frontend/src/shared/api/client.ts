@@ -74,3 +74,27 @@ export function cursorFrom(nextUrl: string | null): string | undefined {
   if (!nextUrl) return undefined;
   return new URL(nextUrl, "http://placeholder.invalid").searchParams.get("cursor") ?? undefined;
 }
+
+/** Sube un archivo como `multipart/form-data` (campo `file`), con el mismo manejo de CSRF y de
+ *  errores que `api`. */
+export async function uploadFile<T>(path: string, file: File): Promise<T> {
+  const body = new FormData();
+  body.append("file", file);
+  const token = await csrfToken();
+  const response = await fetch(path, {
+    method: "POST",
+    headers: { Accept: "application/json", ...(token ? { "X-CSRFToken": token } : {}) },
+    credentials: "same-origin",
+    body,
+  });
+  const data = await response.json().catch(() => null);
+  if (!response.ok) {
+    throw new ApiError(
+      response.status,
+      data?.code ?? "unknown",
+      data?.detail ?? response.statusText,
+      data?.fields ?? {},
+    );
+  }
+  return data as T;
+}

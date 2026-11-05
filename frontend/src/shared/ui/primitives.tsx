@@ -96,6 +96,28 @@ export function TextField({
   );
 }
 
+export function TextAreaField({
+  label,
+  error,
+  hint,
+  optional,
+  className = "",
+  ...props
+}: ComponentProps<"textarea"> & FieldShellProps) {
+  const id = useId();
+  return (
+    <FieldShell id={id} label={label} error={error} hint={hint} optional={optional}>
+      <textarea
+        id={id}
+        aria-invalid={error ? true : undefined}
+        aria-describedby={describedBy(id, error, hint)}
+        className={`${INPUT_STYLES} min-h-24 py-2 ${error ? "border-red-600" : "border-slate-300"} ${className}`}
+        {...props}
+      />
+    </FieldShell>
+  );
+}
+
 export function SelectField({
   label,
   error,

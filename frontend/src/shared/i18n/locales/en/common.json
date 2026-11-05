@@ -77,7 +77,20 @@
     "slugReserved": "That subdomain is reserved.",
     "currencyFormat": "Use 3 letters, for example COP.",
     "hostFormat": "Enter a valid domain, for example www.mybusiness.com.",
-    "min1": "Must be at least 1."
+    "min1": "Must be at least 1.",
+    "moneyFormat": "Enter an amount with up to 2 decimals, for example 30000.",
+    "percentFormat": "Enter a percentage from 0 to 100, with up to 2 decimals.",
+    "urlFormat": "Enter a full address, for example https://instagram.com/yourbusiness.",
+    "durationRange": "Must be between 5 and 1440 minutes.",
+    "bufferRange": "Must be between 0 and 240 minutes.",
+    "plan_limit_reached": "Your plan does not allow more. Ask the platform administrator for a larger plan.",
+    "default_location_required": "There must always be a main location.",
+    "location_in_use": "The location has professionals or workstations: move them before deleting it.",
+    "category_in_use": "The category has services: move or delete them first.",
+    "file_too_large": "The image is larger than 10 MB.",
+    "invalid_image": "The file is not a valid image.",
+    "unsupported_image": "Format not allowed. Use JPG, PNG or WebP.",
+    "image_too_large": "The image has too many pixels."
   },
   "verticals": {
     "barbershop": "Barbershop",
