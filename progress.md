@@ -2,7 +2,7 @@
 
 Estado del SaaS de agendamiento y plan a seguir. Se actualiza al cerrar cada hito o cada PR importante.
 
-**Corte:** 2026-11-03 · `develop` en `4e18cf7` · `main` en M0 (`12343f6`, espera la revisión del encargado).
+**Corte:** 2026-11-05 · `develop` en `b9f0646` (M0 a M8 de backend; pantallas hasta M7) · `main` en M0 (`12343f6`, espera la revisión del encargado).
 
 ---
 
@@ -176,3 +176,54 @@ El camino crítico es **M4 → M5**: casi todo lo demás depende de citas y disp
 - Actualízalo al cerrar cada hito o cada PR que cambie el estado del proyecto.
 - Cada frente escribe solo en sus filas y en sus pendientes.
 - Cambia la fecha de **Corte** y el commit de `develop` arriba.
+
+---
+
+## 10. Mejoras propuestas tras las pruebas manuales (2026-11-05)
+
+Salieron de probar el negocio demo y el panel del Super Admin. Cada una indica qué existe ya, quién la haría y si cabe en el alcance de la Fase 1.
+
+**Alcance:**
+- **Fase 1**: cabe en la spec y se puede hacer antes del cierre.
+- **Cambia la spec**: no está prohibida, pero contradice una decisión de la spec. Necesita aprobación del encargado.
+- **Fuera de alcance**: la spec la excluye (§1 o §12). Va a una fase siguiente salvo que el encargado la apruebe.
+
+### Reserva pública (`/reservar`)
+
+| # | Mejora | Qué existe hoy | Quién | Alcance |
+|---|---|---|---|---|
+| R1 | Foto en cada servicio | La API ya guarda y expone la imagen del servicio (M4, `image_id`); el panel ya la sube | B (mostrarla en la reserva) | Fase 1 |
+| R2 | Modal de detalle por servicio (foto, descripción, duración, precio) | La API pública ya trae esos datos | B | Fase 1 |
+| R3 | Combinar servicios con reglas: un solo corte por cita, pero corte + barba o cejas sí | Hoy se pueden elegir varios servicios sin reglas (máximo 10) | A (regla en la API: por ejemplo "máximo uno por categoría" marcado en la categoría, y validación al crear la cita) y B (campo en `/servicios` y en el asistente) | Fase 1, necesita migración en `catalog` |
+| R4 | Foto de presentación de cada barbero | La API ya guarda la foto del profesional (M4) y la pública la expone | B (mostrarla) | Fase 1 |
+| R5 | Especialidad de cada barbero en la reserva | Las especialidades existen (M4), pero la API pública no las expone | A (agregarlas a `public/professionals/`) y B | Fase 1 |
+| R6 | Calificación por barbero | `Professional.rating_avg` existe como campo reservado, sin uso | — | **Fuera de alcance** (§12: reseñas) |
+| R7 | Calendario que marque con colores los días disponibles y los ocupados | `public/availability/days/` devuelve solo los días con horario libre | A (devolver el estado de cada día: libre, lleno o cerrado) y B (colores) | Fase 1 |
+| R8 | Solo horas libres, sin dejar reservar las ocupadas, y sin mostrar quién reservó | Ya funciona: los horarios salen del motor (M5), la doble reserva la impide la base de datos, y con "cualquiera" no se muestra el profesional. Ningún cliente ve datos de otros | — | Hecho; verificar en la prueba manual |
+| R9 | Todo el flujo en un solo modal, con menos pasos | El asistente tiene 5 pasos en páginas | B | Fase 1 (decisión de UX) |
+| R10 | Agregar la cita al wallet del celular | — | — | **Fuera de alcance** (§1 y §12: wallet). Alternativa dentro de alcance: botón "Agregar al calendario" con un archivo `.ics` |
+
+### Super Admin
+
+| # | Mejora | Qué existe hoy | Quién | Alcance |
+|---|---|---|---|---|
+| S1 | Quitar el selector de idioma del panel del Super Admin y dejarlo solo en el sitio de cada negocio | El selector aparece en todos los paneles | B | Fase 1 |
+| S2 | Tipo de negocio con selección múltiple, en píldoras con checkbox | `Tenant.vertical` admite un solo valor | A (modelo y migración en `tenancy`) y B (formulario) | **Cambia la spec** (§1: "un campo `vertical`") |
+| S3 | Quitar zona horaria y moneda del alta de negocio | Se piden en el formulario; tienen valores por defecto (`America/Bogota`, `COP`) | B (ocultarlos y usar los valores por defecto) | Fase 1 |
+| S4 | Quitar el idioma del alta; el idioma lo elige el visitante en el sitio del negocio | El negocio tiene idioma por defecto y el sitio ya trae selector | B | Fase 1 |
+| S5 | Datos del propietario al crear el negocio: tipo y número de documento (CC), RUT/NIT, teléfono y contraseña | Se pide correo y nombre; la contraseña es temporal y se cambia al primer ingreso | A (`accounts`: documento y teléfono) y B (formulario) | Fase 1. Ojo: que el Super Admin escriba la contraseña del propietario es menos seguro que la temporal actual; conviene mantener la temporal o un enlace para que el propietario la defina |
+| S6 | Dashboard del estado de la plataforma: total de negocios, activos, suspendidos, nuevos | Hay listado con filtros, sin resumen | B (pantalla) y quien sea dueño de `platform_admin` (API de métricas) | Fase 1 |
+| S7 | Soporte: categorías, tickets, sesiones de soporte y quién atiende cada ticket | — | — | **Nuevo módulo, no está en la spec**. Fase siguiente |
+| S8 | Términos y condiciones de la plataforma | Cada negocio tiene sus textos legales; la plataforma no | B | Fase 1 (texto estático) |
+| S9 | Pagos de la suscripción: pagados, pendientes, vencidos y fallidos | — | — | **Fuera de alcance** (§1: precios del software; §12: Wompi y facturación). Fase siguiente |
+| S10 | Uso del sistema por negocio (citas, reservas web, usuarios, último ingreso) | Los datos existen en la base | A (API de métricas) y B (pantalla) | Fase 1, después de M9 |
+| S11 | Integraciones por negocio: cómo le funcionan WhatsApp, correo y wallet | `NotificationLog` llega en M8 | B (con M8) | Fase 1 para WhatsApp y correo; wallet fuera de alcance |
+| S12 | Monitoreo: errores del sistema, copias de seguridad y auditoría | La auditoría ya existe (M3); errores (Sentry) y copias de seguridad están en M10 | A y B en M10 | Fase 1 (M10) |
+
+### Qué hacer con esta lista
+
+1. **Llevar al encargado** las marcadas "Cambia la spec" o "Fuera de alcance" (R6, R10, S2, S7, S9 y el wallet de S11). Ninguna se programa sin su aprobación.
+2. **Las de Fase 1** se reparten así:
+   - **Frente A**: R3, R5, R7, S2 (si se aprueba), S5 y S10, junto con M9.
+   - **Frente B**: R1, R2, R4, R9, S1, S3, S4, S6, S8 y S11, junto con M8 y la pantalla `/reportes`.
+3. **R8** ya está cubierto por el backend; solo hay que confirmarlo en la próxima prueba manual.
