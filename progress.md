@@ -2,7 +2,7 @@
 
 Estado del SaaS de agendamiento y plan a seguir. Se actualiza al cerrar cada hito o cada PR importante.
 
-**Corte:** 2026-11-05 · `develop` en `b9f0646` (M0 a M8 de backend; pantallas hasta M7) · `main` en M0 (`12343f6`, espera la revisión del encargado).
+**Corte:** 2026-11-05 · `develop` en `b9f0646` (M0 a M7 completos y la base de tareas de M8) · `main` en M0 (`12343f6`, espera la revisión del encargado).
 
 ---
 
