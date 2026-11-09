@@ -53,7 +53,8 @@
       "delete": "Eliminar empresa",
       "deleteHelp": "Escribe el subdominio ({{slug}}) para confirmar. La empresa deja de estar disponible; los datos no se borran.",
       "deleteConfirm": "Confirmar eliminación",
-      "dangerZone": "Zona de riesgo"
+      "dangerZone": "Zona de riesgo",
+      "usage": "Uso"
     },
     "ownerPhone": "Celular del propietario",
     "ownerDocumentType": "Tipo de documento",
@@ -66,7 +67,19 @@
     },
     "taxId": "NIT o RUT del negocio",
     "taxIdHint": "Con o sin dígito de verificación: 900123456-7.",
-    "passwordNote": "El sistema genera una contraseña temporal; el propietario la cambia en su primer ingreso. Así nadie más la conoce."
+    "passwordNote": "El sistema genera una contraseña temporal; el propietario la cambia en su primer ingreso. Así nadie más la conoce.",
+    "usage": {
+      "appointmentsRecent": "Citas creadas ({{days}} días)",
+      "webBookingsRecent": "Reservas web ({{days}} días)",
+      "completedRecent": "Completadas ({{days}} días)",
+      "cancelledRecent": "Canceladas ({{days}} días)",
+      "appointmentsTotal": "Citas en total",
+      "customersTotal": "Clientes",
+      "usersActive": "Usuarios activos",
+      "lastLogin": "Último ingreso",
+      "never": "Nadie ha entrado aún",
+      "note": "Las cifras de {{days}} días cuentan las citas creadas en ese periodo, no las agendadas para esas fechas."
+    }
   },
   "theme": {
     "intro": "Colores del negocio. El texto debe leerse bien sobre el fondo y las superficies (contraste mínimo 4.5:1).",

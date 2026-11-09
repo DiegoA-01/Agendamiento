@@ -1,5 +1,16 @@
 # Changelog
 
+## Mejora S10: uso del sistema por negocio
+
+- `GET /tenants/{id}/usage/` (solo Super Admin) devuelve, por negocio:
+  - Citas creadas en los últimos 30 días: cuántas fueron reservas web, cuántas se completaron y cuántas se cancelaron.
+  - Citas totales y clientes.
+  - Usuarios activos y el último ingreso de cualquiera de ellos.
+- Las cifras de 30 días cuentan citas **creadas** en ese periodo: miden actividad, no agenda futura.
+- Cada app aporta su parte desde su `services.py` (`booking.usage_counts`, `accounts.usage_for`). Las citas se cuentan dentro del negocio, así que RLS impide mezclar datos de otro.
+- En el panel del Super Admin, el detalle de cada empresa tiene la pestaña **Uso** con esas cifras. Textos en español e inglés.
+- **Pruebas:** 3 nuevas. El backend pasa 741 pruebas y el frontend 122.
+
 ## Mejora S5: datos del propietario al crear un negocio
 
 - `POST /tenants/` acepta campos nuevos. En la API son opcionales, así que las integraciones actuales no se rompen.

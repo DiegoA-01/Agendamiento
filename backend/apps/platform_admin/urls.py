@@ -5,6 +5,7 @@ from . import views
 urlpatterns = [
     path("tenants/", views.TenantListCreateView.as_view(), name="tenants"),
     path("tenants/<uuid:tenant_id>/", views.TenantDetailView.as_view(), name="tenant"),
+    path("tenants/<uuid:tenant_id>/usage/", views.TenantUsageView.as_view(), name="tenant-usage"),
     path(
         "tenants/<uuid:tenant_id>/suspend/",
         views.TenantStatusView.as_view(suspend=True),

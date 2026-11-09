@@ -28,6 +28,25 @@ export const useTenant = (id: string) =>
     queryFn: () => api<TenantDetail>(`/api/v1/tenants/${id}/`),
   });
 
+/** Uso del sistema por negocio (S10). `*_recent`: citas creadas en los últimos `window_days`. */
+export interface TenantUsage {
+  window_days: number;
+  appointments_total: number;
+  appointments_recent: number;
+  web_bookings_recent: number;
+  completed_recent: number;
+  cancelled_recent: number;
+  customers_total: number;
+  users_active: number;
+  last_login: string | null;
+}
+
+export const useTenantUsage = (id: string) =>
+  useQuery({
+    queryKey: ["tenant", id, "usage"],
+    queryFn: () => api<TenantUsage>(`/api/v1/tenants/${id}/usage/`),
+  });
+
 export const useTenantModules = (id: string) =>
   useQuery({
     queryKey: ["tenant", id, "modules"],

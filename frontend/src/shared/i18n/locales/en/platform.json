@@ -53,7 +53,8 @@
       "delete": "Delete business",
       "deleteHelp": "Type the subdomain ({{slug}}) to confirm. The business stops being available; data is not erased.",
       "deleteConfirm": "Confirm deletion",
-      "dangerZone": "Danger zone"
+      "dangerZone": "Danger zone",
+      "usage": "Usage"
     },
     "ownerPhone": "Owner's mobile",
     "ownerDocumentType": "ID type",
@@ -66,7 +67,19 @@
     },
     "taxId": "Business tax ID (NIT/RUT)",
     "taxIdHint": "With or without check digit: 900123456-7.",
-    "passwordNote": "The system generates a temporary password; the owner changes it on first sign-in, so nobody else knows it."
+    "passwordNote": "The system generates a temporary password; the owner changes it on first sign-in, so nobody else knows it.",
+    "usage": {
+      "appointmentsRecent": "Appointments created ({{days}} days)",
+      "webBookingsRecent": "Online bookings ({{days}} days)",
+      "completedRecent": "Completed ({{days}} days)",
+      "cancelledRecent": "Cancelled ({{days}} days)",
+      "appointmentsTotal": "Total appointments",
+      "customersTotal": "Customers",
+      "usersActive": "Active users",
+      "lastLogin": "Last sign-in",
+      "never": "No one has signed in yet",
+      "note": "The {{days}}-day figures count appointments created in that period, not those scheduled for those dates."
+    }
   },
   "theme": {
     "intro": "Business colors. Text must be readable on the background and surfaces (minimum contrast 4.5:1).",

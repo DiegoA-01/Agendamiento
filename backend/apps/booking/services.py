@@ -18,6 +18,7 @@ from django.utils import timezone
 from apps.accounts import permissions as perms
 from apps.catalog import services as catalog
 from apps.commissions import services as commissions
+from apps.tenancy.context import tenant_context
 from config.api import ApiError
 
 from . import events
@@ -554,3 +555,27 @@ def delete_customer(user, customer_id) -> None:
     customer = get_customer_for(user, customer_id, "delete")
     customer.deleted_at = timezone.now()
     customer.save(update_fields=["deleted_at", "updated_at"])
+
+
+def usage_counts(tenant, *, since: dt.datetime) -> dict[str, int]:
+    """Cuánto usa el negocio la agenda (S10): citas, reservas web y clientes.
+
+    `last_30_days` cuenta las citas creadas desde `since`, no las agendadas para esas fechas: mide
+    actividad. Corre dentro del negocio, así que RLS limita todo a sus filas.
+    """
+    with tenant_context(tenant):
+        recent = Appointment.objects.filter(created_at__gte=since)
+        counts = recent.aggregate(
+            created=Count("id"),
+            web=Count("id", filter=Q(source=Appointment.Source.WEB)),
+            completed=Count("id", filter=Q(status=Appointment.Status.COMPLETED)),
+            cancelled=Count("id", filter=Q(status=Appointment.Status.CANCELLED)),
+        )
+        return {
+            "appointments_total": Appointment.objects.count(),
+            "appointments_recent": counts["created"],
+            "web_bookings_recent": counts["web"],
+            "completed_recent": counts["completed"],
+            "cancelled_recent": counts["cancelled"],
+            "customers_total": Customer.objects.count(),
+        }
