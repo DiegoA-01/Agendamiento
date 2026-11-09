@@ -1,5 +1,19 @@
 # Changelog
 
+## Mejoras R5 y R7 de la reserva: API (frente A)
+
+- **R5. Especialidades en la reserva.** `GET /public/professionals/` incluye `specialties`: una lista `{id, name}` por cada barbero, en orden alfabético y sin las borradas. Se cargan en una sola consulta para todos.
+- **R7. Estado de cada día.** `GET /public/availability/days/` y `GET /availability/days/` agregan `calendar`, con todos los días del mes y su estado:
+  - `available`: hay al menos un horario libre.
+  - `full`: alguien trabaja ese día, pero las citas o el aviso mínimo ya no dejan horarios.
+  - `closed`: nadie atiende, porque no hay horario o el día está bloqueado (festivo, vacaciones).
+  - `unavailable`: fuera de la ventana de reserva (días pasados o más allá de `max_advance_days`).
+  - Con "cualquiera", el día está lleno solo si ningún profesional tiene cupo. Una cita cancelada vuelve a liberar el día.
+  - `days` sigue igual (solo los disponibles), así que las pantallas actuales no cambian.
+- El enum nuevo se llama `CalendarDayStatusEnum` y el estado de la cita conserva el nombre `StatusEnum` en el OpenAPI.
+- 10 pruebas nuevas. La suite completa pasa: 728 pruebas.
+- **Pendiente (frente B):** los colores del calendario y las especialidades en el paso "Profesional" del asistente.
+
 ## M9 — Comisiones y reportes: API (frente A)
 
 - **Comisiones** (`apps/commissions`, spec §11):

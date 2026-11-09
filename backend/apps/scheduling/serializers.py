@@ -112,5 +112,26 @@ class SlotSerializer(serializers.Serializer):
     professional_ids = serializers.ListField(child=serializers.UUIDField())
 
 
+class CalendarDaySerializer(serializers.Serializer):
+    date = serializers.DateField()
+    status = serializers.ChoiceField(
+        choices=["available", "full", "closed", "unavailable"],
+        help_text=(
+            "available: hay horarios; full: se atiende pero ya no hay cupo; closed: nadie "
+            "atiende (sin horario o bloqueado); unavailable: fuera de la ventana de reserva."
+        ),
+    )
+
+
 class DaysSerializer(serializers.Serializer):
-    days = serializers.ListField(child=serializers.DateField())
+    days = serializers.ListField(
+        child=serializers.DateField(), help_text="Solo los días con horarios (`available`)."
+    )
+    calendar = CalendarDaySerializer(many=True, help_text="Todos los días del mes con su estado.")
+
+    @staticmethod
+    def build(calendar):
+        return {
+            "days": [day for day, status in calendar if status == "available"],
+            "calendar": [{"date": day, "status": status} for day, status in calendar],
+        }

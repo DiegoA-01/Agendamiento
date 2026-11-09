@@ -89,7 +89,7 @@ def test_professionals_only_those_with_online_booking(shop):
     )
 
     assert [p["display_name"] for p in body] == ["Ana"]
-    assert set(body[0]) == {"id", "display_name", "bio", "photo"}
+    assert set(body[0]) == {"id", "display_name", "bio", "photo", "specialties"}
     assert body[0]["id"] == str(ana.pk)
 
 
