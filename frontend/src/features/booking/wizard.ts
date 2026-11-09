@@ -1,4 +1,11 @@
-import type { PublicCategory, PublicService, Slot, SlotPeriod } from "../../shared/api/types";
+import type {
+  AvailableDays,
+  DayStatus,
+  PublicCategory,
+  PublicService,
+  Slot,
+  SlotPeriod,
+} from "../../shared/api/types";
 
 /** Pasos del asistente de reserva (spec §13): servicios → profesional → fecha → hora → datos. */
 export const STEPS = ["services", "professional", "date", "time", "details"] as const;
@@ -114,3 +121,26 @@ export function formatDateTime(iso: string, locale: string, timeZone: string): s
     timeZone,
   }).format(new Date(iso));
 }
+
+/** Estado de cada fecha del mes. Si la API aún no manda `calendar`, usa `days` (los demás quedan
+ *  como no disponibles). Una fecha que no viene se trata como no disponible. */
+export function dayStatuses(data: AvailableDays | undefined): Map<string, DayStatus> {
+  const statuses = new Map<string, DayStatus>();
+  if (!data) return statuses;
+  if (data.calendar) {
+    for (const { date, status } of data.calendar) statuses.set(date, status);
+  } else {
+    for (const date of data.days) statuses.set(date, "available");
+  }
+  return statuses;
+}
+
+/** Clases de cada estado en el calendario. El color nunca va solo: el estado también va en el
+ *  nombre accesible del botón y en la leyenda. */
+export const DAY_STYLES: Record<DayStatus, string> = {
+  available:
+    "bg-[var(--color-surface,#ffffff)] ring-1 ring-emerald-600/40 hover:bg-emerald-50 text-slate-900",
+  full: "bg-rose-100 text-rose-800 line-through decoration-rose-400",
+  closed: "bg-slate-200 text-slate-500",
+  unavailable: "text-slate-400 opacity-50",
+};

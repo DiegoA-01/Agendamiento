@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { api } from "../../shared/api/client";
 import type {
+  AvailableDays,
   PublicAppointment,
   PublicCategory,
   PublicCompany,
@@ -47,7 +48,7 @@ export const useAvailableDays = (
     queryFn: () => {
       const params = serviceParams(serviceIds, professionalId);
       params.set("month", month);
-      return api<{ days: string[] }>(`/api/v1/public/availability/days/?${params}`);
+      return api<AvailableDays>(`/api/v1/public/availability/days/?${params}`);
     },
     enabled: serviceIds.length > 0 && Boolean(month),
   });

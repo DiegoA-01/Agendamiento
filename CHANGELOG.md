@@ -1,5 +1,22 @@
 # Changelog
 
+## Pantallas de M9, R5 y R7 (frente B, hechas por el frente A)
+
+- **`/reportes`** (spec §11 y §13), con tres pestañas según los módulos del plan:
+  - **Ventas:** total de ventas, comisiones, parte del negocio, citas y ticket promedio. Tabla por día, semana, mes, profesional o servicio.
+  - **Reservas:** total, completadas y tasas de cancelación y de inasistencia, por mes, por servicio y por profesional.
+  - **Comisiones:** lista paginada. Los ajustes salen marcados y con su motivo.
+  - El dueño puede **ajustar** una comisión: escribe los valores correctos y un motivo, y la original se conserva.
+  - **Filtros:** este mes, mes anterior, últimos 7 días, o fechas a mano (en la zona horaria del negocio, máximo un año). El filtro por profesional solo aparece a quien ve a todo el equipo; un profesional ve solo lo suyo.
+  - Botón **Descargar CSV** en cada pestaña.
+  - Las tablas se desplazan de lado en el celular, sin que la página se salga del ancho.
+- **Asistente de reserva:**
+  - **R5:** las especialidades de cada barbero aparecen como etiquetas en el paso "¿Con quién?".
+  - **R7:** el calendario pinta cada día como disponible, lleno o cerrado, con una leyenda. El estado también va en el nombre accesible del día (por ejemplo, "domingo, 15 de noviembre: Cerrado"). Si la API no manda `calendar`, usa `days` como antes.
+- Textos en español e inglés (`reports.json`, más claves en `booking.json` y el error `invalid_adjustment`).
+- 9 pruebas nuevas (rangos de fechas, parámetros y estado de cada día). El frontend pasa sus 116 pruebas, typecheck, lint y build.
+- Probado en el navegador con el negocio demo, en escritorio y a 375 px: reportes, ajuste de una comisión, especialidades y colores del calendario.
+
 ## Mejoras R5 y R7 de la reserva: API (frente A)
 
 - **R5. Especialidades en la reserva.** `GET /public/professionals/` incluye `specialties`: una lista `{id, name}` por cada barbero, en orden alfabético y sin las borradas. Se cargan en una sola consulta para todos.

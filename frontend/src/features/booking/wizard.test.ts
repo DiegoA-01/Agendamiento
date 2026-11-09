@@ -4,6 +4,7 @@ import {
   addMonths,
   bookingPayload,
   calendarCells,
+  dayStatuses,
   formatTime,
   looksLikePhone,
   selectedServices,
@@ -129,5 +130,31 @@ describe("datos y envío", () => {
       marketing_consent: false,
       website: "",
     });
+  });
+});
+
+describe("dayStatuses", () => {
+  it("usa el estado de cada día que manda la API", () => {
+    const statuses = dayStatuses({
+      days: ["2026-11-02"],
+      calendar: [
+        { date: "2026-11-01", status: "closed" },
+        { date: "2026-11-02", status: "available" },
+        { date: "2026-11-03", status: "full" },
+      ],
+    });
+    expect(statuses.get("2026-11-01")).toBe("closed");
+    expect(statuses.get("2026-11-02")).toBe("available");
+    expect(statuses.get("2026-11-03")).toBe("full");
+    expect(statuses.get("2026-11-04")).toBeUndefined();
+  });
+
+  it("sin calendario, los días de `days` quedan disponibles", () => {
+    const statuses = dayStatuses({ days: ["2026-11-02"] } as never);
+    expect([...statuses]).toEqual([["2026-11-02", "available"]]);
+  });
+
+  it("sin datos no hay estados", () => {
+    expect(dayStatuses(undefined).size).toBe(0);
   });
 });
