@@ -31,14 +31,14 @@ EDITABLE_FIELDS = (
 )
 
 
-def create_company(tenant, *, trade_name: str = "") -> Company:
+def create_company(tenant, *, trade_name: str = "", tax_id: str = "") -> Company:
     """Crea la empresa del tenant con el nombre comercial inicial y su sede por defecto.
 
     La sede hace falta desde el primer día: profesionales y puestos exigen una. Corre dentro del
     tenant porque las tablas tienen RLS.
     """
     with tenancy.tenant_context(tenant):
-        created = Company.objects.create(trade_name=trade_name or tenant.name)
+        created = Company.objects.create(trade_name=trade_name or tenant.name, tax_id=tax_id)
         Location.objects.create(
             name=DEFAULT_LOCATION_NAME.get(tenant.language, DEFAULT_LOCATION_NAME["es"]),
             is_default=True,

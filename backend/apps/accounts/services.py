@@ -166,6 +166,8 @@ def create_tenant_user(
     password: str,
     must_change_password: bool = False,
     phone: str = "",
+    document_type: str = "",
+    document_number: str = "",
 ) -> User:
     """Alta de un usuario de un tenant (la usa el Super Admin al crear el propietario)."""
     return User.objects.create_user(
@@ -175,6 +177,8 @@ def create_tenant_user(
         tenant=tenant,
         full_name=full_name,
         phone=phone,
+        document_type=document_type,
+        document_number=document_number,
         must_change_password=must_change_password,
     )
 

@@ -1,5 +1,19 @@
 # Changelog
 
+## Mejora S5: datos del propietario al crear un negocio
+
+- `POST /tenants/` acepta campos nuevos. En la API son opcionales, así que las integraciones actuales no se rompen.
+  - `owner_phone`: celular del propietario.
+  - `owner_document_type`: tipo de documento. Puede ser `CC`, `CE`, `PA` o `PPT`.
+  - `owner_document_number`: número de documento.
+  - `tax_id`: NIT o RUT del negocio, con o sin dígito de verificación.
+- Validaciones: el tipo y el número de documento van juntos; la cédula solo lleva números; el celular tiene de 7 a 15 dígitos; el NIT tiene de 6 a 12 dígitos y un dígito de verificación opcional.
+- El documento y el teléfono se guardan en el usuario propietario (`accounts`, migración `0003_user_document`). El NIT se guarda en `Company.tax_id`.
+- El documento no se guarda en la auditoría.
+- **La contraseña sigue siendo temporal**: el Super Admin no la escribe. Así la contraseña definitiva solo la conoce el propietario.
+- El formulario `/empresas/nueva` del Super Admin pide celular, tipo y número de documento. El NIT es opcional. Textos en español e inglés.
+- **Pruebas:** 10 nuevas en el backend (738 en total) y 6 en el frontend (122 en total).
+
 ## Pantallas de M9, R5 y R7 (frente B, hechas por el frente A)
 
 - **`/reportes`** (spec §11 y §13), con tres pestañas según los módulos del plan:

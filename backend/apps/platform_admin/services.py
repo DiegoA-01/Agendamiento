@@ -92,6 +92,10 @@ def create_tenant_with_owner(
     owner_email: str,
     owner_name: str,
     vertical: str,
+    owner_phone: str = "",
+    owner_document_type: str = "",
+    owner_document_number: str = "",
+    tax_id: str = "",
     timezone: str,
     currency: str,
     language: str,
@@ -112,7 +116,7 @@ def create_tenant_with_owner(
             currency=currency,
             language=language,
         )
-        company.create_company(tenant, trade_name=name)
+        company.create_company(tenant, trade_name=name, tax_id=tax_id)
         owner = accounts.create_tenant_user(
             tenant=tenant,
             email=owner_email,
@@ -120,6 +124,9 @@ def create_tenant_with_owner(
             role=User.Role.OWNER,
             password=password,
             must_change_password=True,
+            phone=owner_phone,
+            document_type=owner_document_type,
+            document_number=owner_document_number,
         )
         record(
             request,

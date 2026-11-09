@@ -54,7 +54,19 @@
       "deleteHelp": "Escribe el subdominio ({{slug}}) para confirmar. La empresa deja de estar disponible; los datos no se borran.",
       "deleteConfirm": "Confirmar eliminación",
       "dangerZone": "Zona de riesgo"
-    }
+    },
+    "ownerPhone": "Celular del propietario",
+    "ownerDocumentType": "Tipo de documento",
+    "ownerDocumentNumber": "Número de documento",
+    "documentTypes": {
+      "CC": "Cédula de ciudadanía",
+      "CE": "Cédula de extranjería",
+      "PA": "Pasaporte",
+      "PPT": "Permiso por protección temporal"
+    },
+    "taxId": "NIT o RUT del negocio",
+    "taxIdHint": "Con o sin dígito de verificación: 900123456-7.",
+    "passwordNote": "El sistema genera una contraseña temporal; el propietario la cambia en su primer ingreso. Así nadie más la conoce."
   },
   "theme": {
     "intro": "Colores del negocio. El texto debe leerse bien sobre el fondo y las superficies (contraste mínimo 4.5:1).",
