@@ -31,6 +31,8 @@ import {
   addMonths,
   bookingPayload,
   calendarCells,
+  DAY_STYLES,
+  dayStatuses,
   formatDay,
   formatTime,
   looksLikePhone,
@@ -182,6 +184,19 @@ function ProfessionalStep({
             {professional.bio && (
               <span className="block truncate text-sm opacity-80">{professional.bio}</span>
             )}
+            {professional.specialties?.length > 0 && (
+              <span className="mt-1 flex flex-wrap gap-1">
+                <span className="sr-only">{t("booking.wizard.specialties")}:</span>
+                {professional.specialties.map((specialty) => (
+                  <span
+                    key={specialty.id}
+                    className="rounded-full bg-black/5 px-2 py-0.5 text-xs font-medium"
+                  >
+                    {specialty.name}
+                  </span>
+                ))}
+              </span>
+            )}
           </span>
         </button>
       ))}
@@ -207,7 +222,7 @@ function DateStep({
   const today = todayIn(timeZone);
   const [month, setMonth] = useState(() => monthOf(selected || today));
   const days = useAvailableDays(serviceIds, professionalId, month);
-  const available = new Set(days.data?.days ?? []);
+  const statuses = dayStatuses(days.data);
   const monthLabel = new Intl.DateTimeFormat(i18n.language, {
     month: "long",
     year: "numeric",
@@ -250,28 +265,45 @@ function DateStep({
             {name}
           </span>
         ))}
-        {calendarCells(month).map((date, index) =>
-          date ? (
+        {calendarCells(month).map((date, index) => {
+          if (!date) return <span key={`empty-${index}`} />;
+          const status = statuses.get(date) ?? "unavailable";
+          return (
             <button
               key={date}
               type="button"
-              disabled={!available.has(date)}
+              disabled={status !== "available"}
               aria-pressed={selected === date}
-              aria-label={formatDay(date, i18n.language)}
+              aria-label={t("booking.wizard.dayLabel", {
+                day: formatDay(date, i18n.language),
+                status: t(`booking.wizard.dayStatus.${status}`),
+              })}
               onClick={() => onSelect(date)}
-              className={`aspect-square rounded-lg text-sm font-medium disabled:opacity-30 ${
-                selected === date
-                  ? "bg-slate-900 text-white"
-                  : "bg-[var(--color-surface,#ffffff)] hover:bg-black/5"
+              className={`aspect-square rounded-lg text-sm font-medium ${
+                selected === date ? "bg-slate-900 text-white" : DAY_STYLES[status]
               }`}
             >
               {Number(date.slice(8))}
             </button>
-          ) : (
-            <span key={`empty-${index}`} />
-          ),
-        )}
+          );
+        })}
       </div>
+      {days.isSuccess && (
+        <ul
+          aria-label={t("booking.wizard.legend")}
+          className="flex flex-wrap justify-center gap-x-4 gap-y-1 text-xs"
+        >
+          {(["available", "full", "closed"] as const).map((status) => (
+            <li key={status} className="flex items-center gap-1.5">
+              <span
+                aria-hidden="true"
+                className={`size-3 rounded border border-slate-400/60 ${DAY_STYLES[status]}`}
+              />
+              {t(`booking.wizard.dayStatus.${status}`)}
+            </li>
+          ))}
+        </ul>
+      )}
       {days.isSuccess && days.data.days.length === 0 && (
         <Notice tone="info">{t("booking.wizard.noDaysThisMonth")}</Notice>
       )}

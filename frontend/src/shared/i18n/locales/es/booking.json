@@ -98,7 +98,16 @@
       "done": "¡Listo, tu cita está reservada!",
       "doneHint": "Guarda el enlace de tu cita para verla o cancelarla.",
       "manageLink": "Ver o cancelar mi cita",
-      "saveLink": "Si cierras esta página, encontrarás el enlace en el mensaje de confirmación."
+      "saveLink": "Si cierras esta página, encontrarás el enlace en el mensaje de confirmación.",
+      "dayStatus": {
+        "available": "Disponible",
+        "full": "Lleno",
+        "closed": "Cerrado",
+        "unavailable": "No disponible"
+      },
+      "dayLabel": "{{day}}: {{status}}",
+      "legend": "Convenciones del calendario",
+      "specialties": "Especialidades"
     }
   }
 }

@@ -105,7 +105,8 @@
     "invalid_transition": "Esta cita ya no se puede cambiar.",
     "resource_taken": "El puesto ya está ocupado en ese horario.",
     "customer_exists": "Ya existe un cliente con ese celular.",
-    "phoneFormat": "Escribe un celular válido (7 a 15 dígitos)."
+    "phoneFormat": "Escribe un celular válido (7 a 15 dígitos).",
+    "invalid_adjustment": "Revisa los valores: la comisión debe estar entre 0 y el valor del servicio, y el ajuste debe cambiar algo."
   },
   "verticals": {
     "barbershop": "Barbería",

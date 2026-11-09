@@ -304,11 +304,27 @@ export interface PublicCategory {
   services: PublicService[];
 }
 
+export interface PublicSpecialty {
+  id: string;
+  name: string;
+}
+
 export interface PublicProfessional {
   id: string;
   display_name: string;
   bio: string;
   photo: ImageUrls | null;
+  specialties: PublicSpecialty[];
+}
+
+/** Estado de un día en el calendario de reserva (R7). */
+export type DayStatus = "available" | "full" | "closed" | "unavailable";
+
+export interface AvailableDays {
+  /** Solo los días con horarios. */
+  days: string[];
+  /** Todos los días del mes con su estado. */
+  calendar: { date: string; status: DayStatus }[];
 }
 
 export type SlotPeriod = "morning" | "afternoon" | "evening";

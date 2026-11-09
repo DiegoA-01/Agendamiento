@@ -98,7 +98,16 @@
       "done": "Done, your appointment is booked!",
       "doneHint": "Keep your appointment link to view or cancel it.",
       "manageLink": "View or cancel my appointment",
-      "saveLink": "If you close this page, you will find the link in the confirmation message."
+      "saveLink": "If you close this page, you will find the link in the confirmation message.",
+      "dayStatus": {
+        "available": "Available",
+        "full": "Fully booked",
+        "closed": "Closed",
+        "unavailable": "Not available"
+      },
+      "dayLabel": "{{day}}: {{status}}",
+      "legend": "Calendar legend",
+      "specialties": "Specialties"
     }
   }
 }
