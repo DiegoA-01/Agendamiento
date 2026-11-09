@@ -63,7 +63,8 @@ MATRIX: dict[str, dict[str, Grant]] = {
         R.PROFESSIONAL: grant(OWN, "view", "complete", "no_show"),
     },
     COMMISSIONS: {
-        R.OWNER: grant(ALL, "view"),
+        # `adjust`: corregir una comisión con una entrada de ajuste (spec §6); solo el dueño.
+        R.OWNER: grant(ALL, "view", "adjust"),
         R.ADMIN: grant(ALL, "view"),
         R.PROFESSIONAL: grant(OWN, "view"),
     },

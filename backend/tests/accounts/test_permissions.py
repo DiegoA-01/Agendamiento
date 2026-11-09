@@ -22,7 +22,7 @@ EXPECTED = {
         "staff_services": CRUD,
         "schedules": CRUD,
         "appointments": APPOINTMENT_ALL,
-        "commissions": {"view"},
+        "commissions": {"view", "adjust"},
         "plan_modules": {"view"},
     },
     "admin": {

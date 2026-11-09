@@ -1,5 +1,26 @@
 # Changelog
 
+## M9 — Comisiones y reportes: API (frente A)
+
+- **Comisiones** (`apps/commissions`, spec §11):
+  - Al pasar una cita a `completed` se crea un `CommissionEntry` por cada servicio, en la misma transacción. El porcentaje es el que se congeló al reservar (`commission_pct_snapshot`), así que cambiar el porcentaje del profesional después no altera citas ya reservadas.
+  - Cálculo: `comisión = valor × % / 100`, redondeada al centavo con la mitad hacia arriba, y `negocio = valor − comisión`. Una restricción en la base garantiza que las dos partes sumen el valor.
+  - **Inmutables.** No se pueden editar ni borrar, ni desde el ORM ni con SQL directo: un trigger de PostgreSQL lo impide. Completar dos veces no duplica (restricción única por servicio de la cita).
+  - **Ajustes.** `POST /commissions/{id}/adjustments/` recibe los valores corregidos y guarda la diferencia como una fila `adjustment` enlazada a la original. Solo el dueño (nueva acción `adjust` en la matriz de permisos).
+  - `GET /commissions/` (paginado por cursor) y `GET /commissions/export/` (CSV), con filtros `from`, `to`, `professional_id`, `service_id`, `category_id` y `kind`.
+  - Cancelar o marcar no-show no genera comisión.
+- **Reportes** (`apps/reports`):
+  - `GET /reports/sales/`: ventas, comisiones, parte del negocio, número de citas y ticket promedio. Agrupa por `day`, `week`, `month`, `professional` o `service`. Solo cuentan las citas completadas, y los ajustes ya van sumados.
+  - `GET /reports/bookings/`: reservas por mes, por profesional y por servicio, con tasas de cancelación y de no-show. No cuenta las citas `rescheduled`, porque la reserva sigue en la cita nueva.
+  - `export/` en los dos devuelve CSV.
+- **Comunes a todo:**
+  - `from` y `to` son días locales del negocio e incluyen ambos extremos. Por defecto es el mes en curso, y el rango máximo es un año. Una cita a las 23:30 del 31 de marzo en Bogotá queda en marzo aunque en UTC ya sea abril.
+  - Un profesional solo ve sus filas aunque pida las de otro, y si no tiene ficha enlazada no ve nada. La recepción recibe 403.
+  - Cada endpoint exige su módulo del plan (`commissions` o `reports`).
+  - CSV en UTF-8 con BOM (Excel muestra bien las tildes). Los textos que empiezan con `=`, `+`, `-` o `@` se escapan para evitar inyección de fórmulas.
+- **Pruebas:** 45 nuevas. Los valores se comparan con un negocio de ejemplo calculado a mano (tabla en `tests/reports/shop.py`). Cubren redondeo, inmutabilidad, ajustes, zona horaria, permisos, módulos, aislamiento entre negocios y CSV. La suite completa pasa: 718 pruebas.
+- **Pendiente (frente B):** la pantalla `/reportes`.
+
 ## M8 — Tareas de Celery con el negocio activo (frente A)
 
 - `apps/tenancy/tasks.py`, base para las tareas de notificaciones del frente B (spec §4.5):
