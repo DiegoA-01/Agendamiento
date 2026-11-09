@@ -31,6 +31,10 @@ const FIELDS = [
   "language",
   "owner_name",
   "owner_email",
+  "owner_phone",
+  "owner_document_type",
+  "owner_document_number",
+  "tax_id",
 ] as const;
 
 export function TenantCreatePage() {
@@ -52,6 +56,10 @@ export function TenantCreatePage() {
       language: "es",
       owner_name: "",
       owner_email: "",
+      owner_phone: "",
+      owner_document_type: "CC",
+      owner_document_number: "",
+      tax_id: "",
     },
   });
   const { errors } = form.formState;
@@ -215,6 +223,40 @@ export function TenantCreatePage() {
               error={errors.owner_email?.message}
               {...form.register("owner_email")}
             />
+            <TextField
+              label={t("tenants.ownerPhone")}
+              type="tel"
+              inputMode="tel"
+              autoComplete="off"
+              error={errors.owner_phone?.message}
+              {...form.register("owner_phone")}
+            />
+            <SelectField
+              label={t("tenants.ownerDocumentType")}
+              error={errors.owner_document_type?.message}
+              {...form.register("owner_document_type")}
+            >
+              {(["CC", "CE", "PA", "PPT"] as const).map((kind) => (
+                <option key={kind} value={kind}>
+                  {t(`tenants.documentTypes.${kind}`)}
+                </option>
+              ))}
+            </SelectField>
+            <TextField
+              label={t("tenants.ownerDocumentNumber")}
+              autoComplete="off"
+              error={errors.owner_document_number?.message}
+              {...form.register("owner_document_number")}
+            />
+            <TextField
+              label={t("tenants.taxId")}
+              hint={t("tenants.taxIdHint")}
+              optional
+              autoComplete="off"
+              error={errors.tax_id?.message}
+              {...form.register("tax_id")}
+            />
+            <p className="text-xs text-slate-600 sm:col-span-2">{t("tenants.passwordNote")}</p>
           </Card>
 
           <div>

@@ -224,3 +224,65 @@ def test_same_owner_email_in_another_tenant_does_not_clash(api, plan):
     )
     assert create(api, plan).status_code == 201
     assert User.objects.filter(email="dueno@elfilo.com").count() == 2
+
+
+# --- S5: datos del propietario y NIT -------------------------------------------------------------
+
+
+def test_create_tenant_saves_owner_document_phone_and_tax_id(api, plan):
+    response = create(
+        api,
+        plan,
+        owner_phone="+57 300 123 4567",
+        owner_document_type="CC",
+        owner_document_number="1020304050",
+        tax_id="900123456-7",
+    )
+
+    assert response.status_code == 201, response.content
+    owner = User.objects.get(email="dueno@elfilo.com")
+    assert (owner.phone, owner.document_type, owner.document_number) == (
+        "+57 300 123 4567",
+        "CC",
+        "1020304050",
+    )
+    assert owner.must_change_password is True  # la contraseña sigue siendo temporal
+    tenant = Tenant.objects.get(slug="elfilo")
+    with tenancy.tenant_context(tenant):
+        assert Company.objects.get().tax_id == "900123456-7"
+    # El documento no queda en la auditoría.
+    after = AuditLog.objects.get(action="tenant.create").after
+    assert "1020304050" not in str(after)
+
+
+def test_owner_data_stays_optional(api, plan):
+    assert create(api, plan).status_code == 201
+    owner = User.objects.get(email="dueno@elfilo.com")
+    assert (owner.phone, owner.document_type, owner.document_number) == ("", "", "")
+
+
+@pytest.mark.parametrize(
+    ("overrides", "field"),
+    [
+        ({"owner_document_type": "CC"}, "owner_document_number"),
+        ({"owner_document_number": "123456"}, "owner_document_type"),
+        (
+            {"owner_document_type": "CC", "owner_document_number": "AB12345"},
+            "owner_document_number",
+        ),
+        ({"owner_document_type": "XX", "owner_document_number": "123456"}, "owner_document_type"),
+        ({"owner_phone": "12"}, "owner_phone"),
+        ({"owner_phone": "abc defg hij"}, "owner_phone"),
+        ({"tax_id": "90012-ABC"}, "tax_id"),
+    ],
+)
+def test_invalid_owner_data_is_rejected_without_creating_anything(api, plan, overrides, field):
+    response = create(api, plan, **overrides)
+    assert response.status_code == 400, response.content
+    assert field in response.json()["fields"]
+    assert not Tenant.objects.filter(slug="elfilo").exists()
+
+
+def test_a_passport_can_have_letters(api, plan):
+    response = create(api, plan, owner_document_type="PA", owner_document_number="AB123456")
+    assert response.status_code == 201, response.content

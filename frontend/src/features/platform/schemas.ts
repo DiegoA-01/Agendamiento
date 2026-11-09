@@ -16,7 +16,7 @@ const RESERVED_SLUGS = [
 const HOST = /^([a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,63}$/;
 
 // Los mensajes son claves de i18n: la pantalla las traduce.
-export const tenantCreateSchema = z.object({
+const tenantBaseSchema = z.object({
   name: z.string().trim().min(1, "required").max(150),
   slug: z
     .string()
@@ -31,10 +31,33 @@ export const tenantCreateSchema = z.object({
   language: z.enum(["es", "en"]),
   owner_name: z.string().trim().min(1, "required").max(150),
   owner_email: z.email("emailFormat"),
+  // S5: datos del propietario y NIT. La contraseña sigue siendo temporal.
+  owner_phone: z
+    .string()
+    .trim()
+    .refine((value) => /^\+?[\d\s-]+$/.test(value), "phoneFormat")
+    .refine((value) => {
+      const digits = value.replace(/\D/g, "").length;
+      return digits >= 7 && digits <= 15;
+    }, "phoneFormat"),
+  owner_document_type: z.enum(["CC", "CE", "PA", "PPT"]),
+  owner_document_number: z
+    .string()
+    .trim()
+    .regex(/^[A-Za-z0-9]{3,20}$/, "documentFormat"),
+  tax_id: z
+    .string()
+    .trim()
+    .refine((value) => value === "" || /^\d{6,12}(-\d)?$/.test(value), "taxIdFormat"),
 });
+
+export const tenantCreateSchema = tenantBaseSchema.refine(
+  (values) => values.owner_document_type !== "CC" || /^\d+$/.test(values.owner_document_number),
+  { message: "documentDigits", path: ["owner_document_number"] },
+);
 export type TenantCreateValues = z.infer<typeof tenantCreateSchema>;
 
-export const tenantEditSchema = tenantCreateSchema.pick({
+export const tenantEditSchema = tenantBaseSchema.pick({
   name: true,
   plan_id: true,
   vertical: true,

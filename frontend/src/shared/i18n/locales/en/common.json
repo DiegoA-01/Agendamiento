@@ -106,7 +106,10 @@
     "resource_taken": "The workstation is already taken at that time.",
     "customer_exists": "A customer with this mobile phone already exists.",
     "phoneFormat": "Enter a valid mobile phone (7 to 15 digits).",
-    "invalid_adjustment": "Check the amounts: the commission must be between 0 and the service amount, and the adjustment must change something."
+    "invalid_adjustment": "Check the amounts: the commission must be between 0 and the service amount, and the adjustment must change something.",
+    "documentFormat": "Type the number without dots or spaces (3 to 20 characters).",
+    "documentDigits": "A citizenship ID only has digits.",
+    "taxIdFormat": "Type 6 to 12 digits and, optionally, the check digit: 900123456-7."
   },
   "verticals": {
     "barbershop": "Barbershop",

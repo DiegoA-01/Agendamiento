@@ -24,6 +24,10 @@ const validTenant = {
   language: "es",
   owner_name: "Diego Dueño",
   owner_email: "dueno@elfilo.com",
+  owner_phone: "+57 300 123 4567",
+  owner_document_type: "CC",
+  owner_document_number: "1020304050",
+  tax_id: "",
 } as const;
 
 function firstMessage(result: { success: boolean; error?: { issues: { message: string }[] } }) {
@@ -63,8 +67,23 @@ describe("validaciones de formularios", () => {
     [{ currency: "PESOS" }, "currencyFormat"],
     [{ owner_email: "no-es-correo" }, "emailFormat"],
     [{ plan_id: "" }, "required"],
+    [{ owner_phone: "12" }, "phoneFormat"],
+    [{ owner_phone: "abc" }, "phoneFormat"],
+    [{ owner_document_number: "10.203.040" }, "documentFormat"],
+    [{ owner_document_number: "AB12345" }, "documentDigits"],
+    [{ tax_id: "90012-ABC" }, "taxIdFormat"],
   ])("rechaza %j con el mensaje %s", (change, message) => {
     expect(firstMessage(tenantCreateSchema.safeParse({ ...validTenant, ...change }))).toBe(message);
+  });
+
+  it("acepta pasaporte con letras y NIT con dígito de verificación", () => {
+    const result = tenantCreateSchema.safeParse({
+      ...validTenant,
+      owner_document_type: "PA",
+      owner_document_number: "AB123456",
+      tax_id: "900123456-7",
+    });
+    expect(result.success).toBe(true);
   });
 
   it("valida el tema color por color", () => {

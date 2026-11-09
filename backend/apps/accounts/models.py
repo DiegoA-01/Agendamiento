@@ -42,9 +42,19 @@ class User(BaseModel, AbstractBaseUser):
         RECEPTIONIST = "receptionist"
         PROFESSIONAL = "professional"
 
+    class DocumentType(models.TextChoices):
+        """Documentos de identidad de una persona en Colombia (S5)."""
+
+        CC = "CC"  # cédula de ciudadanía
+        CE = "CE"  # cédula de extranjería
+        PA = "PA"  # pasaporte
+        PPT = "PPT"  # permiso por protección temporal
+
     email = models.EmailField()
     full_name = models.CharField(max_length=150)
     phone = models.CharField(max_length=30, blank=True)
+    document_type = models.CharField(max_length=3, choices=DocumentType.choices, blank=True)
+    document_number = models.CharField(max_length=20, blank=True)
     role = models.CharField(max_length=20, choices=Role.choices)
     tenant = models.ForeignKey(
         "tenancy.Tenant", null=True, blank=True, on_delete=models.PROTECT, related_name="users"

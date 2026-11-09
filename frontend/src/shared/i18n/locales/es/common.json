@@ -106,7 +106,10 @@
     "resource_taken": "El puesto ya está ocupado en ese horario.",
     "customer_exists": "Ya existe un cliente con ese celular.",
     "phoneFormat": "Escribe un celular válido (7 a 15 dígitos).",
-    "invalid_adjustment": "Revisa los valores: la comisión debe estar entre 0 y el valor del servicio, y el ajuste debe cambiar algo."
+    "invalid_adjustment": "Revisa los valores: la comisión debe estar entre 0 y el valor del servicio, y el ajuste debe cambiar algo.",
+    "documentFormat": "Escribe el número sin puntos ni espacios (3 a 20 caracteres).",
+    "documentDigits": "La cédula solo lleva números.",
+    "taxIdFormat": "Escribe el NIT con 6 a 12 dígitos y, si quieres, el dígito de verificación: 900123456-7."
   },
   "verticals": {
     "barbershop": "Barbería",

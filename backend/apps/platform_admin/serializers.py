@@ -1,5 +1,6 @@
 from rest_framework import serializers
 
+from apps.accounts.models import User
 from apps.tenancy import services as tenancy
 from apps.tenancy.constants import LANGUAGES, MODULE_KEYS, VERTICALS
 from apps.tenancy.theme import THEME_KEYS
@@ -66,6 +67,40 @@ class TenantCreateSerializer(serializers.Serializer):
     language = serializers.ChoiceField(choices=LANGUAGES, default="es")
     owner_email = serializers.EmailField()
     owner_name = serializers.CharField(max_length=150)
+    # S5. La contraseña sigue siendo temporal: el Super Admin nunca conoce la definitiva.
+    owner_phone = serializers.RegexField(
+        r"^\+?[\d\s-]{7,20}$", required=False, allow_blank=True, default=""
+    )
+    owner_document_type = serializers.ChoiceField(
+        choices=User.DocumentType.choices, required=False, allow_blank=True, default=""
+    )
+    owner_document_number = serializers.RegexField(
+        r"^[A-Za-z0-9]{3,20}$", required=False, allow_blank=True, default=""
+    )
+    tax_id = serializers.RegexField(
+        r"^\d{6,12}(-\d)?$",
+        required=False,
+        allow_blank=True,
+        default="",
+        help_text="NIT o RUT, con o sin dígito de verificación: 900123456-7.",
+    )
+
+    def validate_owner_phone(self, value: str) -> str:
+        digits = "".join(ch for ch in value if ch.isdigit())
+        if value and not 7 <= len(digits) <= 15:
+            raise serializers.ValidationError("Escribe un celular válido (7 a 15 dígitos).")
+        return value.strip()
+
+    def validate(self, attrs):
+        kind, number = attrs.get("owner_document_type"), attrs.get("owner_document_number")
+        if bool(kind) != bool(number):
+            field = "owner_document_number" if kind else "owner_document_type"
+            raise serializers.ValidationError({field: ["Indica el tipo y el número de documento."]})
+        if kind == "CC" and not number.isdigit():
+            raise serializers.ValidationError(
+                {"owner_document_number": ["La cédula solo lleva números."]}
+            )
+        return attrs
 
 
 class TenantCreatedSerializer(serializers.Serializer):
