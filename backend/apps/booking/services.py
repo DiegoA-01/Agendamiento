@@ -17,6 +17,7 @@ from django.utils import timezone
 
 from apps.accounts import permissions as perms
 from apps.catalog import services as catalog
+from apps.commissions import services as commissions
 from config.api import ApiError
 
 from . import events
@@ -325,6 +326,34 @@ def list_appointments(
     return appointments.order_by("start_at", "id")
 
 
+def appointments_for_report(
+    *,
+    start_at: dt.datetime,
+    end_at: dt.datetime,
+    professional_id=None,
+    service_id=None,
+    category_id=None,
+) -> QuerySet[Appointment]:
+    """Citas que empiezan en `[start_at, end_at)` para los reportes de reservas.
+
+    Sin las `rescheduled`: esa reserva sigue viva en la cita nueva y contarla dos veces inflaría
+    el total. El permiso y el alcance los decide `reports` antes de llamar.
+    """
+    appointments = Appointment.objects.filter(start_at__gte=start_at, start_at__lt=end_at).exclude(
+        status=Appointment.Status.RESCHEDULED
+    )
+    if professional_id is not None:
+        appointments = appointments.filter(professional_id=professional_id)
+    # Por subconsulta y no por join: una cita con dos servicios no debe contar dos veces.
+    if service_id is not None:
+        with_service = AppointmentItem.objects.filter(service_id=service_id)
+        appointments = appointments.filter(pk__in=with_service.values("appointment_id"))
+    if category_id is not None:
+        in_category = AppointmentItem.objects.filter(service__category_id=category_id)
+        appointments = appointments.filter(pk__in=in_category.values("appointment_id"))
+    return appointments
+
+
 def get_appointment(user, appointment_id, action: str = "view") -> Appointment:
     """La cita, o 404 si no existe o es de otro profesional (404, no 403: spec §5)."""
     scope = _scope(user, action)
@@ -363,7 +392,11 @@ def change_status(user, appointment_id, action: str, *, reason: str = "") -> App
         appointment.cancelled_at = timezone.now()
         appointment.cancel_reason = reason
         fields += ["cancelled_at", "cancel_reason"]
-    appointment.save(update_fields=fields)
+    with transaction.atomic():
+        appointment.save(update_fields=fields)
+        if action == "complete":
+            # Solo una cita completada genera comisión y cuenta en ventas (spec §7 y §11).
+            commissions.record_for_appointment(appointment)
     _availability().invalidate(appointment.tenant_id)
     events.notify(events.CANCELLED if action == "cancel" else events.UPDATED, appointment)
     return appointment

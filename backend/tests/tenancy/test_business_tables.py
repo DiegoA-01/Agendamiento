@@ -4,6 +4,7 @@ import pytest
 from django.apps import apps
 from django.db import connection
 
+from apps.commissions import services as commissions
 from apps.tenancy.context import get_current_tenant, tenant_context
 from apps.tenancy.models import TenantOwnedModel
 from tests.booking.factories import AppointmentItemFactory
@@ -42,7 +43,8 @@ def _create_one_of_each():
     )
     WorkingHoursFactory()
     TimeBlockFactory()
-    AppointmentItemFactory()
+    item = AppointmentItemFactory()
+    commissions.record_for_appointment(item.appointment)
 
 
 def test_business_rows_are_invisible_to_other_tenants_even_without_the_orm_filter():
