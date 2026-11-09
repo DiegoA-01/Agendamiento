@@ -87,6 +87,16 @@ class TenantListCreateView(PlatformView):
         return Response(body, status=status.HTTP_201_CREATED)
 
 
+class TenantUsageView(PlatformView):
+    @extend_schema(
+        responses=serializers.TenantUsageSerializer,
+        description="Citas, reservas web, clientes, usuarios y último ingreso del negocio (S10).",
+    )
+    def get(self, request, tenant_id):
+        usage = platform.tenant_usage(_tenant_or_404(tenant_id))
+        return Response(serializers.TenantUsageSerializer(usage).data)
+
+
 class TenantDetailView(PlatformView):
     @extend_schema(responses=serializers.TenantDetailSerializer)
     def get(self, request, tenant_id):

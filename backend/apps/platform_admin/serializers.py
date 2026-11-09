@@ -181,3 +181,20 @@ class AuditLogSerializer(serializers.Serializer):
 
     def get_tenant_name(self, log) -> str | None:
         return log.tenant.name if log.tenant else None
+
+
+class TenantUsageSerializer(serializers.Serializer):
+    """Uso del sistema por negocio (S10).
+
+    `*_recent` cuenta las citas creadas en los últimos `window_days` días.
+    """
+
+    window_days = serializers.IntegerField()
+    appointments_total = serializers.IntegerField()
+    appointments_recent = serializers.IntegerField()
+    web_bookings_recent = serializers.IntegerField()
+    completed_recent = serializers.IntegerField()
+    cancelled_recent = serializers.IntegerField()
+    customers_total = serializers.IntegerField()
+    users_active = serializers.IntegerField()
+    last_login = serializers.DateTimeField(allow_null=True)

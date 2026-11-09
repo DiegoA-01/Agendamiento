@@ -21,8 +21,9 @@ import { DomainsTab } from "./DomainsTab";
 import { InfoTab } from "./InfoTab";
 import { ModulesTab } from "./ModulesTab";
 import { ThemeTab } from "./ThemeTab";
+import { UsageTab } from "./UsageTab";
 
-const TABS = ["info", "theme", "modules", "domains"] as const;
+const TABS = ["info", "usage", "theme", "modules", "domains"] as const;
 type Tab = (typeof TABS)[number];
 
 function StatusAndDanger({ tenant }: { tenant: TenantDetail }) {
@@ -177,6 +178,7 @@ export function TenantDetailPage() {
 
       <div role="tabpanel" id={`panel-${tab}`} aria-labelledby={`tab-${tab}`}>
         {tab === "info" && <InfoTab tenant={data} />}
+        {tab === "usage" && <UsageTab tenantId={data.id} />}
         {tab === "theme" && <ThemeTab tenant={data} />}
         {tab === "modules" && <ModulesTab tenant={data} />}
         {tab === "domains" && <DomainsTab tenant={data} />}

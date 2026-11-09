@@ -4,6 +4,7 @@ Orquesta las demás apps solo por sus `services.py`: tenancy (negocio, dominios,
 (datos de empresa) y accounts (propietario).
 """
 
+import datetime as dt
 import secrets
 import uuid
 from typing import Any
@@ -11,9 +12,11 @@ from typing import Any
 from django.db import transaction
 from django.db.models import QuerySet
 from django.http import HttpRequest
+from django.utils import timezone as django_timezone
 
 from apps.accounts import services as accounts
 from apps.accounts.models import User
+from apps.booking import services as booking
 from apps.company import services as company
 from apps.tenancy import services as tenancy
 from config.api import ApiError
@@ -254,3 +257,17 @@ def delete_plan(request: HttpRequest, plan) -> None:
 
 def not_found(what: str = "Recurso") -> ApiError:
     return ApiError("not_found", f"{what} no encontrado.", 404)
+
+
+USAGE_WINDOW_DAYS = 30
+
+
+def tenant_usage(tenant, *, now=None) -> dict:
+    """Uso del sistema por negocio (S10). Los datos ya existían; aquí solo se juntan."""
+    now = now or django_timezone.now()
+    since = now - dt.timedelta(days=USAGE_WINDOW_DAYS)
+    return {
+        "window_days": USAGE_WINDOW_DAYS,
+        **booking.usage_counts(tenant, since=since),
+        **accounts.usage_for(tenant),
+    }

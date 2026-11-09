@@ -12,6 +12,7 @@ from django.contrib.auth.password_validation import validate_password
 from django.contrib.auth.tokens import default_token_generator
 from django.core.exceptions import ValidationError as DjangoValidationError
 from django.core.mail import send_mail
+from django.db.models import Count, Max, Q
 from django.http import HttpRequest
 from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
@@ -250,3 +251,13 @@ def build_me(request: HttpRequest, user: User) -> dict[str, Any]:
         "modules": sorted(tenancy.enabled_module_keys(tenant)) if tenant is not None else [],
         "permissions": permissions_for_role(user.role),
     }
+
+
+def usage_for(tenant) -> dict:
+    """Cuentas del negocio para el reporte de uso (S10): activas y último ingreso de cualquiera."""
+    users = User.objects.for_tenant(tenant)
+    data = users.aggregate(
+        active=Count("id", filter=Q(is_active=True)),
+        last_login=Max("last_login"),
+    )
+    return {"users_active": data["active"], "last_login": data["last_login"]}

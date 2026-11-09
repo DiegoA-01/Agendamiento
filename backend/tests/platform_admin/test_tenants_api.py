@@ -286,3 +286,63 @@ def test_invalid_owner_data_is_rejected_without_creating_anything(api, plan, ove
 def test_a_passport_can_have_letters(api, plan):
     response = create(api, plan, owner_document_type="PA", owner_document_number="AB123456")
     assert response.status_code == 201, response.content
+
+
+# --- S10: uso por negocio ----------------------------------------------------------------------
+
+
+def test_usage_counts_only_that_business_and_the_last_30_days(api):
+    import datetime as dt
+
+    from django.utils import timezone
+
+    from apps.booking.models import Appointment
+    from tests.accounts.factories import UserFactory
+    from tests.booking.factories import AppointmentFactory, CustomerFactory
+
+    shop, other = TenantFactory(), TenantFactory()
+    now = timezone.now()
+    with tenancy.tenant_context(shop):
+        AppointmentFactory(source="web")
+        AppointmentFactory(status="completed")
+        AppointmentFactory(status="cancelled")
+        old = AppointmentFactory()
+        Appointment.objects.filter(pk=old.pk).update(created_at=now - dt.timedelta(days=45))
+        CustomerFactory()
+    with tenancy.tenant_context(other):
+        AppointmentFactory(source="web")
+    owner = UserFactory(tenant=shop, role="owner")
+    User.objects.filter(pk=owner.pk).update(last_login=now - dt.timedelta(hours=3))
+    UserFactory(tenant=shop, role="admin", is_active=False)
+
+    response = call(api, "get", f"/api/v1/tenants/{shop.pk}/usage/")
+
+    assert response.status_code == 200, response.content
+    body = response.json()
+    assert body["window_days"] == 30
+    assert body["appointments_total"] == 4
+    assert body["appointments_recent"] == 3
+    assert body["web_bookings_recent"] == 1
+    assert body["completed_recent"] == 1
+    assert body["cancelled_recent"] == 1
+    assert body["customers_total"] == 5  # 4 de las citas + 1 suelto
+    assert body["users_active"] == 1
+    assert body["last_login"] is not None
+    assert tenancy.get_current_tenant() is None
+
+
+def test_usage_of_a_new_business_is_zero(api):
+    shop = TenantFactory()
+    body = call(api, "get", f"/api/v1/tenants/{shop.pk}/usage/").json()
+    assert body["appointments_total"] == 0
+    assert body["users_active"] == 0
+    assert body["last_login"] is None
+
+
+def test_usage_is_only_for_the_platform(api):
+    import uuid
+
+    assert call(api, "get", f"/api/v1/tenants/{uuid.uuid4()}/usage/").status_code == 404
+    shop = TenantFactory()
+    anonymous = APIClient()
+    assert call(anonymous, "get", f"/api/v1/tenants/{shop.pk}/usage/").status_code in (401, 403)
