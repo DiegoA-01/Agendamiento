@@ -1,5 +1,29 @@
 # Changelog
 
+## M10 (parte 1) — Endurecimiento: límites, auditoría, logs y copias
+
+- **Límite de intentos** (`apps/accounts/throttle.py`):
+  - El login cuenta los fallos por IP (20) y por correo (10) en 15 minutos. Pasado el límite responde `429 rate_limited` aunque la contraseña sea correcta.
+  - Un acierto reinicia el contador del correo, así un atacante no puede dejar bloqueada la cuenta de otra persona por mucho tiempo.
+  - La recuperación de contraseña se limita a 10 solicitudes por IP y 3 por correo cada 15 minutos.
+  - Los contadores son por negocio y se pueden ajustar por variables de entorno.
+- **Auditoría de seguridad:**
+  - `accounts` emite eventos (`signals.security_event`) y `platform_admin` los guarda en `AuditLog`. Ninguna de las dos apps importa los modelos de la otra.
+  - Se auditan los inicios de sesión correctos y fallidos (con el correo escrito, aunque no exista), los cambios y recuperaciones de contraseña, la activación del 2FA y el 2FA quitado por comando.
+  - Nunca se guardan contraseñas ni códigos. La pantalla **Auditoría** del Super Admin ya los muestra y permite filtrarlos.
+- **Logs:** cada línea JSON lleva `request_id` y el `tenant` cuando existen. La respuesta devuelve el `request_id` en `X-Request-ID`, y se reutiliza el que mande el proxy si es válido.
+- **Copias de seguridad:**
+  - `scripts/backup.sh` hace `pg_dump` de toda la base, la cifra con AES-256 y le agrega una suma SHA-256. Borra las copias viejas y, si se configura, sube la copia fuera del servidor.
+  - `scripts/restore.sh` restaura en una base aparte para probar la copia.
+  - Probado: se restauraron 1 negocio, 6 citas y 2 usuarios, y con la frase equivocada la restauración falla.
+- **`docs/OPERACION.md`:** copias diarias con cron, prueba de restauración, restauración ante un incidente, monitoreo con `/healthz/`, cómo buscar en los logs, tabla de límites y acciones auditadas.
+- `client_ip` pasa a `config/net.py` porque ahora la usan la reserva pública y el login.
+- **Pruebas:** 9 nuevas. El backend pasa 750 y el frontend 122.
+- **Pendiente de M10:**
+  - Pruebas e2e con Playwright para reservar, completar y ver la comisión. Necesita aprobar la dependencia.
+  - Sentry (también es una dependencia nueva).
+  - Reactivar la 2FA.
+
 ## Mejora S10: uso del sistema por negocio
 
 - `GET /tenants/{id}/usage/` (solo Super Admin) devuelve, por negocio:
