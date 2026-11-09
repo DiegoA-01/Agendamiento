@@ -199,7 +199,7 @@ class AvailabilityDaysView(AvailabilityView):
     def get(self, request):
         query = self.query(serializers.DaysQuerySerializer)
         year, month = (int(part) for part in query["month"].split("-"))
-        days = availability.get_available_days(
+        calendar = availability.get_month_calendar(
             request.tenant,
             query["service_ids"],
             year,
@@ -207,4 +207,4 @@ class AvailabilityDaysView(AvailabilityView):
             query["professional_id"],
             public=False,
         )
-        return Response({"days": days})
+        return Response(serializers.DaysSerializer(serializers.DaysSerializer.build(calendar)).data)

@@ -54,11 +54,23 @@ class PublicCategorySerializer(serializers.Serializer):
     services = PublicServiceSerializer(many=True)
 
 
+class PublicSpecialtySerializer(serializers.Serializer):
+    id = serializers.UUIDField()
+    name = serializers.CharField()
+
+
 class PublicProfessionalSerializer(serializers.Serializer):
     id = serializers.UUIDField()
     display_name = serializers.CharField()
     bio = serializers.CharField()
     photo = serializers.SerializerMethodField()
+    specialties = serializers.SerializerMethodField()
+
+    @extend_schema_field(PublicSpecialtySerializer(many=True))
+    def get_specialties(self, professional):
+        """Especialidades por nombre (R5), para que el cliente elija con quién reservar."""
+        found = sorted(professional.specialties.all(), key=lambda s: s.name.casefold())
+        return PublicSpecialtySerializer(found, many=True).data
 
     @extend_schema_field(ImageUrlsSerializer(allow_null=True))
     def get_photo(self, professional):

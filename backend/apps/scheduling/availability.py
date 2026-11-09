@@ -277,20 +277,61 @@ def get_available_slots(tenant, service_ids, day: dt.date, professional_id=None,
     )
 
 
-def get_available_days(
+# Estado de cada día en el calendario de reserva (R7).
+DAY_AVAILABLE = "available"  # hay al menos un horario libre
+DAY_FULL = "full"  # se atiende, pero las citas (o el aviso mínimo) ya no dejan horarios
+DAY_CLOSED = "closed"  # nadie atiende: sin horario de trabajo o bloqueado (festivo, vacaciones)
+DAY_UNAVAILABLE = "unavailable"  # fuera de la ventana de reserva (pasado o muy lejano)
+DAY_STATUSES = (DAY_AVAILABLE, DAY_FULL, DAY_CLOSED, DAY_UNAVAILABLE)
+
+
+def _works_after(tenant, professional, day: dt.date, earliest: dt.datetime) -> bool:
+    """¿El profesional atiende ese día después de `earliest`? Horario menos bloqueos; las citas
+    no cuentan: un día lleno de citas sigue siendo un día de trabajo."""
+    tz = ZoneInfo(tenant.timezone)
+    day_start, day_end = _day_bounds(day, tz)
+    blocks = TimeBlock.objects.filter(
+        professional=professional, start_at__lt=day_end, end_at__gt=day_start
+    )
+    open_time = _subtract(
+        _working_intervals(professional, day, tz), [(b.start_at, b.end_at) for b in blocks]
+    )
+    return any(end > earliest for _, end in open_time)
+
+
+def day_status(tenant, services, day: dt.date, professionals, *, window: Window) -> str:
+    """`available`, `full`, `closed` o `unavailable` (ver las constantes `DAY_*`)."""
+    _, day_end = _day_bounds(day, ZoneInfo(tenant.timezone))
+    if (window.last_day is not None and day > window.last_day) or day_end <= window.earliest:
+        return DAY_UNAVAILABLE
+    if slots_for_day(tenant, services, day, professionals, window=window):
+        return DAY_AVAILABLE
+    if any(_works_after(tenant, p, day, window.earliest) for p in professionals):
+        return DAY_FULL
+    return DAY_CLOSED
+
+
+def get_month_calendar(
     tenant, service_ids, year: int, month: int, professional_id=None, *, public: bool
-):
-    """Días del mes con al menos un horario disponible (spec §8.10)."""
+) -> list[tuple[dt.date, str]]:
+    """Cada día del mes con su estado, para pintar el calendario con colores (R7)."""
     services = resolve_services(service_ids)
     professionals = candidates(services, professional_id, public=public)
     window = booking_window(tenant, public=public)
     day = dt.date(year, month, 1)
-    days = []
+    calendar = []
     while day.month == month:
-        if slots_for_day(tenant, services, day, professionals, window=window):
-            days.append(day)
+        calendar.append((day, day_status(tenant, services, day, professionals, window=window)))
         day += dt.timedelta(days=1)
-    return days
+    return calendar
+
+
+def get_available_days(
+    tenant, service_ids, year: int, month: int, professional_id=None, *, public: bool
+):
+    """Días del mes con al menos un horario disponible (spec §8.10)."""
+    calendar = get_month_calendar(tenant, service_ids, year, month, professional_id, public=public)
+    return [day for day, status in calendar if status == DAY_AVAILABLE]
 
 
 def free_resource_for(tenant, professional, start: dt.datetime, end: dt.datetime):

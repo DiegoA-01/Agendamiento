@@ -3,6 +3,7 @@
 from collections import OrderedDict
 from zoneinfo import ZoneInfo
 
+from django.db.models import prefetch_related_objects
 from django.utils import timezone
 from drf_spectacular.utils import OpenApiParameter, OpenApiResponse, extend_schema
 from rest_framework import status
@@ -106,6 +107,7 @@ class PublicProfessionalsView(PublicView):
     def get(self, request):
         services = availability.resolve_services(_service_ids(request))
         professionals = availability.candidates(services, public=True)
+        prefetch_related_objects(professionals, "specialties")  # una consulta, no una por ficha
         return Response(serializers.PublicProfessionalSerializer(professionals, many=True).data)
 
 
@@ -152,7 +154,7 @@ class PublicDaysView(PublicView):
     def get(self, request):
         query = _availability_query(request, scheduling_serializers.DaysQuerySerializer)
         year, month = (int(part) for part in query["month"].split("-"))
-        days = availability.get_available_days(
+        calendar = availability.get_month_calendar(
             request.tenant,
             query["service_ids"],
             year,
@@ -160,7 +162,11 @@ class PublicDaysView(PublicView):
             query["professional_id"],
             public=True,
         )
-        return Response({"days": days})
+        return Response(
+            scheduling_serializers.DaysSerializer(
+                scheduling_serializers.DaysSerializer.build(calendar)
+            ).data
+        )
 
 
 def _appointment_data(tenant, appointment) -> dict:

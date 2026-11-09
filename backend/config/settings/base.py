@@ -159,6 +159,12 @@ SPECTACULAR_SETTINGS = {
     "DESCRIPTION": "API del SaaS de agendamiento para barberías y salones (Fase 1).",
     "VERSION": "0.1.0",
     "SERVE_INCLUDE_SCHEMA": False,
+    "ENUM_NAME_OVERRIDES": {
+        # Estado de un día del calendario de reserva (R7); choca con `status` de la cita.
+        "CalendarDayStatusEnum": ["available", "full", "closed", "unavailable"],
+        # El estado de la cita conserva su nombre de siempre.
+        "StatusEnum": "apps.booking.models.Appointment.Status",
+    },
 }
 
 CELERY_BROKER_URL = REDIS_URL
