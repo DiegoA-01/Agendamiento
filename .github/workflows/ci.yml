@@ -84,6 +84,13 @@ jobs:
           node-version: 24
           cache: npm
           cache-dependency-path: frontend/package-lock.json
+      # Primero las dependencias del host: el contenedor `web` monta un volumen en
+      # frontend/node_modules y Docker crearía esa carpeta como root, y `npm ci` ya no podría
+      # escribir ahí (falla con código 243).
+      - run: npm ci
+        working-directory: frontend
+      - run: npx playwright install --with-deps chromium
+        working-directory: frontend
       - name: Levantar el sistema completo
         run: |
           cp .env.example .env
@@ -94,10 +101,6 @@ jobs:
             sleep 5
           done
           curl -fsS -H "Host: admin.localhost" http://localhost:8080/healthz/
-      - run: npm ci
-        working-directory: frontend
-      - run: npx playwright install --with-deps chromium
-        working-directory: frontend
       - run: npx playwright test
         working-directory: frontend
       - name: Reporte de Playwright si falla
