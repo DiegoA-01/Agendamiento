@@ -14,3 +14,8 @@ AUTH_LIMIT_PER_IP = 10_000
 AUTH_LIMIT_PER_EMAIL = 10_000
 PASSWORD_RESET_LIMIT_PER_IP = 10_000
 PASSWORD_RESET_LIMIT_PER_EMAIL = 10_000
+# Celery en el mismo proceso y sin broker: ninguna prueba encola tareas en el Redis real (las
+# pruebas con commits reales, como la de concurrencia, disparan `on_commit`).
+CELERY_TASK_ALWAYS_EAGER = True
+CELERY_TASK_EAGER_PROPAGATES = True
+CELERY_BROKER_URL = "memory://"

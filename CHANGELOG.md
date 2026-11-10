@@ -1,5 +1,20 @@
 # Changelog
 
+## M8 — Notificaciones por correo y WhatsApp (frente B)
+
+- Nueva tabla `NotificationLog` (con RLS): tipo (`confirmation`, `reminder`, `cancellation`, `reschedule`), canal (`email`, `whatsapp`), destinatario, estado (`queued`, `sent`, `failed`), intentos, error, fecha de envío, asunto y texto. **Idempotente**: la misma cita, tipo y canal (y horas, en los recordatorios) se manda una sola vez, aunque Celery repita la tarea o el recordatorio corra de nuevo.
+- **Cuándo se avisa:** al crear una cita (confirmación, o reprogramación si viene de otra), al cancelarla (desde el panel o por el enlace) y con los **recordatorios** 24 h y 2 h antes (`NOTIFICATION_REMINDER_HOURS`). Iniciar, completar o marcar inasistencia no avisan.
+- **Enganche sin acoplar las apps:** `booking.events.notify` envía la señal `booking.signals.appointment_changed`; `notifications` la escucha (igual que la auditoría de M10). `booking` gana dos funciones de lectura para las notificaciones: `appointment_for_notification` y `confirmed_starting_between`.
+- **Canal:** WhatsApp si el plan incluye `notifications_whatsapp` y hay consentimiento (el cliente aceptó mensajes o reservó él mismo en la web); si no, correo; sin ninguno de los dos no se manda nada.
+- **Reintentos:** hasta 3 intentos con espera de 1, 2 y 4 minutos. Si WhatsApp los agota, el mismo mensaje sale por correo.
+- **Proveedores:** correo con el `EmailBackend` de Django; WhatsApp detrás de `WhatsAppProvider` con `FakeProvider` (por defecto, no sale a internet) y `CloudApiProvider` (Meta, con `urllib`, sin dependencias nuevas). Ver `pormejorar.md` §36 y §37 antes de usar WhatsApp real.
+- **Plantillas** por idioma (es, en) y vertical en `notifications/templates.py`, con las variables de la spec y el enlace absoluto de la cita (`PUBLIC_SITE_URL`). Fechas y horas en la zona del negocio.
+- **Celery Beat** corre `notifications.send_reminders` cada 5 minutos por negocio activo, con la base `TenantTask` de M8.
+- **Pruebas:** en `test.py` Celery corre en el mismo proceso y sin broker; antes, las pruebas con commits reales mandaban tareas al Redis de desarrollo. 26 pruebas nuevas; el backend pasa 770.
+- Probado con el worker de Docker: una reserva web en `demo-barbershop` generó la confirmación por WhatsApp (FakeProvider) y la cancelación por enlace su aviso, ambos `sent`; Beat reparte los recordatorios por negocio.
+- Variables nuevas en `.env.example`: `WHATSAPP_PROVIDER`, `WHATSAPP_TOKEN`, `WHATSAPP_PHONE_NUMBER_ID`, `NOTIFICATION_REMINDER_HOURS` y `PUBLIC_SITE_URL`.
+- **Pendiente:** credenciales por negocio cifradas (necesita aprobar `cryptography`), plantillas aprobadas por Meta y la pantalla de integraciones (S11).
+
 ## M10 (parte 1) — Endurecimiento: límites, auditoría, logs y copias
 
 - **Límite de intentos** (`apps/accounts/throttle.py`):
