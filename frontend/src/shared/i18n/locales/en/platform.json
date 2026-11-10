@@ -54,7 +54,8 @@
       "deleteHelp": "Type the subdomain ({{slug}}) to confirm. The business stops being available; data is not erased.",
       "deleteConfirm": "Confirm deletion",
       "dangerZone": "Danger zone",
-      "usage": "Usage"
+      "usage": "Usage",
+      "integrations": "Integrations"
     },
     "ownerPhone": "Owner's mobile",
     "ownerDocumentType": "ID type",
@@ -79,6 +80,43 @@
       "lastLogin": "Last sign-in",
       "never": "No one has signed in yet",
       "note": "The {{days}}-day figures count appointments created in that period, not those scheduled for those dates."
+    },
+    "integrations": {
+      "whatsapp": "WhatsApp",
+      "email": "Email",
+      "planEnabled": "Enabled in the plan",
+      "yes": "Yes",
+      "no": "No",
+      "provider": "Provider",
+      "configured": "Configured",
+      "missingConfig": "The WhatsApp Cloud API token or phone number ID is missing.",
+      "emailBackend": "Email backend",
+      "emailSimulated": "Emails are not actually delivered in this environment.",
+      "sent": "Sent",
+      "failed": "Failed",
+      "queued": "Queued",
+      "lastSent": "Last sent",
+      "never": "Never",
+      "window": "Messages created in the last {{days}} days",
+      "failures": "Recent failures",
+      "empty": "No failures in the last 30 days",
+      "date": "Date",
+      "kind": "Type",
+      "channel": "Channel",
+      "recipient": "Recipient",
+      "attempts": "Attempts",
+      "error": "Error",
+      "providers": {
+        "fake": "Simulated (does not send)",
+        "cloud_api": "WhatsApp Cloud API",
+        "other": "Other"
+      },
+      "kinds": {
+        "confirmation": "Confirmation",
+        "reminder": "Reminder",
+        "cancellation": "Cancellation",
+        "reschedule": "Reschedule"
+      }
     }
   },
   "theme": {

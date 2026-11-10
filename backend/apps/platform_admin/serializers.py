@@ -198,3 +198,35 @@ class TenantUsageSerializer(serializers.Serializer):
     customers_total = serializers.IntegerField()
     users_active = serializers.IntegerField()
     last_login = serializers.DateTimeField(allow_null=True)
+
+
+class IntegrationChannelSerializer(serializers.Serializer):
+    channel = serializers.ChoiceField(choices=["whatsapp", "email"])
+    sent = serializers.IntegerField()
+    failed = serializers.IntegerField()
+    queued = serializers.IntegerField()
+    last_sent_at = serializers.DateTimeField(allow_null=True)
+
+
+class IntegrationFailureSerializer(serializers.Serializer):
+    created_at = serializers.DateTimeField()
+    kind = serializers.CharField()
+    channel = serializers.CharField()
+    to = serializers.CharField()
+    attempts = serializers.IntegerField()
+    error = serializers.CharField(max_length=300, allow_blank=True)
+
+
+class TenantIntegrationsSerializer(serializers.Serializer):
+    """Integraciones del negocio (S11).
+
+    Cuenta registros creados en los últimos `window_days` días; destinatarios enmascarados.
+    """
+
+    window_days = serializers.IntegerField()
+    whatsapp_enabled = serializers.BooleanField()
+    whatsapp_provider = serializers.ChoiceField(choices=["fake", "cloud_api", "other"])
+    whatsapp_configured = serializers.BooleanField()
+    email_backend = serializers.CharField()
+    channels = IntegrationChannelSerializer(many=True)
+    recent_failures = IntegrationFailureSerializer(many=True)

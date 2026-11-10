@@ -8,6 +8,7 @@ import type {
   Plan,
   Tenant,
   TenantDetail,
+  TenantIntegrations,
 } from "../../shared/api/types";
 
 export function queryString(params: Record<string, string | undefined>): string {
@@ -103,3 +104,9 @@ export const AUDIT_ACTIONS = [
   "auth.two_factor_enable",
   "auth.two_factor_reset",
 ] as const;
+
+export const useTenantIntegrations = (id: string) =>
+  useQuery({
+    queryKey: ["tenant", id, "integrations"],
+    queryFn: () => api<TenantIntegrations>(`/api/v1/tenants/${id}/integrations/`),
+  });
