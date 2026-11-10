@@ -16,7 +16,14 @@ export default defineConfig({
     timezoneId: "America/Bogota",
     trace: "on-first-retry",
     screenshot: "only-on-failure",
-    video: "retain-on-failure",
+    // En local el video necesita descargar ffmpeg; solo se graba en el CI.
+    video: process.env.CI ? "retain-on-failure" : "off",
   },
-  projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
+  projects: [
+    {
+      name: "chromium",
+      // PW_CHANNEL=chrome usa el Chrome instalado en el equipo, sin descargar Chromium.
+      use: { ...devices["Desktop Chrome"], channel: process.env.PW_CHANNEL || undefined },
+    },
+  ],
 });

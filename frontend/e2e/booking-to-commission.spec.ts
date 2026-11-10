@@ -86,12 +86,14 @@ test("un cliente reserva, el dueño completa la cita y ve la comisión", async (
   await page.goto(businessUrl("/citas"));
   await page.getByLabel("Desde").fill(day);
   await page.getByLabel("Hasta").fill(day);
-  await page.getByRole("button", { name: new RegExp(customer) }).click();
-
+  // Cada acción cierra el detalle y la tarjeta muestra el estado nuevo: se vuelve a abrir.
+  const card = page.getByRole("button", { name: new RegExp(customer) });
+  await card.click();
   await page.getByRole("button", { name: "Iniciar" }).click();
-  await expect(page.getByRole("button", { name: "Completar" })).toBeVisible();
+  await expect(card).toContainText("En curso");
+  await card.click();
   await page.getByRole("button", { name: "Completar" }).click();
-  await expect(page.getByText("Completada").first()).toBeVisible();
+  await expect(card).toContainText("Completada");
 
   // --- 3. La comisión aparece en los reportes -------------------------------------------------
   await page.goto(businessUrl("/reportes"));
@@ -104,5 +106,10 @@ test("un cliente reserva, el dueño completa la cita y ve la comisión", async (
   await expect(row).toContainText("COP");
 
   await page.getByRole("tab", { name: "Ventas" }).click();
-  await expect(page.getByText("Citas", { exact: true }).locator("..")).toContainText("1");
+  // Tarjeta "Citas" del resumen de ventas: la cita completada cuenta.
+  const appointmentsCard = page
+    .locator("section")
+    .filter({ has: page.getByText("Citas", { exact: true }) })
+    .filter({ hasNotText: "Ventas" });
+  await expect(appointmentsCard).toHaveText(/Citas\s*1$/);
 });
