@@ -29,7 +29,8 @@ test("un cliente reserva, el dueño completa la cita y ve la comisión", async (
   await page.goto(businessUrl("/reservar"));
   await dismissCookies(page);
 
-  await page.getByRole("button", { name: new RegExp(SERVICE) }).click();
+  // El nombre del botón de elegir empieza por el servicio; el de "Ver el detalle de …" no.
+  await page.getByRole("button", { name: new RegExp(`^${SERVICE}`) }).click();
   await next(page);
 
   const professionalButton = page
