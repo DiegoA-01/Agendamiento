@@ -189,6 +189,8 @@ export interface Category {
   id: string;
   name: string;
   sort_order: number;
+  /** R3: solo un servicio de esta categoría por cita (p. ej. un solo corte). */
+  single_choice: boolean;
 }
 
 /** Montos como texto decimal (`"30000.00"`): nunca se convierten a número para guardar. */
@@ -301,6 +303,8 @@ export interface PublicService {
 export interface PublicCategory {
   id: string;
   name: string;
+  /** R3: solo un servicio de esta categoría por cita. */
+  single_choice: boolean;
   services: PublicService[];
 }
 

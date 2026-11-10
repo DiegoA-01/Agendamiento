@@ -109,7 +109,9 @@
     "invalid_adjustment": "Check the amounts: the commission must be between 0 and the service amount, and the adjustment must change something.",
     "documentFormat": "Type the number without dots or spaces (3 to 20 characters).",
     "documentDigits": "A citizenship ID only has digits.",
-    "taxIdFormat": "Type 6 to 12 digits and, optionally, the check digit: 900123456-7."
+    "taxIdFormat": "Type 6 to 12 digits and, optionally, the check digit: 900123456-7.",
+    "one_per_category": "You can only choose one service from that category per appointment.",
+    "customer_overlap": "You already have an appointment at that time. Choose another time."
   },
   "verticals": {
     "barbershop": "Barbershop",

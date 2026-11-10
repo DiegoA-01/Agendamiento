@@ -65,6 +65,19 @@ def professional_for_user(user) -> Professional | None:
 # --- Motor de disponibilidad y citas (M5) -------------------------------------------------------
 
 
+def single_choice_conflict(services: list[Service]) -> ServiceCategory | None:
+    """La primera categoría "solo uno por cita" que aparece más de una vez, o None (R3)."""
+    seen: set = set()
+    for service in services:
+        category = service.category
+        if not category.single_choice:
+            continue
+        if category.pk in seen:
+            return category
+        seen.add(category.pk)
+    return None
+
+
 def get_bookable_services(service_ids: Iterable) -> list[Service] | None:
     """Servicios activos con esos ids, en el orden pedido (sin repetidos).
 
@@ -74,7 +87,10 @@ def get_bookable_services(service_ids: Iterable) -> list[Service] | None:
     ids = list(dict.fromkeys(str(value) for value in service_ids))
     if not ids or not all(_is_uuid(value) for value in ids):
         return None
-    found = {str(s.pk): s for s in Service.objects.filter(pk__in=ids, is_active=True)}
+    found = {
+        str(s.pk): s
+        for s in Service.objects.select_related("category").filter(pk__in=ids, is_active=True)
+    }
     if len(found) != len(ids):
         return None
     return [found[value] for value in ids]
@@ -253,12 +269,16 @@ def get_category(user, category_id) -> ServiceCategory:
     return category
 
 
-def create_category(*, name: str, sort_order: int = 0) -> ServiceCategory:
-    return ServiceCategory.objects.create(name=name, sort_order=sort_order)
+def create_category(
+    *, name: str, sort_order: int = 0, single_choice: bool = False
+) -> ServiceCategory:
+    return ServiceCategory.objects.create(
+        name=name, sort_order=sort_order, single_choice=single_choice
+    )
 
 
 def update_category(category: ServiceCategory, **changes) -> ServiceCategory:
-    for field in ("name", "sort_order"):
+    for field in ("name", "sort_order", "single_choice"):
         if field in changes:
             setattr(category, field, changes[field])
     category.save()

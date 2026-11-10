@@ -59,12 +59,16 @@ def test_with_any_professional_simultaneous_bookings_fill_each_professional_once
     for name in ("Ana", "Beto", "Carla"):
         shop.professional(name)
     clients = [shop.client("receptionist")[0] for _ in range(10)]
-    payload = shop.payload(at(9))
+    # Un cliente distinto por petición: el mismo cliente no puede tener dos citas a la vez (R3).
+    payloads = [
+        shop.payload(at(9), customer={"full_name": f"Cliente {n}", "phone": f"30055500{n:02d}"})
+        for n in range(len(clients))
+    ]
     barrier = threading.Barrier(len(clients))
     statuses: list[int] = []
     lock = threading.Lock()
 
-    def post(client: APIClient) -> None:
+    def post(client: APIClient, payload: dict) -> None:
         try:
             barrier.wait()
             response = client.post(URL, payload, format="json")
@@ -73,7 +77,10 @@ def test_with_any_professional_simultaneous_bookings_fill_each_professional_once
         finally:
             connection.close()
 
-    threads = [threading.Thread(target=post, args=(client,)) for client in clients]
+    threads = [
+        threading.Thread(target=post, args=(client, payload))
+        for client, payload in zip(clients, payloads, strict=True)
+    ]
     for thread in threads:
         thread.start()
     for thread in threads:

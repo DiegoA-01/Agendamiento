@@ -113,7 +113,13 @@ def test_a_professional_only_hears_about_their_own_appointments(
     agenda = open_agenda(shop, pro)
 
     with django_capture_on_commit_callbacks(execute=True):
-        staff.post(URL, shop.payload(at(9), beto), format="json")
+        staff.post(
+            URL,
+            shop.payload(
+                at(9), beto, customer={"full_name": "Pedro Gómez", "phone": "301 765 4321"}
+            ),
+            format="json",
+        )
         staff.post(URL, shop.payload(at(9), ana), format="json")
 
     assert f'"professional_id": "{ana.pk}"' in next_event(agenda)

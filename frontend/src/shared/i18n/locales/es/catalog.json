@@ -41,7 +41,10 @@
       "name": "Nombre de la categoría",
       "rename": "Renombrar",
       "deleteConfirm": "¿Eliminar la categoría {{name}}?",
-      "emptyEditable": "Crea una categoría (por ejemplo, Cortes) y luego agrega sus servicios."
+      "emptyEditable": "Crea una categoría (por ejemplo, Cortes) y luego agrega sus servicios.",
+      "singleChoice": "Solo un servicio de esta categoría por cita",
+      "singleChoiceHint": "Ejemplo: Cortes. El cliente no puede reservar dos cortes juntos, pero sí un corte con barba o cejas.",
+      "onlyOne": "Uno por cita"
     },
     "services": {
       "intro": "Los servicios activos aparecen en la reserva en línea.",

@@ -22,6 +22,10 @@ class CategorySerializer(serializers.Serializer):
     id = serializers.UUIDField(read_only=True)
     name = serializers.CharField(max_length=100)
     sort_order = serializers.IntegerField(min_value=0, required=False)
+    single_choice = serializers.BooleanField(
+        required=False,
+        help_text="Solo un servicio de esta categoría por cita (p. ej. un solo corte).",
+    )
 
 
 class ServiceSerializer(serializers.Serializer):

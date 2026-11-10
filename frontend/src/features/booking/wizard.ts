@@ -144,3 +144,13 @@ export const DAY_STYLES: Record<DayStatus, string> = {
   closed: "bg-slate-200 text-slate-500",
   unavailable: "text-slate-400 opacity-50",
 };
+
+/** Agrega o quita un servicio de la selección (R3). En una categoría "solo uno por cita", elegir
+ *  otro servicio reemplaza al anterior: dos cortes no, pero corte + barba sí. */
+export function toggleService(categories: PublicCategory[], ids: string[], id: string): string[] {
+  if (ids.includes(id)) return ids.filter((value) => value !== id);
+  const category = categories.find((c) => c.services.some((service) => service.id === id));
+  if (!category?.single_choice) return [...ids, id];
+  const sameCategory = new Set(category.services.map((service) => service.id));
+  return [...ids.filter((value) => !sameCategory.has(value)), id];
+}

@@ -41,7 +41,10 @@
       "name": "Category name",
       "rename": "Rename",
       "deleteConfirm": "Delete the category {{name}}?",
-      "emptyEditable": "Create a category (for example, Haircuts) and then add its services."
+      "emptyEditable": "Create a category (for example, Haircuts) and then add its services.",
+      "singleChoice": "Only one service from this category per appointment",
+      "singleChoiceHint": "Example: Haircuts. Customers can't book two haircuts together, but they can add a beard trim or brows.",
+      "onlyOne": "One per appointment"
     },
     "services": {
       "intro": "Active services appear in online booking.",

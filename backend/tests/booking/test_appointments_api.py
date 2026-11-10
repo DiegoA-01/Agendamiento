@@ -161,8 +161,16 @@ def test_any_professional_falls_back_when_the_first_one_is_busy(shop):
     ana, beto = shop.professional("Ana"), shop.professional("Beto")
     client, _ = shop.client()
     assert book(shop, client, at(9), ana).status_code == 201
-    assert book(shop, client, at(9)).json()["professional_id"] == str(beto.pk)
-    assert book(shop, client, at(9)).status_code == 409
+    # Otros clientes: uno mismo no puede tener dos citas a la misma hora (R3).
+    assert book(
+        shop, client, at(9), customer={"full_name": "Pedro Gómez", "phone": "301 765 4321"}
+    ).json()["professional_id"] == str(beto.pk)
+    assert (
+        book(
+            shop, client, at(9), customer={"full_name": "Laura Díaz", "phone": "302 111 2233"}
+        ).status_code
+        == 409
+    )
 
 
 def test_a_service_that_needs_a_resource_gets_a_free_one(shop):
@@ -297,7 +305,9 @@ def test_a_professional_sees_and_acts_only_on_their_own_appointments(shop):
     beto = shop.professional("Beto")
     staff, _ = shop.client()
     mine = book(shop, staff, at(9), ana).json()["id"]
-    theirs = book(shop, staff, at(9), beto).json()["id"]
+    theirs = book(
+        shop, staff, at(9), beto, customer={"full_name": "Pedro Gómez", "phone": "301 765 4321"}
+    ).json()["id"]
 
     pro = APIClient()
     login(pro, pro_user, host(shop.tenant.slug))

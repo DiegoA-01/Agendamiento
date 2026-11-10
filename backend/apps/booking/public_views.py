@@ -83,7 +83,12 @@ class PublicServicesView(PublicView):
         for service in catalog.active_services():
             category = categories.setdefault(
                 service.category_id,
-                {"id": service.category_id, "name": service.category.name, "services": []},
+                {
+                    "id": service.category_id,
+                    "name": service.category.name,
+                    "single_choice": service.category.single_choice,
+                    "services": [],
+                },
             )
             category["services"].append(service)
         return Response(

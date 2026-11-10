@@ -40,6 +40,7 @@ import {
   selectedServices,
   slotsByPeriod,
   todayIn,
+  toggleService,
   totals,
   type Customer,
   type Step,
@@ -85,7 +86,12 @@ function ServicesStep({
     <div className="flex flex-col gap-5">
       {categories.map((category) => (
         <section key={category.id} className="flex flex-col gap-2">
-          <h2 className="font-semibold">{category.name}</h2>
+          <div>
+            <h2 className="font-semibold">{category.name}</h2>
+            {category.single_choice && (
+              <p className="text-sm opacity-80">{t("booking.wizard.chooseOne")}</p>
+            )}
+          </div>
           {category.services.map((service) => {
             const isSelected = selected.includes(service.id);
             return (
@@ -93,7 +99,13 @@ function ServicesStep({
                 key={service.id}
                 type="button"
                 aria-pressed={isSelected}
-                disabled={!isSelected && selected.length >= MAX_SERVICES}
+                disabled={
+                  !isSelected &&
+                  selected.length >= MAX_SERVICES &&
+                  !(
+                    category.single_choice && category.services.some((s) => selected.includes(s.id))
+                  )
+                }
                 className={optionStyle(isSelected)}
                 onClick={() => onToggle(service.id)}
               >
@@ -634,7 +646,7 @@ export default function BookPage() {
           categories={services.data}
           selected={serviceIds}
           onToggle={(id) => {
-            setServiceIds((ids) => (ids.includes(id) ? ids.filter((x) => x !== id) : [...ids, id]));
+            setServiceIds((ids) => toggleService(services.data ?? [], ids, id));
             // Otros servicios cambian quién atiende y qué horarios hay: se vuelven a elegir.
             setProfessional(null);
             setDate("");

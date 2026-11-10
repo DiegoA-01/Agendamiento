@@ -107,7 +107,8 @@
       },
       "dayLabel": "{{day}}: {{status}}",
       "legend": "Calendar legend",
-      "specialties": "Specialties"
+      "specialties": "Specialties",
+      "chooseOne": "Choose one."
     }
   }
 }

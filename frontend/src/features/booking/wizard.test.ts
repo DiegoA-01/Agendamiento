@@ -10,6 +10,7 @@ import {
   selectedServices,
   slotsByPeriod,
   todayIn,
+  toggleService,
   totals,
 } from "./wizard";
 
@@ -17,6 +18,7 @@ const CATEGORIES: PublicCategory[] = [
   {
     id: "c1",
     name: "Cortes",
+    single_choice: false,
     services: [
       {
         id: "corte",
@@ -39,6 +41,7 @@ const CATEGORIES: PublicCategory[] = [
   {
     id: "c2",
     name: "Barba",
+    single_choice: false,
     services: [
       { id: "barba", name: "Barba", description: "", duration_min: 20, price: "0.10", image: null },
     ],
@@ -156,5 +159,40 @@ describe("dayStatuses", () => {
 
   it("sin datos no hay estados", () => {
     expect(dayStatuses(undefined).size).toBe(0);
+  });
+});
+
+describe("toggleService (R3)", () => {
+  const svc = (id: string) => ({
+    id,
+    name: id,
+    description: "",
+    duration_min: 30,
+    price: "10000.00",
+    image: null,
+  });
+  const categories = [
+    { id: "cortes", name: "Cortes", single_choice: true, services: [svc("corte"), svc("fade")] },
+    { id: "extras", name: "Extras", single_choice: false, services: [svc("barba"), svc("cejas")] },
+  ];
+
+  it("un segundo corte reemplaza al primero", () => {
+    expect(toggleService(categories, ["corte"], "fade")).toEqual(["fade"]);
+  });
+
+  it("corte más barba y cejas se suman", () => {
+    expect(toggleService(categories, ["corte", "barba"], "cejas")).toEqual([
+      "corte",
+      "barba",
+      "cejas",
+    ]);
+  });
+
+  it("al reemplazar conserva los demás servicios", () => {
+    expect(toggleService(categories, ["corte", "barba"], "fade")).toEqual(["barba", "fade"]);
+  });
+
+  it("tocar uno elegido lo quita", () => {
+    expect(toggleService(categories, ["corte", "barba"], "corte")).toEqual(["barba"]);
   });
 });

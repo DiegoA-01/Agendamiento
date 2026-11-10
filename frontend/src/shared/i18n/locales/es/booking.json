@@ -107,7 +107,8 @@
       },
       "dayLabel": "{{day}}: {{status}}",
       "legend": "Convenciones del calendario",
-      "specialties": "Especialidades"
+      "specialties": "Especialidades",
+      "chooseOne": "Elige uno."
     }
   }
 }
