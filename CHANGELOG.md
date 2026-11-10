@@ -27,6 +27,23 @@
 - Variables nuevas en `.env.example`: `WHATSAPP_PROVIDER`, `WHATSAPP_TOKEN`, `WHATSAPP_PHONE_NUMBER_ID`, `NOTIFICATION_REMINDER_HOURS` y `PUBLIC_SITE_URL`.
 - **Pendiente:** credenciales por negocio cifradas (necesita aprobar `cryptography`), plantillas aprobadas por Meta y la pantalla de integraciones (S11).
 
+## M10 (parte 2) — Prueba de punta a punta con Playwright
+
+- Dependencia nueva de desarrollo, aprobada: `@playwright/test`.
+- `frontend/e2e/booking-to-commission.spec.ts` cubre el criterio de aceptación de M10 con un navegador real:
+  1. Un cliente reserva en `/reservar`: servicio, barbero, primer día disponible, primera hora y sus datos.
+  2. El dueño entra al panel, encuentra la cita en `/citas`, la inicia y la completa.
+  3. La comisión aparece en `/reportes` y la cita cuenta en ventas.
+- `e2e/global-setup.ts` crea un negocio nuevo en cada corrida con `seed_demo`, con un subdominio distinto, así no choca con datos viejos.
+- **CI:** job `e2e` que levanta todo con `docker compose`, instala Chromium y corre la prueba. Si falla, sube el reporte de Playwright (capturas, video y traza) y muestra los logs de los contenedores.
+- **Correr en local**, con el proyecto levantado:
+
+  ```bash
+  cd frontend && npx playwright install chromium && npx playwright test
+  ```
+
+- `.local/` queda en `.gitignore` para guardar credenciales de prueba sin subirlas.
+
 ## M10 (parte 1) — Endurecimiento: límites, auditoría, logs y copias
 
 - **Límite de intentos** (`apps/accounts/throttle.py`):
