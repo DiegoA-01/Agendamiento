@@ -74,7 +74,9 @@ jobs:
 
   e2e:
     # Reservar → completar → comisión con un navegador real (M10, spec §14).
-    runs-on: ubuntu-latest
+    # Versión fija: `ubuntu-latest` está pasando a Ubuntu 26 y `playwright install --with-deps`
+    # todavía no sabe instalar las librerías de Chromium en esa versión.
+    runs-on: ubuntu-24.04
     needs: [backend, frontend]
     timeout-minutes: 25
     steps:
