@@ -180,6 +180,30 @@ CELERY_BROKER_URL = REDIS_URL
 CELERY_RESULT_BACKEND = REDIS_URL
 CELERY_TIMEZONE = "UTC"
 CELERY_TASK_ACKS_LATE = True
+# Recordatorios de citas (M8): cada 5 minutos, una tarea por negocio activo.
+CELERY_BEAT_SCHEDULE = {
+    "notifications-reminders": {
+        "task": "tenancy.for_each_active_tenant",
+        "schedule": 300.0,
+        "args": ["notifications.send_reminders"],
+    },
+}
+
+# Notificaciones al cliente (M8, spec §10).
+# Proveedor de WhatsApp: `FakeProvider` (no sale a internet) o `CloudApiProvider` (Meta).
+WHATSAPP_PROVIDER = os.environ.get("WHATSAPP_PROVIDER", "apps.notifications.providers.FakeProvider")
+WHATSAPP_TOKEN = os.environ.get("WHATSAPP_TOKEN", "")
+WHATSAPP_PHONE_NUMBER_ID = os.environ.get("WHATSAPP_PHONE_NUMBER_ID", "")
+WHATSAPP_API_VERSION = os.environ.get("WHATSAPP_API_VERSION", "v21.0")
+# Horas antes de la cita en que sale cada recordatorio (spec: 24 h y 2 h).
+NOTIFICATION_REMINDER_HOURS = [
+    int(hours)
+    for hours in os.environ.get("NOTIFICATION_REMINDER_HOURS", "24,2").split(",")
+    if hours
+]
+NOTIFICATION_MAX_ATTEMPTS = 3
+# Dirección pública del negocio para el enlace de la cita; `{host}` = `<slug>.<BASE_DOMAIN>`.
+PUBLIC_SITE_URL = os.environ.get("PUBLIC_SITE_URL", "http://{host}")
 
 LOGGING = {
     "version": 1,
