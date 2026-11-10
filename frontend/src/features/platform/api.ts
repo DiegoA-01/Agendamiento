@@ -95,4 +95,11 @@ export const AUDIT_ACTIONS = [
   "plan.create",
   "plan.update",
   "plan.delete",
+  "auth.login",
+  "auth.login_failed",
+  "auth.password_change",
+  "auth.password_reset_request",
+  "auth.password_reset",
+  "auth.two_factor_enable",
+  "auth.two_factor_reset",
 ] as const;

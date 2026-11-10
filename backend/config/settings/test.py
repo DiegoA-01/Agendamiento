@@ -7,3 +7,10 @@ ROOT_URLCONF = "tests.urls"
 REQUIRE_TWO_FACTOR = True
 # Hash rápido: los tests crean muchos usuarios y PBKDF2 es lento a propósito.
 PASSWORD_HASHERS = ["django.contrib.auth.hashers.MD5PasswordHasher"]
+# Los límites de intentos de login cuentan en Redis y duran 15 minutos: con valores reales, la
+# suite completa (muchos logins fallidos desde la misma IP) se bloquearía sola. Las pruebas del
+# límite los bajan con el fixture `settings` y usan IP y correo únicos.
+AUTH_LIMIT_PER_IP = 10_000
+AUTH_LIMIT_PER_EMAIL = 10_000
+PASSWORD_RESET_LIMIT_PER_IP = 10_000
+PASSWORD_RESET_LIMIT_PER_EMAIL = 10_000

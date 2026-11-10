@@ -31,3 +31,6 @@ backend/mediafiles/
 
 # grafo de graphify (local, se regenera)
 graphify-out/
+
+# Copias de seguridad locales (scripts/backup.sh)
+backups/

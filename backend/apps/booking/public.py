@@ -16,6 +16,7 @@ from django.core.cache import cache
 from django.utils import timezone
 
 from config.api import ApiError
+from config.net import client_ip  # noqa: F401 (la usan las vistas públicas)
 
 from . import events
 from . import services as booking
@@ -27,17 +28,6 @@ CANCELLABLE = (Appointment.Status.PENDING, Appointment.Status.CONFIRMED)
 
 
 # --- Límites y antibots -------------------------------------------------------------------------
-
-
-def client_ip(request) -> str:
-    """IP del cliente detrás de los proxies propios (`TRUSTED_PROXY_COUNT`)."""
-    forwarded = request.META.get("HTTP_X_FORWARDED_FOR", "")
-    hops = settings.TRUSTED_PROXY_COUNT
-    if forwarded and hops > 0:
-        addresses = [address.strip() for address in forwarded.split(",") if address.strip()]
-        if addresses:
-            return addresses[-min(hops, len(addresses))]
-    return request.META.get("REMOTE_ADDR", "")
 
 
 def _over_limit(key: str, limit: int) -> bool:

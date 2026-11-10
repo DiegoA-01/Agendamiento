@@ -6,6 +6,7 @@ import datetime as dt
 import pytest
 from django.db import connection
 from django.test.utils import CaptureQueriesContext
+from django.utils import timezone
 
 from apps.company import services as company
 from apps.scheduling import availability
@@ -145,7 +146,9 @@ def test_with_anyone_a_day_is_full_only_if_every_professional_is_full(shop):
 
 def test_days_outside_the_booking_window_are_unavailable(shop):
     shop.professional("Ana")
-    yesterday = dt.date.today() - dt.timedelta(days=1)
+    # "Ayer" en la zona del negocio: con dt.date.today() (UTC) falla de 7 p. m. a medianoche en
+    # Bogotá, cuando en UTC ya es el día siguiente.
+    yesterday = timezone.localdate(timezone=BOGOTA) - dt.timedelta(days=1)
     too_far = DAY + dt.timedelta(days=7 * 10)  # lunes, pero más allá de los 60 días
     assert status_of(shop, yesterday) == "unavailable"
     assert status_of(shop, too_far) == "unavailable"

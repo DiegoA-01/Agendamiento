@@ -178,6 +178,15 @@
         "create": "Plan creado",
         "update": "Plan editado",
         "delete": "Plan eliminado"
+      },
+      "auth": {
+        "login": "Inicio de sesión",
+        "login_failed": "Intento de ingreso fallido",
+        "password_change": "Contraseña cambiada",
+        "password_reset_request": "Recuperación de contraseña solicitada",
+        "password_reset": "Contraseña recuperada",
+        "two_factor_enable": "2FA activado",
+        "two_factor_reset": "2FA quitado por comando"
       }
     },
     "empty": "Todavía no hay acciones registradas."

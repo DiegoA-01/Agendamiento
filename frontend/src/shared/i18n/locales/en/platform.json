@@ -178,6 +178,15 @@
         "create": "Plan created",
         "update": "Plan edited",
         "delete": "Plan deleted"
+      },
+      "auth": {
+        "login": "Sign-in",
+        "login_failed": "Failed sign-in attempt",
+        "password_change": "Password changed",
+        "password_reset_request": "Password reset requested",
+        "password_reset": "Password reset",
+        "two_factor_enable": "2FA enabled",
+        "two_factor_reset": "2FA removed by command"
       }
     },
     "empty": "No actions recorded yet."

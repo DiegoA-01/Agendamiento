@@ -19,8 +19,9 @@ from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 
 from apps.tenancy import services as tenancy
 from config.api import ApiError
+from config.net import client_ip
 
-from . import totp
+from . import signals, throttle, totp
 from .backends import BACKEND_PATH
 from .messages import PASSWORD_RESET
 from .models import User
@@ -45,15 +46,32 @@ def _dummy_hash() -> str:
     return make_password("dummy-password-for-timing")
 
 
+def _limit_scope(request: HttpRequest) -> str:
+    """Los contadores de intentos son por negocio (o de la plataforma) además de IP y correo."""
+    tenant = _scope_tenant(request)
+    return str(tenant.pk) if tenant is not None else "platform"
+
+
+def _failed(request: HttpRequest, email: str, user: User | None) -> None:
+    """Cuenta el fallo para el límite de intentos y lo deja en la auditoría."""
+    throttle.record_failure(_limit_scope(request), client_ip(request), email)
+    signals.emit(signals.LOGIN_FAILED, request=request, user=user, email=email)
+
+
 def _authenticate(request: HttpRequest, email: str, password: str) -> User:
     """Valida correo y contraseña dentro del tenant del host. Mismo error si algo falla, y mismo
-    tiempo de respuesta exista o no el correo, para no revelar qué correos están registrados."""
+    tiempo de respuesta exista o no el correo, para no revelar qué correos están registrados.
+
+    Con demasiados fallos recientes de esa IP o de ese correo responde 429 sin revisar nada.
+    """
+    throttle.check_login(_limit_scope(request), client_ip(request), email)
     tenant = _scope_tenant(request)
     user = User.objects.for_tenant(tenant).filter(email=email.strip().lower()).first()
     if user is None:
         check_password(password, _dummy_hash())
     elif user.is_active and user.check_password(password):
         return user
+    _failed(request, email, user)
     raise ApiError("invalid_credentials", "Correo o contraseña incorrectos.", 401)
 
 
@@ -74,12 +92,15 @@ def login(request: HttpRequest, email: str, password: str, totp_code: str = "") 
             if not totp_code:
                 raise ApiError("two_factor_required", "Falta el código de verificación.", 401)
             if not _verify_totp(user, totp_code):
+                _failed(request, email, user)
                 raise ApiError("invalid_two_factor_code", "Código de verificación incorrecto.", 401)
         elif user.role in REQUIRED_2FA_ROLES:
             raise ApiError(
                 "two_factor_setup_required", "Debes activar la verificación en dos pasos.", 403
             )
     django_login(request, user, backend=BACKEND_PATH)
+    throttle.clear_email(_limit_scope(request), email)
+    signals.emit(signals.LOGIN_SUCCEEDED, request=request, user=user, email=email)
     return user
 
 
@@ -106,19 +127,24 @@ def confirm_two_factor(request: HttpRequest, email: str, password: str, code: st
     if user.totp_enabled or not user.totp_secret:
         raise ApiError("two_factor_setup_not_started", "Primero inicia la configuración.", 409)
     if not _verify_totp(user, code):
+        _failed(request, email, user)
         raise ApiError("invalid_two_factor_code", "Código de verificación incorrecto.", 401)
     user.totp_enabled = True
     user.save(update_fields=["totp_enabled", "updated_at"])
     django_login(request, user, backend=BACKEND_PATH)
+    throttle.clear_email(_limit_scope(request), email)
+    signals.emit(signals.TWO_FACTOR_ENABLED, request=request, user=user, email=email)
     return user
 
 
 def request_password_reset(request: HttpRequest, email: str) -> None:
     """Envía el enlace si el correo existe en este tenant. No dice si existe o no."""
+    throttle.check_password_reset(_limit_scope(request), client_ip(request), email)
     tenant = _scope_tenant(request)
     user = (
         User.objects.for_tenant(tenant).filter(email=email.strip().lower(), is_active=True).first()
     )
+    signals.emit(signals.PASSWORD_RESET_REQUESTED, request=request, user=user, email=email)
     if user is None:
         return
     uid = urlsafe_base64_encode(force_bytes(user.pk))
@@ -156,6 +182,7 @@ def confirm_password_reset(request: HttpRequest, uid: str, token: str, new_passw
     # Cambiar la contraseña invalida el token y todas las sesiones abiertas de ese usuario.
     user.set_password(new_password)
     user.save(update_fields=["password", "updated_at"])
+    signals.emit(signals.PASSWORD_RESET, request=request, user=user, email=user.email)
 
 
 def create_tenant_user(
@@ -213,6 +240,7 @@ def change_password(
     user.must_change_password = False
     user.save(update_fields=["password", "must_change_password", "updated_at"])
     update_session_auth_hash(request, user)
+    signals.emit(signals.PASSWORD_CHANGED, request=request, user=user, email=user.email)
 
 
 def reset_two_factor(user: User) -> None:
@@ -221,6 +249,7 @@ def reset_two_factor(user: User) -> None:
     user.totp_enabled = False
     user.totp_last_step = None
     user.save(update_fields=["totp_secret", "totp_enabled", "totp_last_step", "updated_at"])
+    signals.emit(signals.TWO_FACTOR_RESET, user=user, email=user.email)
 
 
 def build_me(request: HttpRequest, user: User) -> dict[str, Any]:

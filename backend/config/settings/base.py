@@ -37,6 +37,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    "config.request_id.RequestIdMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "apps.tenancy.middleware.TenantMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -115,6 +116,14 @@ PUBLIC_BOOKING_LIMIT_PER_PHONE = int(os.environ.get("PUBLIC_BOOKING_LIMIT_PER_PH
 # agregó a X-Forwarded-For; con 0 se usa REMOTE_ADDR. Nunca más alto que los proxies reales: un
 # cliente podría falsear la cabecera para saltarse el límite.
 TRUSTED_PROXY_COUNT = int(os.environ.get("TRUSTED_PROXY_COUNT", "1"))
+
+# Límite de intentos (M10): fallos de login por IP y por correo en la ventana, y solicitudes de
+# recuperación de contraseña. Ver apps/accounts/throttle.py.
+AUTH_LIMIT_WINDOW = int(os.environ.get("AUTH_LIMIT_WINDOW", "900"))  # 15 minutos
+AUTH_LIMIT_PER_IP = int(os.environ.get("AUTH_LIMIT_PER_IP", "20"))
+AUTH_LIMIT_PER_EMAIL = int(os.environ.get("AUTH_LIMIT_PER_EMAIL", "10"))
+PASSWORD_RESET_LIMIT_PER_IP = int(os.environ.get("PASSWORD_RESET_LIMIT_PER_IP", "10"))
+PASSWORD_RESET_LIMIT_PER_EMAIL = int(os.environ.get("PASSWORD_RESET_LIMIT_PER_EMAIL", "3"))
 # Captcha opcional (Turnstile, hCaptcha o reCAPTCHA: todos validan con un POST secret+response).
 PUBLIC_BOOKING_CAPTCHA = env_bool("PUBLIC_BOOKING_CAPTCHA", False)
 CAPTCHA_VERIFY_URL = os.environ.get(

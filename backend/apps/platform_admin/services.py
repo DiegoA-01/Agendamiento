@@ -37,16 +37,19 @@ def record(
     tenant=None,
     before: Any = None,
     after: Any = None,
+    actor=None,
 ) -> AuditLog:
+    if actor is None and request is not None and getattr(request.user, "is_authenticated", False):
+        actor = request.user
     return AuditLog.objects.create(
-        actor=request.user,
+        actor=actor,
         tenant=tenant,
         action=action,
         entity=entity,
         entity_id=str(entity_id),
         before=before,
         after=after,
-        ip=_client_ip(request),
+        ip=_client_ip(request) if request is not None else None,
     )
 
 
