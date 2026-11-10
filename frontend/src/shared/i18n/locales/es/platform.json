@@ -79,7 +79,8 @@
       "lastLogin": "Último ingreso",
       "never": "Nadie ha entrado aún",
       "note": "Las cifras de {{days}} días cuentan las citas creadas en ese periodo, no las agendadas para esas fechas."
-    }
+    },
+    "defaultsHint": "Se crea con la zona horaria de Bogotá, pesos colombianos (COP) y español. Puedes cambiarlo después en los datos de la empresa."
   },
   "theme": {
     "intro": "Colores del negocio. El texto debe leerse bien sobre el fondo y las superficies (contraste mínimo 4.5:1).",

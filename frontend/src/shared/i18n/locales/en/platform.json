@@ -79,7 +79,8 @@
       "lastLogin": "Last sign-in",
       "never": "No one has signed in yet",
       "note": "The {{days}}-day figures count appointments created in that period, not those scheduled for those dates."
-    }
+    },
+    "defaultsHint": "It is created with the Bogotá time zone, Colombian pesos (COP) and Spanish. You can change this later in the business details."
   },
   "theme": {
     "intro": "Business colors. Text must be readable on the background and surfaces (minimum contrast 4.5:1).",

@@ -1,6 +1,5 @@
 import { useTranslation } from "react-i18next";
 import { NavLink, Outlet } from "react-router-dom";
-import { LanguageSwitcher } from "../../shared/ui/LanguageSwitcher";
 import { Button } from "../../shared/ui/primitives";
 import { useMe } from "../auth/useMe";
 import { useSignOut } from "../auth/useSignOut";
@@ -45,7 +44,6 @@ export function PlatformLayout() {
             ))}
           </nav>
           <div className="flex flex-wrap items-center gap-3">
-            <LanguageSwitcher />
             {me.data && <span className="text-sm text-slate-600">{me.data.user.email}</span>}
             <Button
               variant="secondary"
