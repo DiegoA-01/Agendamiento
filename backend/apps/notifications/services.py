@@ -10,12 +10,13 @@ from zoneinfo import ZoneInfo
 
 from django.conf import settings
 from django.db import IntegrityError, transaction
+from django.db.models import Count, Max, Q
 from django.utils import timezone
 
 from apps.booking import services as booking
 from apps.tenancy import services as tenancy
 from apps.tenancy.constants import MODULE_WHATSAPP
-from apps.tenancy.context import get_current_tenant
+from apps.tenancy.context import get_current_tenant, tenant_context
 
 from . import providers, templates
 from .models import NotificationLog
@@ -206,3 +207,39 @@ def attempt_delivery(log: NotificationLog) -> str:
     log.error = ""
     log.save(update_fields=["attempts", "error", "status", "sent_at", "updated_at"])
     return SENT
+
+
+def mask_recipient(value: str) -> str:
+    """Oculta el destinatario sin revelar valores cortos completos."""
+    if not value:
+        return ""
+    if "@" in value:
+        local, domain = value.rsplit("@", 1)
+        return f"{local[:1]}•••@{domain}"
+    if len(value) <= 7:
+        return "•" * len(value)
+    return f"{value[:3]}•••••{value[-4:]}"
+
+
+def integration_summary(tenant, *, since: dt.datetime) -> dict:
+    """Actividad reciente de notificaciones, aislada por negocio (S11)."""
+    with tenant_context(tenant):
+        logs = NotificationLog.objects.filter(tenant=tenant, created_at__gte=since)
+        channels = []
+        for channel in (Channel.WHATSAPP, Channel.EMAIL):
+            counts = logs.filter(channel=channel).aggregate(
+                sent=Count("pk", filter=Q(status="sent")),
+                failed=Count("pk", filter=Q(status="failed")),
+                queued=Count("pk", filter=Q(status="queued")),
+                last_sent_at=Max("sent_at", filter=Q(status="sent")),
+            )
+            channels.append({"channel": channel, **counts})
+        failures = list(
+            logs.filter(status="failed")
+            .order_by("-created_at", "-pk")
+            .values("created_at", "kind", "channel", "to", "attempts", "error")[:5]
+        )
+        for failure in failures:
+            failure["to"] = mask_recipient(failure["to"])
+            failure["error"] = failure["error"][:300]
+        return {"channels": channels, "recent_failures": failures}

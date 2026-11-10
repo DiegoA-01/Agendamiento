@@ -1,5 +1,17 @@
 # Changelog
 
+## Mejora S11: integraciones por negocio (frente B)
+
+- `GET /tenants/{id}/integrations/` (solo Super Admin) devuelve, por negocio:
+  - **WhatsApp:** si el plan lo incluye, el proveedor de la plataforma (`fake`, `cloud_api` u `other`) y si está configurado.
+  - **Correo:** el sistema de envío (`console`, `smtp`…).
+  - **Por canal, en los últimos 30 días:** enviados, fallidos, en cola y último envío.
+  - **Los 5 fallos más recientes** con fecha, tipo, canal, intentos y error (máximo 300 caracteres).
+- **Privacidad:** el destinatario sale enmascarado (`+57•••••4567`, `c•••@example.com`).
+- Cada app aporta su parte desde su `services.py` (`notifications.integration_summary` y `mask_recipient`), contando dentro del negocio (RLS).
+- En el panel del Super Admin, el detalle de cada empresa tiene la pestaña **Integraciones**. Avisa cuando WhatsApp real no está configurado o cuando los correos no salen de verdad (consola). La tabla de fallos se desplaza dentro de su caja en el celular.
+- Implementado con Codex y verificado: 19 pruebas nuevas (el backend pasa 789) y probado en el navegador con los envíos reales de la demo.
+
 ## M8 — Notificaciones por correo y WhatsApp (frente B)
 
 - Nueva tabla `NotificationLog` (con RLS): tipo (`confirmation`, `reminder`, `cancellation`, `reschedule`), canal (`email`, `whatsapp`), destinatario, estado (`queued`, `sent`, `failed`), intentos, error, fecha de envío, asunto y texto. **Idempotente**: la misma cita, tipo y canal (y horas, en los recordatorios) se manda una sola vez, aunque Celery repita la tarea o el recordatorio corra de nuevo.
