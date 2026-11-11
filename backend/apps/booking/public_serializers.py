@@ -51,6 +51,9 @@ class PublicServiceSerializer(serializers.Serializer):
 class PublicCategorySerializer(serializers.Serializer):
     id = serializers.UUIDField()
     name = serializers.CharField()
+    single_choice = serializers.BooleanField(
+        help_text="Solo un servicio de esta categoría por cita (R3)."
+    )
     services = PublicServiceSerializer(many=True)
 
 

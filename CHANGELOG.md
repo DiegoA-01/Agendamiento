@@ -1,5 +1,19 @@
 # Changelog
 
+## Mejora R3: reglas para combinar servicios y un cliente a la vez
+
+- **Solo uno por cita por categoría.** Las categorías tienen el campo `single_choice` (migración `catalog/0002`). Si está activo, una cita no puede llevar dos servicios de esa categoría.
+  - Ejemplo: con "Cortes" marcada, dos cortes juntos dan error. Un corte con barba, cejas o diseño sí se puede.
+  - La API responde `400 one_per_category` al crear la cita y también al pedir horarios o días, en el panel y en la reserva pública.
+- **Un cliente no puede estar en dos citas a la vez.** Si el mismo cliente (mismo celular) ya tiene una cita activa que se cruza con el horario, la API responde `409 customer_overlap` y dice cuál es.
+  - Se bloquea la fila del cliente durante la reserva, así dos reservas simultáneas no pueden pasar las dos.
+  - Sí se permite una cita justo después de otra, otra cita después de cancelar, y que otro cliente reserve la misma hora con otro profesional. Con el mismo profesional sigue saliendo `slot_taken`.
+- **`/servicios`:** casilla "Solo un servicio de esta categoría por cita" al crear o editar una categoría, y la etiqueta "Uno por cita" en el título.
+- **Asistente `/reservar`:** en esas categorías dice "Elige uno". Elegir otro servicio de la misma categoría reemplaza al anterior en vez de sumarlo.
+- `GET /public/services/` incluye `single_choice` en cada categoría.
+- Hubo que ajustar cuatro pruebas viejas que reservaban dos citas a la misma hora con el mismo cliente; ahora usan clientes distintos.
+- **Pruebas:** 11 nuevas en el backend (761 en total) y 4 en el frontend (126 en total).
+
 ## Mejoras S1, S3, S4 y R2 (frente B)
 
 - **S1:** el panel del Super Admin ya no tiene selector de idioma. El sitio de cada negocio y su panel lo conservan.

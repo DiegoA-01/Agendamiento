@@ -78,6 +78,7 @@ export function companyPayload(values: CompanyValues) {
 
 export const categorySchema = z.object({
   name: z.string().trim().min(1, "required").max(100),
+  single_choice: z.boolean(),
 });
 export type CategoryValues = z.infer<typeof categorySchema>;
 

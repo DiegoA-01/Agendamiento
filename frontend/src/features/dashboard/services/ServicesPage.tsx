@@ -49,7 +49,7 @@ function CategoryForm({ category, onDone }: { category?: Category; onDone: () =>
   const queryClient = useQueryClient();
   const form = useForm<CategoryValues>({
     resolver: zodResolver(categorySchema),
-    defaultValues: { name: category?.name ?? "" },
+    defaultValues: { name: category?.name ?? "", single_choice: category?.single_choice ?? false },
   });
   const save = useMutation({
     mutationFn: (values: CategoryValues) =>
@@ -75,6 +75,13 @@ function CategoryForm({ category, onDone }: { category?: Category; onDone: () =>
           error={form.formState.errors.name?.message}
           autoFocus
           {...form.register("name")}
+        />
+      </div>
+      <div className="w-full">
+        <CheckboxField
+          label={t("catalog.categories.singleChoice")}
+          hint={t("catalog.categories.singleChoiceHint")}
+          {...form.register("single_choice")}
         />
       </div>
       <Button type="submit" disabled={save.isPending}>
@@ -105,7 +112,10 @@ function CategoryHeader({ category, editable }: { category: Category; editable: 
   return (
     <div className="flex flex-col gap-2">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h2 className="text-lg font-semibold">{category.name}</h2>
+        <h2 className="flex flex-wrap items-center gap-2 text-lg font-semibold">
+          {category.name}
+          {category.single_choice && <Badge tone="info">{t("catalog.categories.onlyOne")}</Badge>}
+        </h2>
         {editable && (
           <div className="flex gap-2">
             <Button variant="ghost" onClick={() => setEditing(true)}>

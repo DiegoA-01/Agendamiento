@@ -11,6 +11,9 @@ PERCENT = {"max_digits": 5, "decimal_places": 2}
 class ServiceCategory(TenantOwnedModel):
     name = models.CharField(max_length=100)
     sort_order = models.PositiveIntegerField(default=0)
+    # R3: "solo uno por cita". Ej.: Cortes. Una cita no puede llevar dos cortes, pero sí un corte
+    # más servicios de otras categorías (barba, cejas, diseño).
+    single_choice = models.BooleanField(default=False)
 
     class Meta:
         verbose_name_plural = "service categories"

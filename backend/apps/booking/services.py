@@ -235,6 +235,7 @@ def create_appointment(
                 continue
         try:
             with transaction.atomic():
+                _check_customer_is_free(customer, start_at, end_at)
                 appointment = Appointment.objects.create(
                     customer=customer,
                     professional=professional,
@@ -353,6 +354,38 @@ def appointments_for_report(
         in_category = AppointmentItem.objects.filter(service__category_id=category_id)
         appointments = appointments.filter(pk__in=in_category.values("appointment_id"))
     return appointments
+
+
+def _check_customer_is_free(customer: Customer, start_at, end_at) -> None:
+    """409 si el cliente ya tiene una cita activa que se cruza con este horario (R3).
+
+    Bloquea la fila del cliente: dos reservas simultáneas del mismo cliente se atienden en fila,
+    así la segunda ve la primera. Otro cliente sí puede reservar la misma hora con otro
+    profesional; con el mismo profesional lo impide la restricción de exclusión.
+    """
+    if customer.pk is None:
+        return
+    Customer.objects.select_for_update().filter(pk=customer.pk).first()
+    clash = (
+        Appointment.objects.filter(
+            customer=customer,
+            status__in=ACTIVE_STATUSES,
+            start_at__lt=end_at,
+            end_at__gt=start_at,
+        )
+        .order_by("start_at")
+        .first()
+    )
+    if clash is not None:
+        raise ApiError(
+            "customer_overlap",
+            "Ya tienes una cita en ese horario.",
+            409,
+            {
+                "start_at": [timezone.localtime(clash.start_at).isoformat()],
+                "appointment_id": [str(clash.pk)],
+            },
+        )
 
 
 def get_appointment(user, appointment_id, action: str = "view") -> Appointment:

@@ -113,7 +113,8 @@
       "noDescription": "Este servicio no tiene descripción.",
       "addService": "Agregar a mi cita",
       "removeService": "Quitar de mi cita",
-      "closeDetail": "Cerrar"
+      "closeDetail": "Cerrar",
+      "chooseOne": "Elige uno."
     }
   }
 }

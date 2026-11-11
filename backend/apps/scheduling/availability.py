@@ -196,6 +196,14 @@ def resolve_services(service_ids):
             400,
             {"service_ids": ["Revisa los servicios elegidos."]},
         )
+    conflict = catalog.single_choice_conflict(services)
+    if conflict is not None:
+        raise ApiError(
+            "one_per_category",
+            f"Solo puedes elegir un servicio de «{conflict.name}» por cita.",
+            400,
+            {"service_ids": [f"Elige un solo servicio de «{conflict.name}»."]},
+        )
     return services
 
 

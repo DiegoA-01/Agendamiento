@@ -109,7 +109,9 @@
     "invalid_adjustment": "Revisa los valores: la comisión debe estar entre 0 y el valor del servicio, y el ajuste debe cambiar algo.",
     "documentFormat": "Escribe el número sin puntos ni espacios (3 a 20 caracteres).",
     "documentDigits": "La cédula solo lleva números.",
-    "taxIdFormat": "Escribe el NIT con 6 a 12 dígitos y, si quieres, el dígito de verificación: 900123456-7."
+    "taxIdFormat": "Escribe el NIT con 6 a 12 dígitos y, si quieres, el dígito de verificación: 900123456-7.",
+    "one_per_category": "Solo puedes elegir un servicio de esa categoría por cita.",
+    "customer_overlap": "Ya tienes una cita en ese horario. Elige otra hora."
   },
   "verticals": {
     "barbershop": "Barbería",

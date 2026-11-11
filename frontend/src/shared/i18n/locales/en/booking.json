@@ -113,7 +113,8 @@
       "noDescription": "This service has no description.",
       "addService": "Add to my appointment",
       "removeService": "Remove from my appointment",
-      "closeDetail": "Close"
+      "closeDetail": "Close",
+      "chooseOne": "Choose one."
     }
   }
 }
