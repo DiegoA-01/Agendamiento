@@ -62,6 +62,7 @@
       "stepOf": "Step {{step}} of {{total}}",
       "steps": {
         "services": "What would you like?",
+        "schedule": "With whom and when?",
         "professional": "With whom?",
         "date": "Choose the day",
         "time": "Choose the time",
@@ -114,7 +115,8 @@
       "addService": "Add to my appointment",
       "removeService": "Remove from my appointment",
       "closeDetail": "Close",
-      "chooseOne": "Choose one."
+      "chooseOne": "Choose one.",
+      "closeBooking": "Close booking"
     }
   }
 }

@@ -1,5 +1,14 @@
 # Changelog
 
+## Mejora R9: la reserva en una ventana de 3 pasos (frente B, hecha por el frente A)
+
+- El botón **Reservar cita** de la portada abre la reserva en una ventana encima de la portada. En el celular ocupa toda la pantalla; en pantallas grandes es una ventana centrada. `/reservar` sigue funcionando: abre la portada con la ventana encima.
+- **De 5 pasos a 3:** servicios; profesional, día y hora en la misma vista (el calendario aparece al elegir profesional y las horas al elegir día, y la vista baja sola hasta ellas); y tus datos con el resumen.
+- Se cierra con la ✕, con Escape o desde el navegador; al cerrarla se vuelve a la portada. Usa `<dialog>` nativo, como el detalle del servicio (R2), que ahora se abre encima de la reserva.
+- Al cambiar de paso, la ventana vuelve arriba y el foco pasa al título, que también es el nombre de la ventana para los lectores de pantalla. La barra de **Volver / Continuar** queda siempre abajo.
+- La prueba de Playwright ahora abre la reserva desde la portada y recorre los 3 pasos; pasa en local.
+- Textos nuevos en español e inglés.
+
 ## Mejora S6: resumen de la plataforma (frente B, hecha por el frente A)
 
 - `GET /platform/summary/` (solo Super Admin) devuelve el total de negocios, cuántos están activos y suspendidos, los nuevos de los últimos 30 días, el reparto por plan y por tipo de negocio, y los 5 últimos negocios creados. Los negocios borrados no cuentan.
