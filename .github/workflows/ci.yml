@@ -105,10 +105,16 @@ jobs:
       - name: Instalar Chromium y sus librerías
         working-directory: frontend
         run: |
+          # apt reintenta cada descarga; si el espejo de Ubuntu no responde (pasó: "Temporary
+          # failure resolving azure.archive.ubuntu.com"), se espera y se vuelve a intentar.
+          echo 'Acquire::Retries "5";' | sudo tee /etc/apt/apt.conf.d/80-retries >/dev/null
           for attempt in 1 2 3; do
             timeout 300 npx playwright install --with-deps chromium && exit 0
-            echo "Intento $attempt falló; reintentando en 15 s"
-            sleep 15
+            echo "Intento $attempt falló; reintentando en 45 s"
+            # `timeout` corta npx pero no el apt-get que lanzó: si queda vivo, retiene el
+            # candado de apt y los intentos siguientes fallan con "Could not get lock".
+            sudo pkill -f apt-get || true
+            sleep 45
           done
           exit 1
       - name: Levantar el sistema completo
