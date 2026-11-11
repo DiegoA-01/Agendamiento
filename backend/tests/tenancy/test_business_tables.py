@@ -10,6 +10,7 @@ from apps.tenancy.models import TenantOwnedModel
 from tests.booking.factories import AppointmentItemFactory
 from tests.catalog.factories import ProfessionalServiceFactory, ResourceFactory, SpecialtyFactory
 from tests.media.factories import MediaFileFactory
+from tests.notifications.factories import NotificationLogFactory
 from tests.scheduling.factories import TimeBlockFactory, WorkingHoursFactory
 from tests.tenancy.factories import TenantFactory
 
@@ -45,6 +46,7 @@ def _create_one_of_each():
     TimeBlockFactory()
     item = AppointmentItemFactory()
     commissions.record_for_appointment(item.appointment)
+    NotificationLogFactory(appointment=item.appointment)
 
 
 def test_business_rows_are_invisible_to_other_tenants_even_without_the_orm_filter():

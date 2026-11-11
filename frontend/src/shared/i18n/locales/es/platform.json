@@ -54,7 +54,8 @@
       "deleteHelp": "Escribe el subdominio ({{slug}}) para confirmar. La empresa deja de estar disponible; los datos no se borran.",
       "deleteConfirm": "Confirmar eliminación",
       "dangerZone": "Zona de riesgo",
-      "usage": "Uso"
+      "usage": "Uso",
+      "integrations": "Integraciones"
     },
     "ownerPhone": "Celular del propietario",
     "ownerDocumentType": "Tipo de documento",
@@ -79,7 +80,45 @@
       "lastLogin": "Último ingreso",
       "never": "Nadie ha entrado aún",
       "note": "Las cifras de {{days}} días cuentan las citas creadas en ese periodo, no las agendadas para esas fechas."
-    }
+    },
+    "integrations": {
+      "whatsapp": "WhatsApp",
+      "email": "Correo",
+      "planEnabled": "Habilitado en el plan",
+      "yes": "Sí",
+      "no": "No",
+      "provider": "Proveedor",
+      "configured": "Configurado",
+      "missingConfig": "Falta configurar el token o el identificador de teléfono de WhatsApp Cloud API.",
+      "emailBackend": "Backend de correo",
+      "emailSimulated": "En este entorno los correos no salen de verdad.",
+      "sent": "Enviados",
+      "failed": "Fallidos",
+      "queued": "En cola",
+      "lastSent": "Último envío",
+      "never": "Nunca",
+      "window": "Mensajes creados en los últimos {{days}} días",
+      "failures": "Últimos fallos",
+      "empty": "Sin fallos en los últimos 30 días",
+      "date": "Fecha",
+      "kind": "Tipo",
+      "channel": "Canal",
+      "recipient": "Destinatario",
+      "attempts": "Intentos",
+      "error": "Error",
+      "providers": {
+        "fake": "Simulado (no envía)",
+        "cloud_api": "WhatsApp Cloud API",
+        "other": "Otro"
+      },
+      "kinds": {
+        "confirmation": "Confirmación",
+        "reminder": "Recordatorio",
+        "cancellation": "Cancelación",
+        "reschedule": "Reprogramación"
+      }
+    },
+    "defaultsHint": "Se crea con la zona horaria de Bogotá, pesos colombianos (COP) y español. Puedes cambiarlo después en los datos de la empresa."
   },
   "theme": {
     "intro": "Colores del negocio. El texto debe leerse bien sobre el fondo y las superficies (contraste mínimo 4.5:1).",

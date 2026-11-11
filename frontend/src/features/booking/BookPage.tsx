@@ -4,7 +4,12 @@ import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { ApiError, api } from "../../shared/api/client";
 import { describeError } from "../../shared/api/errors";
-import type { PublicBooked, PublicCategory, PublicProfessional } from "../../shared/api/types";
+import type {
+  PublicBooked,
+  PublicCategory,
+  PublicProfessional,
+  PublicService,
+} from "../../shared/api/types";
 import { formatMoney } from "../../shared/money";
 import {
   Button,
@@ -24,6 +29,7 @@ import {
   useSlots,
 } from "./api";
 import { AppointmentSummary } from "./ManagePage";
+import { ServiceDetail } from "./ServiceDetail";
 import {
   MAX_SERVICES,
   PERIODS,
@@ -81,6 +87,7 @@ function ServicesStep({
 }) {
   const { t } = useTranslation();
   const { money } = useCompanyFormat();
+  const [detail, setDetail] = useState<PublicService | null>(null);
   if (categories.length === 0) return <EmptyState>{t("booking.wizard.noServices")}</EmptyState>;
   return (
     <div className="flex flex-col gap-5">
@@ -95,45 +102,67 @@ function ServicesStep({
           {category.services.map((service) => {
             const isSelected = selected.includes(service.id);
             return (
-              <button
-                key={service.id}
-                type="button"
-                aria-pressed={isSelected}
-                disabled={
-                  !isSelected &&
-                  selected.length >= MAX_SERVICES &&
-                  !(
-                    category.single_choice && category.services.some((s) => selected.includes(s.id))
-                  )
-                }
-                className={optionStyle(isSelected)}
-                onClick={() => onToggle(service.id)}
-              >
-                {service.image?.thumb && (
-                  <img
-                    src={service.image.thumb}
-                    alt=""
-                    className="size-14 rounded-lg object-cover"
-                  />
-                )}
-                <span className="min-w-0 flex-1">
-                  <span className="block font-medium">{service.name}</span>
-                  <span className="block text-sm opacity-80">
-                    {money(service.price)} ·{" "}
-                    {t("catalog.services.minutes", { count: service.duration_min })}
-                  </span>
-                  {service.description && (
-                    <span className="mt-1 block text-sm opacity-70">{service.description}</span>
+              <div key={service.id} className="flex items-stretch gap-2">
+                <button
+                  type="button"
+                  aria-pressed={isSelected}
+                  disabled={
+                    !isSelected &&
+                    selected.length >= MAX_SERVICES &&
+                    !(
+                      category.single_choice &&
+                      category.services.some((s) => selected.includes(s.id))
+                    )
+                  }
+                  className={optionStyle(isSelected)}
+                  onClick={() => onToggle(service.id)}
+                >
+                  {service.image?.thumb && (
+                    <img
+                      src={service.image.thumb}
+                      alt=""
+                      className="size-14 rounded-lg object-cover"
+                    />
                   )}
-                </span>
-                <span aria-hidden="true" className="text-xl">
-                  {isSelected ? "✓" : "+"}
-                </span>
-              </button>
+                  <span className="min-w-0 flex-1">
+                    <span className="block font-medium">{service.name}</span>
+                    <span className="block text-sm opacity-80">
+                      {money(service.price)} ·{" "}
+                      {t("catalog.services.minutes", { count: service.duration_min })}
+                    </span>
+                    {service.description && (
+                      <span className="mt-1 line-clamp-2 block text-sm opacity-70">
+                        {service.description}
+                      </span>
+                    )}
+                  </span>
+                  <span aria-hidden="true" className="text-xl">
+                    {isSelected ? "✓" : "+"}
+                  </span>
+                </button>
+                <button
+                  type="button"
+                  className="shrink-0 rounded-xl border-2 border-black/10 bg-[var(--color-surface,#ffffff)] px-3 text-sm font-medium hover:border-black/30 focus-visible:outline-2"
+                  aria-label={t("booking.wizard.detailOf", { name: service.name })}
+                  onClick={() => setDetail(service)}
+                >
+                  {t("booking.wizard.detail")}
+                </button>
+              </div>
             );
           })}
         </section>
       ))}
+      {detail && (
+        <ServiceDetail
+          service={detail}
+          price={money(detail.price)}
+          selected={selected.includes(detail.id)}
+          canAdd={selected.length < MAX_SERVICES}
+          onToggle={() => onToggle(detail.id)}
+          onClose={() => setDetail(null)}
+        />
+      )}
     </div>
   );
 }

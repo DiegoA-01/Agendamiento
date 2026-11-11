@@ -16,6 +16,8 @@ import redis
 from django.conf import settings
 from django.db import transaction
 
+from .signals import appointment_changed
+
 CREATED = "appointment.created"
 UPDATED = "appointment.updated"
 CANCELLED = "appointment.cancelled"
@@ -58,10 +60,12 @@ def publish(tenant_id, message: dict) -> None:
 
 
 def notify(kind: str, appointment) -> None:
-    """Publica el evento cuando la transacción en curso se confirme (o ya, si no hay una)."""
+    """Publica el evento cuando la transacción en curso se confirme (o ya, si no hay una), y avisa
+    a las demás apps (notificaciones) con `signals.appointment_changed`."""
     message = payload(kind, appointment)
     tenant_id = appointment.tenant_id
     transaction.on_commit(lambda: publish(tenant_id, message))
+    appointment_changed.send(sender="booking", kind=kind, appointment=appointment)
 
 
 def _sse(message: dict) -> str:

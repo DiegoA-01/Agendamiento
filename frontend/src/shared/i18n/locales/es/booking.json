@@ -108,6 +108,12 @@
       "dayLabel": "{{day}}: {{status}}",
       "legend": "Convenciones del calendario",
       "specialties": "Especialidades",
+      "detail": "Detalle",
+      "detailOf": "Ver el detalle de {{name}}",
+      "noDescription": "Este servicio no tiene descripción.",
+      "addService": "Agregar a mi cita",
+      "removeService": "Quitar de mi cita",
+      "closeDetail": "Cerrar",
       "chooseOne": "Elige uno."
     }
   }

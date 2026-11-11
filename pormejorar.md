@@ -57,6 +57,9 @@ Los puntos marcados **Requiere aprobación** necesitan una decisión tuya o del 
 | 32 | Revisión de accesibilidad automática | Baja | M10 |
 | 34 | Servir las imágenes subidas en producción | Alta | Antes de desplegar |
 | 35 | Imágenes que nadie usa | Baja | M10 |
+| 36 | WhatsApp en producción: plantillas aprobadas por Meta | Alta | Antes de activar WhatsApp real |
+| 37 | Credenciales de WhatsApp por negocio, cifradas | Media | Cuando se apruebe `cryptography` |
+| 38 | Recordatorios configurables por negocio | Baja | Mejora |
 
 ---
 
@@ -505,4 +508,37 @@ Información para quien mantenga el proyecto, no son errores:
 **Cuándo:** M10, o cuando el disco empiece a crecer.
 
 **Cómo:** una tarea periódica de Celery que borre las imágenes de más de un día que ningún modelo referencia (`Company.logo`, `Professional.photo`, `Service.image`).
+
+## 36. WhatsApp en producción: plantillas aprobadas por Meta
+
+**Qué es:** `CloudApiProvider` (M8) manda un mensaje de **texto** con el enlace de la cita. Meta solo deja mandar texto libre dentro de las 24 horas siguientes a un mensaje del cliente. La confirmación y los recordatorios los inicia el negocio, así que en la práctica Meta exige **plantillas aprobadas** (con variables y botones).
+
+**Por qué importa:** con un número real de WhatsApp Business, la mayoría de los mensajes serían rechazados. Al agotar los 3 intentos saldrían por correo (el respaldo funciona), pero WhatsApp no llegaría.
+
+**Cuándo:** antes de cambiar `WHATSAPP_PROVIDER` a `CloudApiProvider` en producción.
+
+**Cómo:**
+- Registrar en Meta una plantilla por tipo de mensaje e idioma (confirmación, recordatorio, cancelación y reprogramación), con las variables de `notifications/templates.py` y los botones Confirmar, Cancelar y Reprogramar apuntando al enlace de la cita (spec §10).
+- En `CloudApiProvider.send`, mandar `type: "template"` con el nombre de la plantilla y sus parámetros en lugar de `type: "text"`.
+- Probar con el número de prueba de Meta antes de usar el del negocio.
+
+## 37. Credenciales de WhatsApp por negocio, cifradas
+
+**Qué es:** hoy el token y el número de WhatsApp son de toda la plataforma (`WHATSAPP_TOKEN`, `WHATSAPP_PHONE_NUMBER_ID` en el entorno). La spec §15 pide credenciales **por negocio y cifradas en reposo**.
+
+**Por qué importa:** todos los negocios mandarían desde el mismo número. Si cada barbería quiere su propio WhatsApp, hay que guardar sus credenciales, y guardarlas en texto plano expone el token si se filtra la base.
+
+**Cuándo:** cuando el encargado apruebe `cryptography` (también la necesita el cifrado del secreto del 2FA, punto 3). **Requiere aprobación.**
+
+**Cómo:** un modelo `NotificationSettings` por negocio en `notifications`, con los campos sensibles cifrados (Fernet, clave en una variable de entorno), y `whatsapp_provider()` que lea las del negocio activo y, si no hay, las de la plataforma. La pantalla de integraciones (S11) las editaría.
+
+## 38. Recordatorios configurables por negocio
+
+**Qué es:** las horas de los recordatorios (24 h y 2 h) son iguales para todos (`NOTIFICATION_REMINDER_HOURS`). La spec dice "recordatorio configurable".
+
+**Por qué importa:** un spa con citas largas quizá prefiera 48 h; una barbería, solo 2 h.
+
+**Cuándo:** mejora, cuando un negocio lo pida.
+
+**Cómo:** un campo en la configuración de agenda del negocio (`tenancy`, frente A) o en `NotificationSettings`, leído por `tasks.send_reminders` en vez del setting global.
 

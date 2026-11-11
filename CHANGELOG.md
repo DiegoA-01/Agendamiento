@@ -14,6 +14,57 @@
 - Hubo que ajustar cuatro pruebas viejas que reservaban dos citas a la misma hora con el mismo cliente; ahora usan clientes distintos.
 - **Pruebas:** 11 nuevas en el backend (761 en total) y 4 en el frontend (126 en total).
 
+## Mejoras S1, S3, S4 y R2 (frente B)
+
+- **S1:** el panel del Super Admin ya no tiene selector de idioma. El sitio de cada negocio y su panel lo conservan.
+- **S3 y S4:** el alta de un negocio ya no pide zona horaria, moneda ni idioma. Se crea con Bogotá, COP y español, y el formulario lo dice. Se pueden cambiar después en los datos de la empresa, que siguen editables, y la API sigue aceptándolos.
+- **R2:** en el paso de servicios de la reserva, cada servicio tiene un botón **Detalle** que abre una ventana con la foto grande, la descripción completa, la duración, el precio y el botón para agregarlo o quitarlo de la cita. Es un `<dialog>` nativo: maneja el foco, se cierra con Escape o tocando fuera y se anuncia como diálogo. En la lista, la descripción queda en 2 líneas.
+- Textos en español e inglés. Probado en el navegador: el alta de un negocio queda con `America/Bogota`, `COP` y `es`, y la ventana de detalle funciona a 375 px.
+
+## Mejora S11: integraciones por negocio (frente B)
+
+- `GET /tenants/{id}/integrations/` (solo Super Admin) devuelve, por negocio:
+  - **WhatsApp:** si el plan lo incluye, el proveedor de la plataforma (`fake`, `cloud_api` u `other`) y si está configurado.
+  - **Correo:** el sistema de envío (`console`, `smtp`…).
+  - **Por canal, en los últimos 30 días:** enviados, fallidos, en cola y último envío.
+  - **Los 5 fallos más recientes** con fecha, tipo, canal, intentos y error (máximo 300 caracteres).
+- **Privacidad:** el destinatario sale enmascarado (`+57•••••4567`, `c•••@example.com`).
+- Cada app aporta su parte desde su `services.py` (`notifications.integration_summary` y `mask_recipient`), contando dentro del negocio (RLS).
+- En el panel del Super Admin, el detalle de cada empresa tiene la pestaña **Integraciones**. Avisa cuando WhatsApp real no está configurado o cuando los correos no salen de verdad (consola). La tabla de fallos se desplaza dentro de su caja en el celular.
+- Implementado con Codex y verificado: 19 pruebas nuevas (el backend pasa 789) y probado en el navegador con los envíos reales de la demo.
+
+## M8 — Notificaciones por correo y WhatsApp (frente B)
+
+- Nueva tabla `NotificationLog` (con RLS): tipo (`confirmation`, `reminder`, `cancellation`, `reschedule`), canal (`email`, `whatsapp`), destinatario, estado (`queued`, `sent`, `failed`), intentos, error, fecha de envío, asunto y texto. **Idempotente**: la misma cita, tipo y canal (y horas, en los recordatorios) se manda una sola vez, aunque Celery repita la tarea o el recordatorio corra de nuevo.
+- **Cuándo se avisa:** al crear una cita (confirmación, o reprogramación si viene de otra), al cancelarla (desde el panel o por el enlace) y con los **recordatorios** 24 h y 2 h antes (`NOTIFICATION_REMINDER_HOURS`). Iniciar, completar o marcar inasistencia no avisan.
+- **Enganche sin acoplar las apps:** `booking.events.notify` envía la señal `booking.signals.appointment_changed`; `notifications` la escucha (igual que la auditoría de M10). `booking` gana dos funciones de lectura para las notificaciones: `appointment_for_notification` y `confirmed_starting_between`.
+- **Canal:** WhatsApp si el plan incluye `notifications_whatsapp` y hay consentimiento (el cliente aceptó mensajes o reservó él mismo en la web); si no, correo; sin ninguno de los dos no se manda nada.
+- **Reintentos:** hasta 3 intentos con espera de 1, 2 y 4 minutos. Si WhatsApp los agota, el mismo mensaje sale por correo.
+- **Proveedores:** correo con el `EmailBackend` de Django; WhatsApp detrás de `WhatsAppProvider` con `FakeProvider` (por defecto, no sale a internet) y `CloudApiProvider` (Meta, con `urllib`, sin dependencias nuevas). Ver `pormejorar.md` §36 y §37 antes de usar WhatsApp real.
+- **Plantillas** por idioma (es, en) y vertical en `notifications/templates.py`, con las variables de la spec y el enlace absoluto de la cita (`PUBLIC_SITE_URL`). Fechas y horas en la zona del negocio.
+- **Celery Beat** corre `notifications.send_reminders` cada 5 minutos por negocio activo, con la base `TenantTask` de M8.
+- **Pruebas:** en `test.py` Celery corre en el mismo proceso y sin broker; antes, las pruebas con commits reales mandaban tareas al Redis de desarrollo. 26 pruebas nuevas; el backend pasa 770.
+- Probado con el worker de Docker: una reserva web en `demo-barbershop` generó la confirmación por WhatsApp (FakeProvider) y la cancelación por enlace su aviso, ambos `sent`; Beat reparte los recordatorios por negocio.
+- Variables nuevas en `.env.example`: `WHATSAPP_PROVIDER`, `WHATSAPP_TOKEN`, `WHATSAPP_PHONE_NUMBER_ID`, `NOTIFICATION_REMINDER_HOURS` y `PUBLIC_SITE_URL`.
+- **Pendiente:** credenciales por negocio cifradas (necesita aprobar `cryptography`), plantillas aprobadas por Meta y la pantalla de integraciones (S11).
+
+## M10 (parte 2) — Prueba de punta a punta con Playwright
+
+- Dependencia nueva de desarrollo, aprobada: `@playwright/test`.
+- `frontend/e2e/booking-to-commission.spec.ts` cubre el criterio de aceptación de M10 con un navegador real:
+  1. Un cliente reserva en `/reservar`: servicio, barbero, primer día disponible, primera hora y sus datos.
+  2. El dueño entra al panel, encuentra la cita en `/citas`, la inicia y la completa.
+  3. La comisión aparece en `/reportes` y la cita cuenta en ventas.
+- `e2e/global-setup.ts` crea un negocio nuevo en cada corrida con `seed_demo`, con un subdominio distinto, así no choca con datos viejos.
+- **CI:** job `e2e` que levanta todo con `docker compose`, instala Chromium y corre la prueba. Si falla, sube el reporte de Playwright (capturas, video y traza) y muestra los logs de los contenedores.
+- **Correr en local**, con el proyecto levantado:
+
+  ```bash
+  cd frontend && npx playwright install chromium && npx playwright test
+  ```
+
+- `.local/` queda en `.gitignore` para guardar credenciales de prueba sin subirlas.
+
 ## M10 (parte 1) — Endurecimiento: límites, auditoría, logs y copias
 
 - **Límite de intentos** (`apps/accounts/throttle.py`):

@@ -108,6 +108,12 @@
       "dayLabel": "{{day}}: {{status}}",
       "legend": "Calendar legend",
       "specialties": "Specialties",
+      "detail": "Details",
+      "detailOf": "See the details of {{name}}",
+      "noDescription": "This service has no description.",
+      "addService": "Add to my appointment",
+      "removeService": "Remove from my appointment",
+      "closeDetail": "Close",
       "chooseOne": "Choose one."
     }
   }

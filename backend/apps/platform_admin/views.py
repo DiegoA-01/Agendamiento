@@ -97,6 +97,16 @@ class TenantUsageView(PlatformView):
         return Response(serializers.TenantUsageSerializer(usage).data)
 
 
+class TenantIntegrationsView(PlatformView):
+    @extend_schema(
+        responses=serializers.TenantIntegrationsSerializer,
+        description="Configuración y actividad de WhatsApp y correo del negocio (S11).",
+    )
+    def get(self, request, tenant_id):
+        integrations = platform.tenant_integrations(_tenant_or_404(tenant_id))
+        return Response(serializers.TenantIntegrationsSerializer(integrations).data)
+
+
 class TenantDetailView(PlatformView):
     @extend_schema(responses=serializers.TenantDetailSerializer)
     def get(self, request, tenant_id):
