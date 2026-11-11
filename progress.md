@@ -2,19 +2,24 @@
 
 Estado del SaaS de agendamiento y plan a seguir. Se actualiza al cerrar cada hito o cada PR importante.
 
-**Corte:** 2026-11-06 · `develop` en `b9f0646` · `main` en M0 (`12343f6`, espera la revisión del encargado).
+**Corte:** 2026-11-11 · `develop` en `3150508` (PR #41) · `main` en M0 (`12343f6`, espera la revisión del encargado).
 
 ---
 
 ## 1. Resumen en 30 segundos
 
-- **Hecho:** M0 a M7 completos, backend y pantallas: base, multi-negocio, cuentas, Super Admin, Fase 0, catálogo y equipo, motor de disponibilidad y citas, reserva pública, agenda en tiempo real y clientes. De M8 está la base de tareas de Celery.
-- **Avance aproximado:** API 35 de 37 grupos de la spec (≈ 95 %); proyecto completo ≈ 75–80 %.
-- **Falta:** notificaciones (M8, frente B), comisiones y reportes (M9), endurecimiento y e2e (M10), y el cierre.
-- **Siguiente para el frente A:** M9 (comisiones al completar una cita, reportes y CSV).
-- **Siguiente para el frente B:** M8 (correo y WhatsApp con `FakeProvider`, recordatorios y `NotificationLog`).
-- **Recordatorio obligatorio:** la verificación en dos pasos (2FA) está **apagada en desarrollo** y hay que reactivarla antes de entregar (`pormejorar.md` §33).
-- **Urgente:** la rama por defecto de GitHub sigue siendo `main` y ya mandó dos PRs a `main` por error (§7, riesgo 1).
+- **Hecho:** los hitos M0 a M9 completos, con backend y pantallas. De M10 está todo salvo Sentry y el servidor de producción. También están hechas casi todas las mejoras de Fase 1 que salieron de las pruebas manuales (§10).
+- **Avance aproximado:** la API cubre los 37 grupos de la spec, y el proyecto completo va en ≈ 90–95 %.
+- **Frente A:** no le queda trabajo de backlog. Solo quedan S2, si el encargado la aprueba, y lo que necesita aprobación (§5).
+- **Frente B:** le quedan R9, S6 y S8.
+- **Antes de entregar:**
+  - Reactivar la verificación en dos pasos (2FA), que está **apagada en desarrollo** (`pormejorar.md` §33).
+  - Decidir el servidor de producción y Sentry.
+  - Pasar la revisión del encargado y hacer el PR de `develop` a `main`.
+- **Pruebas sobre `develop`:**
+  - Backend: **800**. Frontend: **126**.
+  - Playwright: 1 prueba de punta a punta.
+  - Todo en verde en el CI.
 
 ---
 
@@ -25,9 +30,15 @@ Estado del SaaS de agendamiento y plan a seguir. Se actualiza al cerrar cada hit
 | Responsable | Diego (`DiegoA-01`) | Yehiron |
 | Apps | `scheduling`, `booking`, `commissions`, `reports`; en la práctica también `tenancy` y `accounts` | `company`, `catalog`, `media`, `notifications`, `platform_admin` y todas las pantallas |
 
-- Una rama por tarea desde `develop`, y **PR hacia `develop`, nunca hacia `main`**. El CI corre en cada PR y se mezcla con el CI en verde.
-- Solo el dueño de una app crea migraciones en ella. Si un frente necesita una función en una app ajena, la agrega mínima (solo lectura) y avisa en el PR.
-- Antes de empezar una tarea: `git fetch` y revisar los PR abiertos, para no repetir trabajo.
+- **Ramas:**
+  - Se crea una rama por tarea desde `develop`.
+  - Los PR van **hacia `develop`, nunca hacia `main`**.
+  - Se mezcla solo con el CI en verde (backend, frontend y e2e).
+- **Push:** el agente de Diego nunca hace push sin una confirmación explícita.
+- **Apps del otro frente:**
+  - Solo el dueño de una app crea migraciones en ella. Si un frente necesita una función en una app ajena, la agrega mínima y avisa en el PR.
+  - Varias tareas de B las hizo el frente A con permiso: pantallas de M9, R5 y R7, la migración de `catalog` de R3 y los conflictos de los PR #37, #38 y #40.
+- **Antes de empezar una tarea:** `git fetch`, revisar los PR abiertos y hacer `git pull` de la propia rama, que puede tener merges del otro frente.
 - Reglas completas en [`docs/REPARTO.md`](docs/REPARTO.md).
 
 ---
@@ -43,11 +54,14 @@ Estado del SaaS de agendamiento y plan a seguir. Se actualiza al cerrar cada hit
 | **M2** — Cuentas | Roles, login por sesión + CSRF, recuperación de contraseña, 2FA (TOTP), `/me/`, matriz de permisos, Argon2id | Diego | — |
 | **M3** — Super Admin | Empresas, planes, tema con contraste WCAG, módulos, dominios propios por DNS, suspensión, auditoría | Diego | — |
 | **Fase 0** | Apps y modelos con RLS, anti doble reserva, esqueleto del panel; luego configuración de agenda, `/me/` con permisos, sede por defecto, rutas públicas y polling de Vite | Yehiron y Diego | #2, #3, #10–#14 |
-| **M4** — Catálogo y equipo | Imágenes WebP; API de empresa, sedes, categorías, servicios, puestos, profesionales y servicios por profesional (B4.1); horarios y bloqueos; pantallas `/empresa`, `/servicios`, `/puestos`, `/equipo`, `/horarios` | Yehiron y Diego | #4, #6, #15–#18, #20, #22 |
+| **M4** — Catálogo y equipo | Imágenes WebP; API de empresa, sedes, categorías, servicios, puestos, profesionales y servicios por profesional; horarios y bloqueos; pantallas `/empresa`, `/servicios`, `/puestos`, `/equipo`, `/horarios` | Yehiron y Diego | #4, #6, #15–#18, #20, #22 |
 | **M5** — Motor y citas | Motor de disponibilidad con caché, citas con estados y reprogramación, `409 slot_taken`; `seed_demo`. **Aceptación:** 20 reservas simultáneas dan 1 cita y 19 rechazos | Diego y Yehiron | #19, #24 |
 | **M6** — Reserva pública | API pública con límites por IP y celular, honeypot y captcha opcional; asistente `/reservar`, `/cita/:token`, páginas legales y aviso de cookies | Diego y Yehiron | #21, #25 |
-| **M7** — Tiempo real y clientes | SSE `events/` sobre Redis (con el arreglo del 406 en el navegador), API de clientes; pantallas `/agenda`, `/citas` y `/clientes` | Diego y Yehiron | #23, #26, #27 |
-| **M8** (parcial) — Base de tareas | `TenantTask`, `delay_on_commit` y `for_each_active_tenant` para Celery Beat | Diego | #29 |
+| **M7** — Tiempo real y clientes | SSE `events/` sobre Redis, API de clientes; pantallas `/agenda`, `/citas` y `/clientes` | Diego y Yehiron | #23, #26, #27 |
+| **M8** — Notificaciones | Base de tareas de Celery por negocio (`TenantTask`); `NotificationLog` idempotente, confirmación, cancelación, reprogramación y recordatorios a 24 h y 2 h, reintentos con paso a correo si falla WhatsApp, `FakeProvider` y `CloudApiProvider` | Diego (base) y Yehiron | #29, #37 |
+| **M9** — Comisiones y reportes | `CommissionEntry` inmutable (también por trigger de PostgreSQL) que se crea al completar la cita; ajustes como filas nuevas (solo el propietario); reportes de ventas (por día, semana, mes, profesional o servicio) y de reservas; exportación CSV protegida contra fórmulas; pantalla `/reportes`. **Aceptación:** los valores cuadran con un negocio de prueba calculado a mano | Diego | #31, #33 |
+| **M10** — Endurecimiento | Límite de fallos de login por IP y por correo y de recuperaciones de contraseña (Redis); auditoría de ingresos, fallos, cambios de contraseña y 2FA; logs JSON con `request_id` y negocio; scripts `backup.sh` y `restore.sh` cifrados con prueba de restauración (`docs/OPERACION.md`); **Playwright** reservar → completar → comisión, corriendo en el CI | Diego | #36, #39 |
+| **Mejoras de Fase 1** (§10) | R1, R2, R3, R4, R5, R7, S1, S3, S4, S5, S10 y S11 | Diego y Yehiron | #32–#35, #38, #40, #41 |
 
 ### Qué hay en el código hoy
 
@@ -56,27 +70,37 @@ Estado del SaaS de agendamiento y plan a seguir. Se actualiza al cerrar cada hit
 | App | Qué tiene |
 |---|---|
 | `tenancy` | Negocios, dominios, planes, módulos, RLS, contexto del negocio activo, configuración de agenda y tareas de Celery por negocio |
-| `accounts` | Usuarios, roles, sesión, 2FA, recuperación de contraseña, matriz de permisos y `/me/` con permisos |
-| `platform_admin` | API del Super Admin, auditoría y `seed_demo` |
-| `company` | Empresa, sedes (con sede por defecto) y textos legales limpios de HTML peligroso |
-| `catalog` | Categorías, servicios, especialidades, profesionales, servicios por profesional, puestos y funciones para el motor |
-| `scheduling` | Horarios, bloqueos, configuración de agenda y el motor de disponibilidad |
-| `booking` | Citas, estados, clientes, reserva pública y eventos en tiempo real (SSE) |
+| `accounts` | Usuarios (con tipo y número de documento), roles, sesión, 2FA, recuperación, matriz de permisos, `/me/`, límite de intentos y la señal `security_event` |
+| `platform_admin` | API del Super Admin, auditoría (incluye los eventos de seguridad), uso por negocio (S10), integraciones por negocio (S11) y `seed_demo` |
+| `company` | Empresa (con NIT), sedes y textos legales limpios de HTML peligroso |
+| `catalog` | Categorías (con "uno por cita", R3), servicios, especialidades, profesionales, servicios por profesional y puestos |
+| `scheduling` | Horarios, bloqueos, configuración de agenda, motor de disponibilidad y calendario por estado del día (R7) |
+| `booking` | Citas, estados, clientes (sin citas cruzadas, R3), reserva pública, eventos SSE y datos para reportes y notificaciones |
+| `commissions` | Comisiones inmutables y ajustes |
+| `reports` | Reportes de ventas y reservas, con CSV |
+| `notifications` | Correo y WhatsApp, plantillas por idioma y vertical, recordatorios y `NotificationLog` |
 | `media` | Imágenes en WebP |
-| `commissions`, `notifications`, `reports` | Registradas, sin lógica todavía (M8 y M9) |
 
 **Frontend** (React):
-- Login con 2FA, cambio forzado de contraseña y recuperación.
-- Panel del Super Admin: empresas, detalle (datos, tema, módulos, dominios), planes y auditoría.
-- Panel del negocio con menú según los permisos de `/me/`: agenda (día y semana, en tiempo real), citas con acciones según estado, clientes, servicios, equipo, puestos, horarios y empresa. Falta `/reportes` (M9).
-- Sitio público del negocio: portada, asistente de reserva de 5 pasos, gestión de la cita por enlace, páginas legales y aviso de cookies.
-- Textos en español e inglés.
+- **Login:** con 2FA, cambio forzado de contraseña y recuperación.
+- **Panel del Super Admin:**
+  - Empresas con alta simplificada (S3 y S4) y datos del propietario (S5).
+  - Detalle con datos, tema, módulos, dominios, uso (S10) e integraciones (S11).
+  - Planes y auditoría.
+- **Panel del negocio:** agenda en tiempo real, citas, clientes, servicios, equipo, puestos, horarios, empresa y `/reportes`.
+- **Sitio público del negocio:**
+  - Portada.
+  - Asistente de reserva con fotos de servicios y barberos, detalle del servicio, especialidades, calendario de colores y regla de "elige uno".
+  - Gestión de la cita por enlace, páginas legales y aviso de cookies.
+- **Idiomas:** textos en español e inglés.
 
 **Calidad:**
-- Pruebas: **672** en el backend y **107** en el frontend, en verde sobre `develop`. Ruff, mypy, ESLint, tipos y build limpios.
-- Pruebas destacadas: aislamiento entre negocios (ORM y RLS), concurrencia de reservas, SSE, límites de la reserva pública y tareas de Celery por negocio.
-- El CI valida además la documentación OpenAPI sin avisos.
-- Para probar a mano: `docker compose exec api python manage.py seed_demo --vertical barbershop` crea un negocio demo completo.
+- **Pruebas:** **800** en el backend, **126** en el frontend y la prueba de Playwright, en verde sobre `develop`. Ruff, mypy, ESLint, tipos, build y OpenAPI sin avisos.
+- **El CI tiene tres trabajos:**
+  - `backend`.
+  - `frontend`.
+  - `e2e`: levanta todo con Docker Compose y corre Playwright, con Chromium en caché y reintentos si falla la descarga.
+- **Para probar a mano:** `docker compose exec api python manage.py seed_demo --vertical barbershop` crea un negocio demo completo. El Super Admin entra por `admin.localhost`, no por el dominio del negocio.
 
 ---
 
@@ -91,11 +115,17 @@ Para no volver a discutirlas. Las que dicen "provisional" se revisan antes de en
 | 2FA | Obligatorio para el Super Admin y opcional para el propietario. **Provisional: apagado en desarrollo** (`REQUIRE_TWO_FACTOR=0`) | `pormejorar.md` §5 y §33 |
 | Aislamiento | Base compartida + `tenant_id` + RLS forzado, con la app conectada por un rol sin superusuario | `CHANGELOG.md` (M1) |
 | Doble reserva | La garantía final es la restricción de exclusión de PostgreSQL; la API revalida antes y responde `409 slot_taken` con sugerencias | `CHANGELOG.md` (M5) |
-| Caché de disponibilidad | Redis por negocio, profesional y fecha, con una versión por negocio que sube en cada cambio de agenda | `CHANGELOG.md` (M5) |
+| Cliente en dos citas | Un mismo cliente no puede tener dos citas activas que se crucen (`409 customer_overlap`); otra persona sí puede tomar esa hora con otro profesional | `CHANGELOG.md` (R3) |
+| Servicios por categoría | Cada categoría puede marcarse "uno por cita" (`400 one_per_category`); por defecto no tiene la regla | `CHANGELOG.md` (R3) |
 | "Cualquiera" | Se asigna el profesional libre con menos citas ese día; empate por orden alfabético. El cliente no ve quién atiende | `CHANGELOG.md` (M5 y M6) |
-| Reserva pública | 10 POST por hora por IP y 5 por celular; IP real detrás de Caddy (`TRUSTED_PROXY_COUNT`); honeypot; captcha opcional sin dependencias nuevas | `CHANGELOG.md` (M6) |
+| Reserva pública | 10 POST por hora por IP y 5 por celular; IP real detrás de Caddy (`TRUSTED_PROXY_COUNT`); honeypot; captcha opcional | `CHANGELOG.md` (M6) |
 | Tiempo real | SSE sobre Redis pub/sub, publicado después del commit; el profesional solo recibe sus citas | `CHANGELOG.md` (M7) |
 | Tareas de Celery | Toda tarea de negocio usa `TenantTask` y recibe el id del negocio como primer argumento | `apps/tenancy/tasks.py` |
+| Notificaciones | WhatsApp si el plan lo incluye y hay consentimiento; si no, correo. `booking` avisa por señal, sin importar `notifications` | `CHANGELOG.md` (M8) |
+| Comisiones | Inmutables: nunca se editan ni se borran; las correcciones son ajustes que guardan la diferencia. Redondeo `ROUND_HALF_UP` | `CHANGELOG.md` (M9) |
+| Límite de intentos | 20 fallos por IP y 10 por correo en 15 minutos; 3 recuperaciones por correo | `CHANGELOG.md` (M10) |
+| Copias de seguridad | `pg_dump` cifrado con AES-256 y suma sha256; la restauración se prueba en una base aparte | `docs/OPERACION.md` |
+| Dependencias | Playwright aprobado (solo desarrollo y CI). Sentry, servidor de producción y `cryptography` siguen sin aprobar | §5 |
 | Flujo de Git | Rama por tarea, PR a `develop`, nunca a `main`; `main` solo con revisión del encargado | `docs/REPARTO.md` |
 
 ---
@@ -103,18 +133,18 @@ Para no volver a discutirlas. Las que dicen "provisional" se revisan antes de en
 ## 5. Pendientes y acuerdos
 
 ### Por decidir entre los dos o con el encargado
-- **Las mejoras de la §10** marcadas "Cambia la spec" o "Fuera de alcance" necesitan la aprobación del encargado.
+- **Las mejoras marcadas "Cambia la spec" o "Fuera de alcance"** en la §10 (R6, R10, S2, S7, S9 y el wallet de S11) necesitan la aprobación del encargado.
 - **Qué pasa al bajar de plan** con los profesionales o sedes que sobran.
-- **Si las comisiones tienen pantalla propia** o se ven dentro de `/reportes` (M9).
-- **Precio por profesional en la reserva pública:** hoy el asistente muestra un precio de referencia porque la API pública no da el precio propio de cada profesional.
+- **Precio por profesional en la reserva pública:** hoy el asistente muestra un precio de referencia.
 
 ### Aprobaciones de dependencias
 
-| Paquete | Para qué | Decidir antes de |
+| Paquete | Para qué | Estado |
 |---|---|---|
-| Servidor de producción (`gunicorn`, `uvicorn` o `daphne`) | Producción y SSE: cada agenda abierta ocupa una conexión | M10 |
-| Librería de cifrado (`cryptography`) | Credenciales de WhatsApp y secreto 2FA | M8 |
-| Playwright | Pruebas de extremo a extremo (las exige la spec) | M10 |
+| Playwright | Prueba de punta a punta | **Aprobado** y en uso |
+| Servidor de producción (`gunicorn`, `uvicorn` o `daphne`) | Producción y SSE: cada agenda abierta ocupa una conexión | Pendiente; decidir antes de desplegar |
+| Sentry | Errores en producción (S12) | Pendiente; tiene sentido cuando haya servidor de producción |
+| `cryptography` | Cifrar el secreto del 2FA y las credenciales de WhatsApp por negocio | Pendiente |
 
 ---
 
@@ -122,28 +152,40 @@ Para no volver a discutirlas. Las que dicen "provisional" se revisan antes de en
 
 Cada hito se da por terminado con su criterio de aceptación de la spec (§14), no con una fecha.
 
-| Hito | Frente A (Diego) | Frente B (Yehiron) | Criterio de aceptación | Estado |
-|---|---|---|---|---|
-| **M0 a M7** | — | — | Cumplidos | ✓ |
-| **M8** | ~~Base de tareas de Celery~~ (PR #29) | Correo y WhatsApp (`FakeProvider`), recordatorios a 24 h y 2 h con Celery Beat, reintentos, `NotificationLog`, credenciales cifradas | Confirmación y recordatorio registrados en `NotificationLog`; reintentos probados | En curso (B) |
-| **M9** | Comisiones al completar una cita (inmutables; las correcciones son entradas de ajuste), reportes de ventas y de reservas, CSV | Pantalla `/reportes` | Los valores cuadran con casos calculados a mano | Siguiente (A) |
-| **M10** | Límites de intentos de login, auditoría de ingresos, cifrado del secreto 2FA, copias de seguridad, servidor de producción | Playwright, accesibilidad, logs y Sentry | Playwright cubre reservar → completar → comisión | Pendiente |
-| **Cierre** | **Reactivar el 2FA**, resolver los puntos Alta de `pormejorar.md`, revisión del encargado y PR de `develop` a `main` | | Sin puntos Alta abiertos | Pendiente |
+| Paso | Frente A (Diego) | Frente B (Yehiron) | Estado |
+|---|---|---|---|
+| **M0 a M9** | — | — | ✓ |
+| **M10** | ~~Límites, auditoría de ingresos, logs, copias~~ (#36), ~~Playwright~~ (#39). Falta: servidor de producción y cifrado del secreto 2FA (necesitan aprobación) | Sentry (necesita aprobación), revisión de accesibilidad | Casi listo |
+| **Mejoras de Fase 1** | ~~R3, R5, R7, S5, S10~~. S2 solo si se aprueba | ~~R1, R2, R4, S1, S3, S4, S11~~. **Faltan R9, S6 y S8** | En curso (B) |
+| **Prueba manual completa** | Recorrer el negocio demo y el Super Admin; confirmar R8 | Lo mismo en celular (375 px) | Pendiente |
+| **Cierre** | **Reactivar el 2FA**, resolver los puntos Alta de `pormejorar.md`, revisión del encargado y PR de `develop` a `main` | | Pendiente |
 
-Las mejoras de Fase 1 de la §10 se hacen junto con M9 (frente A) y M8 (frente B).
+**Orden sugerido:**
+1. Yehiron cierra R9, S6 y S8.
+2. Llevar al encargado las decisiones de §5 y las mejoras que cambian la spec.
+3. Hacer la prueba manual completa.
+4. Reactivar el 2FA y correr todas las pruebas con él encendido.
+5. Revisar los puntos Alta de `pormejorar.md`: servidor de producción, imágenes en producción, cifrado del 2FA y WhatsApp real.
+6. Abrir el PR de `develop` a `main` para la revisión del encargado.
 
 ---
 
 ## 7. Riesgos y alertas
 
-1. **PRs que se van a `main`.** La rama por defecto de GitHub sigue siendo `main`: el PR #5 y el #28 se mezclaron ahí por error y `main` se devolvió a M0 las dos veces. **Cambiar ya** en GitHub: Settings → General → Default branch → `develop`. El PC de Diego tiene además un hook `pre-push` que rechaza los push a `main`.
+1. **PRs que se van a `main`.** El #5 y el #28 se mezclaron en `main` por error.
+   - Revisar en GitHub que la rama por defecto sea `develop`: Settings → General → Default branch.
+   - Al abrir un PR, confirmar siempre que la base sea `develop`.
 2. **2FA apagado en desarrollo.** Reactivarlo es obligatorio antes de entregar (`pormejorar.md` §33).
 3. **Claves foráneas entre negocios.** RLS impide *ver* datos de otro negocio pero no *enlazarlos*. Cada `services.py` busca los ids recibidos dentro del negocio activo antes de usarlos.
-4. **Servidor de desarrollo.** `runserver` no sirve para producción y cada conexión SSE ocupa un hilo (`pormejorar.md` §4).
-5. **Una prueba intermitente.** Tras recrear los contenedores, una corrida dio 1 fallo en 672 que no se pudo reproducir. Si vuelve, identificarla.
-6. **Docker Desktop en Windows** se apaga con frecuencia. Si aparece el error de `dockerInference`: Quit, volver a abrir y, si sigue, `wsl --shutdown`.
-7. **Imágenes en producción.** Falta definir cómo se sirven los archivos subidos (`pormejorar.md` §34).
-8. **Copias de seguridad.** No existen todavía; deben estar antes de tener un negocio piloto (`pormejorar.md` §23).
+4. **Servidor de desarrollo.** `runserver` no sirve para producción, y cada conexión SSE ocupa un hilo (`pormejorar.md` §4).
+5. **Pruebas que dependen de la hora.** Una prueba de R7 fallaba de noche en Bogotá porque usaba la fecha en UTC (ya corregida). Toda prueba con "hoy" o "ayer" debe usar la fecha local del negocio.
+6. **CI de punta a punta.**
+   - La descarga de Chromium a veces falla por la red del runner. Ya hay caché y reintentos.
+   - Si falla igual, reintentar el trabajo `e2e` antes de buscar un error en el código.
+   - Si un cambio de pantalla rompe la prueba, revisar los selectores de `frontend/e2e/`.
+7. **Docker Desktop en Windows** se apaga con frecuencia. Si aparece el error de `dockerInference`: Quit, volver a abrir y, si sigue, `wsl --shutdown`.
+8. **Imágenes en producción.** Falta definir cómo se sirven los archivos subidos (`pormejorar.md` §34).
+9. **WhatsApp real.** Necesita plantillas aprobadas por Meta y credenciales cifradas por negocio (`pormejorar.md` §36 y §37). Hasta entonces se usa `FakeProvider`.
 
 ---
 
@@ -153,6 +195,7 @@ Las mejoras de Fase 1 de la §10 se hacen junto con M9 (frente A) y M8 (frente B
 |---|---|
 | [`docs/SPEC-FASE-1-MVP.md`](docs/SPEC-FASE-1-MVP.md) | Qué se construye (la fuente de verdad) |
 | [`docs/REPARTO.md`](docs/REPARTO.md) | Quién hace qué y reglas para no chocar |
+| [`docs/OPERACION.md`](docs/OPERACION.md) | Copias de seguridad, restauración y logs |
 | [`CHANGELOG.md`](CHANGELOG.md) | Qué entró en cada hito, con detalle |
 | [`pormejorar.md`](pormejorar.md) | Mejoras y riesgos pendientes, con prioridad |
 | [`README.md`](README.md) | Cómo levantar el proyecto y crear el primer Super Admin |
@@ -169,7 +212,7 @@ Las mejoras de Fase 1 de la §10 se hacen junto con M9 (frente A) y M8 (frente B
 
 ## 10. Mejoras propuestas tras las pruebas manuales (2026-11-05)
 
-Salieron de probar el negocio demo y el panel del Super Admin. Cada una indica qué existe ya, quién la haría y si cabe en el alcance de la Fase 1.
+Salieron de probar el negocio demo y el panel del Super Admin.
 
 **Alcance:**
 - **Fase 1**: cabe en la spec y se puede hacer antes del cierre.
@@ -178,40 +221,32 @@ Salieron de probar el negocio demo y el panel del Super Admin. Cada una indica q
 
 ### Reserva pública (`/reservar`)
 
-| # | Mejora | Qué existe hoy | Quién | Alcance |
+| # | Mejora | Quién | Alcance | Estado |
 |---|---|---|---|---|
-| R1 | Foto en cada servicio | La API ya guarda y expone la imagen del servicio (M4, `image_id`); el panel ya la sube | B (mostrarla en la reserva) | Fase 1 |
-| R2 | Modal de detalle por servicio (foto, descripción, duración, precio) | La API pública ya trae esos datos | B | Fase 1 |
-| R3 | Combinar servicios con reglas: un solo corte por cita, pero corte + barba o cejas sí | Hoy se pueden elegir varios servicios sin reglas (máximo 10) | A (regla en la API: por ejemplo "máximo uno por categoría" marcado en la categoría, y validación al crear la cita) y B (campo en `/servicios` y en el asistente) | Fase 1, necesita migración en `catalog` |
-| R4 | Foto de presentación de cada barbero | La API ya guarda la foto del profesional (M4) y la pública la expone | B (mostrarla) | Fase 1 |
-| R5 | Especialidad de cada barbero en la reserva | Las especialidades existen (M4), pero la API pública no las expone | A (agregarlas a `public/professionals/`) y B | Fase 1 |
-| R6 | Calificación por barbero | `Professional.rating_avg` existe como campo reservado, sin uso | — | **Fuera de alcance** (§12: reseñas) |
-| R7 | Calendario que marque con colores los días disponibles y los ocupados | `public/availability/days/` devuelve solo los días con horario libre | A (devolver el estado de cada día: libre, lleno o cerrado) y B (colores) | Fase 1 |
-| R8 | Solo horas libres, sin dejar reservar las ocupadas, y sin mostrar quién reservó | Ya funciona: los horarios salen del motor (M5), la doble reserva la impide la base de datos, y con "cualquiera" no se muestra el profesional. Ningún cliente ve datos de otros | — | Hecho; verificar en la prueba manual |
-| R9 | Todo el flujo en un solo modal, con menos pasos | El asistente tiene 5 pasos en páginas | B | Fase 1 (decisión de UX) |
-| R10 | Agregar la cita al wallet del celular | — | — | **Fuera de alcance** (§1 y §12: wallet). Alternativa dentro de alcance: botón "Agregar al calendario" con un archivo `.ics` |
+| R1 | Foto en cada servicio | B | Fase 1 | ✓ |
+| R2 | Ventana de detalle por servicio (foto, descripción, duración, precio) | B | Fase 1 | ✓ #38 |
+| R3 | Un solo servicio por categoría marcada (un corte por cita, pero corte + barba o cejas sí) y un cliente sin citas cruzadas | A y B | Fase 1 | ✓ #41 |
+| R4 | Foto de presentación de cada barbero | B | Fase 1 | ✓ |
+| R5 | Especialidad de cada barbero en la reserva | A y B | Fase 1 | ✓ #32, #33 |
+| R6 | Calificación por barbero | — | **Fuera de alcance** (§12: reseñas) | Para el encargado |
+| R7 | Calendario con colores: disponible, lleno, cerrado | A y B | Fase 1 | ✓ #32, #33 |
+| R8 | Solo horas libres, sin mostrar quién reservó | — | Ya funcionaba desde M5 | Confirmar en la prueba manual |
+| R9 | Todo el flujo en un solo modal, con menos pasos | B | Fase 1 (decisión de UX) | **Pendiente** |
+| R10 | Agregar la cita al wallet del celular | — | **Fuera de alcance**. Alternativa: botón "Agregar al calendario" con `.ics` | Para el encargado |
 
 ### Super Admin
 
-| # | Mejora | Qué existe hoy | Quién | Alcance |
+| # | Mejora | Quién | Alcance | Estado |
 |---|---|---|---|---|
-| S1 | Quitar el selector de idioma del panel del Super Admin y dejarlo solo en el sitio de cada negocio | El selector aparece en todos los paneles | B | Fase 1 |
-| S2 | Tipo de negocio con selección múltiple, en píldoras con checkbox | `Tenant.vertical` admite un solo valor | A (modelo y migración en `tenancy`) y B (formulario) | **Cambia la spec** (§1: "un campo `vertical`") |
-| S3 | Quitar zona horaria y moneda del alta de negocio | Se piden en el formulario; tienen valores por defecto (`America/Bogota`, `COP`) | B (ocultarlos y usar los valores por defecto) | Fase 1 |
-| S4 | Quitar el idioma del alta; el idioma lo elige el visitante en el sitio del negocio | El negocio tiene idioma por defecto y el sitio ya trae selector | B | Fase 1 |
-| S5 | Datos del propietario al crear el negocio: tipo y número de documento (CC), RUT/NIT, teléfono y contraseña | Se pide correo y nombre; la contraseña es temporal y se cambia al primer ingreso | A (`accounts`: documento y teléfono) y B (formulario) | Fase 1. Ojo: que el Super Admin escriba la contraseña del propietario es menos seguro que la temporal actual; conviene mantener la temporal o un enlace para que el propietario la defina |
-| S6 | Dashboard del estado de la plataforma: total de negocios, activos, suspendidos, nuevos | Hay listado con filtros, sin resumen | B (pantalla) y quien sea dueño de `platform_admin` (API de métricas) | Fase 1 |
-| S7 | Soporte: categorías, tickets, sesiones de soporte y quién atiende cada ticket | — | — | **Nuevo módulo, no está en la spec**. Fase siguiente |
-| S8 | Términos y condiciones de la plataforma | Cada negocio tiene sus textos legales; la plataforma no | B | Fase 1 (texto estático) |
-| S9 | Pagos de la suscripción: pagados, pendientes, vencidos y fallidos | — | — | **Fuera de alcance** (§1: precios del software; §12: Wompi y facturación). Fase siguiente |
-| S10 | Uso del sistema por negocio (citas, reservas web, usuarios, último ingreso) | Los datos existen en la base | A (API de métricas) y B (pantalla) | Fase 1, después de M9 |
-| S11 | Integraciones por negocio: cómo le funcionan WhatsApp, correo y wallet | `NotificationLog` llega en M8 | B (con M8) | Fase 1 para WhatsApp y correo; wallet fuera de alcance |
-| S12 | Monitoreo: errores del sistema, copias de seguridad y auditoría | La auditoría ya existe (M3); errores (Sentry) y copias de seguridad están en M10 | A y B en M10 | Fase 1 (M10) |
-
-### Qué hacer con esta lista
-
-1. **Llevar al encargado** las marcadas "Cambia la spec" o "Fuera de alcance" (R6, R10, S2, S7, S9 y el wallet de S11). Ninguna se programa sin su aprobación.
-2. **Las de Fase 1** se reparten así:
-   - **Frente A**: R3, R5, R7, S2 (si se aprueba), S5 y S10, junto con M9.
-   - **Frente B**: R1, R2, R4, R9, S1, S3, S4, S6, S8 y S11, junto con M8 y la pantalla `/reportes`.
-3. **R8** ya está cubierto por el backend; solo hay que confirmarlo en la próxima prueba manual.
+| S1 | Selector de idioma solo en el sitio de cada negocio | B | Fase 1 | ✓ #38 |
+| S2 | Tipo de negocio con selección múltiple | A y B | **Cambia la spec** (§1: "un campo `vertical`") | Para el encargado |
+| S3 | Quitar zona horaria y moneda del alta | B | Fase 1 | ✓ #38 |
+| S4 | Quitar el idioma del alta | B | Fase 1 | ✓ #38 |
+| S5 | Datos del propietario: documento, NIT y teléfono (la contraseña sigue siendo temporal, por seguridad) | A y B | Fase 1 | ✓ #34 |
+| S6 | Resumen de la plataforma: total de negocios, activos, suspendidos, nuevos | B | Fase 1 | **Pendiente** |
+| S7 | Soporte con tickets | — | **Nuevo módulo, no está en la spec** | Fase siguiente |
+| S8 | Términos y condiciones de la plataforma | B | Fase 1 (texto estático) | **Pendiente** |
+| S9 | Pagos de la suscripción | — | **Fuera de alcance** (§1 y §12) | Fase siguiente |
+| S10 | Uso del sistema por negocio | A y B | Fase 1 | ✓ #35 |
+| S11 | Integraciones por negocio (WhatsApp y correo) | B | Fase 1; wallet fuera de alcance | ✓ #40 |
+| S12 | Monitoreo: errores, copias y auditoría | A y B | Fase 1 (M10) | Copias y auditoría ✓ #36; Sentry pendiente de aprobación |
