@@ -6,7 +6,7 @@ import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { api } from "../../shared/api/client";
 import { applyServerErrors, describeError } from "../../shared/api/errors";
-import { LANGUAGES, VERTICALS, type TenantCreated } from "../../shared/api/types";
+import { VERTICALS, type TenantCreated } from "../../shared/api/types";
 import { baseDomainFrom, tenantUrl } from "../../shared/format";
 import {
   Button,
@@ -186,24 +186,9 @@ export function TenantCreatePage() {
                 </option>
               ))}
             </SelectField>
-            <TextField
-              label={t("tenants.timezone")}
-              error={errors.timezone?.message}
-              {...form.register("timezone")}
-            />
-            <TextField
-              label={t("tenants.currency")}
-              maxLength={3}
-              error={errors.currency?.message}
-              {...form.register("currency")}
-            />
-            <SelectField label={t("tenants.language")} {...form.register("language")}>
-              {LANGUAGES.map((language) => (
-                <option key={language} value={language}>
-                  {t(`language.${language}`)}
-                </option>
-              ))}
-            </SelectField>
+            {/* Zona horaria, moneda e idioma van con los valores por defecto (Colombia); se
+                cambian después en el detalle de la empresa si hace falta (mejoras S3 y S4). */}
+            <p className="text-sm text-slate-600 sm:col-span-2">{t("tenants.defaultsHint")}</p>
           </Card>
 
           <Card className="grid gap-4 sm:grid-cols-2">

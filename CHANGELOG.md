@@ -1,5 +1,12 @@
 # Changelog
 
+## Mejoras S1, S3, S4 y R2 (frente B)
+
+- **S1:** el panel del Super Admin ya no tiene selector de idioma. El sitio de cada negocio y su panel lo conservan.
+- **S3 y S4:** el alta de un negocio ya no pide zona horaria, moneda ni idioma. Se crea con Bogotá, COP y español, y el formulario lo dice. Se pueden cambiar después en los datos de la empresa, que siguen editables, y la API sigue aceptándolos.
+- **R2:** en el paso de servicios de la reserva, cada servicio tiene un botón **Detalle** que abre una ventana con la foto grande, la descripción completa, la duración, el precio y el botón para agregarlo o quitarlo de la cita. Es un `<dialog>` nativo: maneja el foco, se cierra con Escape o tocando fuera y se anuncia como diálogo. En la lista, la descripción queda en 2 líneas.
+- Textos en español e inglés. Probado en el navegador: el alta de un negocio queda con `America/Bogota`, `COP` y `es`, y la ventana de detalle funciona a 375 px.
+
 ## Mejora S11: integraciones por negocio (frente B)
 
 - `GET /tenants/{id}/integrations/` (solo Super Admin) devuelve, por negocio:

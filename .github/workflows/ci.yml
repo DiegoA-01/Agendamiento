@@ -91,8 +91,32 @@ jobs:
       # escribir ahí (falla con código 243).
       - run: npm ci
         working-directory: frontend
-      - run: npx playwright install --with-deps chromium
+      # Chromium en caché entre corridas (la clave cambia con la versión de Playwright). Las
+      # librerías del sistema se instalan siempre; cada intento tiene tope de 5 minutos y se
+      # reintenta hasta 3 veces, porque la descarga a veces se cuelga en la máquina de GitHub.
+      - name: Versión de Playwright
+        id: playwright
         working-directory: frontend
+        run: echo "version=$(node -p "require('@playwright/test/package.json').version")" >> "$GITHUB_OUTPUT"
+      - uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}
+      - name: Instalar Chromium y sus librerías
+        working-directory: frontend
+        run: |
+          # apt reintenta cada descarga; si el espejo de Ubuntu no responde (pasó: "Temporary
+          # failure resolving azure.archive.ubuntu.com"), se espera y se vuelve a intentar.
+          echo 'Acquire::Retries "5";' | sudo tee /etc/apt/apt.conf.d/80-retries >/dev/null
+          for attempt in 1 2 3; do
+            timeout 300 npx playwright install --with-deps chromium && exit 0
+            echo "Intento $attempt falló; reintentando en 45 s"
+            # `timeout` corta npx pero no el apt-get que lanzó: si queda vivo, retiene el
+            # candado de apt y los intentos siguientes fallan con "Could not get lock".
+            sudo pkill -f apt-get || true
+            sleep 45
+          done
+          exit 1
       - name: Levantar el sistema completo
         run: |
           cp .env.example .env
@@ -116,4 +140,5 @@ jobs:
           retention-days: 7
       - name: Logs del sistema si falla
         if: failure()
-        run: docker compose logs --no-color --tail=300
+        # Si el sistema no llegó a levantarse no hay .env ni logs: que este paso no tape el error.
+        run: docker compose logs --no-color --tail=300 || true
