@@ -579,3 +579,27 @@ def usage_counts(tenant, *, since: dt.datetime) -> dict[str, int]:
             "cancelled_recent": counts["cancelled"],
             "customers_total": Customer.objects.count(),
         }
+
+
+# --- Para las notificaciones (M8, frente B) ------------------------------------------------------
+
+
+def appointment_for_notification(appointment_id) -> Appointment | None:
+    """Cita del negocio activo con lo que necesita un mensaje (cliente, profesional, servicios)."""
+    if not _is_uuid(appointment_id):
+        return None
+    return (
+        Appointment.objects.select_related("customer", "professional", "location")
+        .prefetch_related("items__service")
+        .filter(pk=appointment_id)
+        .first()
+    )
+
+
+def confirmed_starting_between(start: dt.datetime, end: dt.datetime) -> list[uuid.UUID]:
+    """Ids de las citas confirmadas que empiezan en `(start, end]` (recordatorios)."""
+    return list(
+        Appointment.objects.filter(
+            status=Appointment.Status.CONFIRMED, start_at__gt=start, start_at__lte=end
+        ).values_list("pk", flat=True)
+    )

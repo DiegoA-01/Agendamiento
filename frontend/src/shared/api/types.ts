@@ -388,3 +388,30 @@ export interface Appointment {
   rescheduled_from_id: string | null;
   created_at: string;
 }
+
+export interface IntegrationChannel {
+  channel: "whatsapp" | "email";
+  sent: number;
+  failed: number;
+  queued: number;
+  last_sent_at: string | null;
+}
+
+export interface IntegrationFailure {
+  created_at: string;
+  kind: "confirmation" | "reminder" | "cancellation" | "reschedule";
+  channel: "whatsapp" | "email";
+  to: string;
+  attempts: number;
+  error: string;
+}
+
+export interface TenantIntegrations {
+  window_days: number;
+  whatsapp_enabled: boolean;
+  whatsapp_provider: "fake" | "cloud_api" | "other";
+  whatsapp_configured: boolean;
+  email_backend: string;
+  channels: IntegrationChannel[];
+  recent_failures: IntegrationFailure[];
+}

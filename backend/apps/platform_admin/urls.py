@@ -7,6 +7,11 @@ urlpatterns = [
     path("tenants/<uuid:tenant_id>/", views.TenantDetailView.as_view(), name="tenant"),
     path("tenants/<uuid:tenant_id>/usage/", views.TenantUsageView.as_view(), name="tenant-usage"),
     path(
+        "tenants/<uuid:tenant_id>/integrations/",
+        views.TenantIntegrationsView.as_view(),
+        name="tenant-integrations",
+    ),
+    path(
         "tenants/<uuid:tenant_id>/suspend/",
         views.TenantStatusView.as_view(suspend=True),
         name="tenant-suspend",

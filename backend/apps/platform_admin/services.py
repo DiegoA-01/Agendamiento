@@ -9,6 +9,7 @@ import secrets
 import uuid
 from typing import Any
 
+from django.conf import settings
 from django.db import transaction
 from django.db.models import QuerySet
 from django.http import HttpRequest
@@ -18,7 +19,9 @@ from apps.accounts import services as accounts
 from apps.accounts.models import User
 from apps.booking import services as booking
 from apps.company import services as company
+from apps.notifications import services as notifications
 from apps.tenancy import services as tenancy
+from apps.tenancy.constants import MODULE_WHATSAPP
 from config.api import ApiError
 
 from .models import AuditLog
@@ -273,4 +276,28 @@ def tenant_usage(tenant, *, now=None) -> dict:
         "window_days": USAGE_WINDOW_DAYS,
         **booking.usage_counts(tenant, since=since),
         **accounts.usage_for(tenant),
+    }
+
+
+def tenant_integrations(tenant, *, now=None) -> dict:
+    """Configuración y actividad de notificaciones del negocio (S11)."""
+    now = now or django_timezone.now()
+    provider_class = settings.WHATSAPP_PROVIDER.rsplit(".", 1)[-1]
+    provider = {"FakeProvider": "fake", "CloudApiProvider": "cloud_api"}.get(
+        provider_class, "other"
+    )
+    configured = provider == "fake" or (
+        provider == "cloud_api"
+        and bool(settings.WHATSAPP_TOKEN.strip())
+        and bool(settings.WHATSAPP_PHONE_NUMBER_ID.strip())
+    )
+    return {
+        "window_days": USAGE_WINDOW_DAYS,
+        "whatsapp_enabled": tenancy.is_module_enabled(tenant, MODULE_WHATSAPP),
+        "whatsapp_provider": provider,
+        "whatsapp_configured": configured,
+        "email_backend": settings.EMAIL_BACKEND.split(".")[-2],
+        **notifications.integration_summary(
+            tenant, since=now - dt.timedelta(days=USAGE_WINDOW_DAYS)
+        ),
     }
