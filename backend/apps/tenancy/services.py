@@ -153,6 +153,34 @@ def list_tenants(*, search: str = "", status: str = "") -> QuerySet[Tenant]:
     return queryset
 
 
+def platform_summary(*, since, latest: int = 5) -> dict[str, Any]:
+    """Estado de la plataforma para el Super Admin (S6). No cuenta los negocios borrados."""
+    tenants = Tenant.objects.filter(deleted_at__isnull=True)
+    counts = tenants.aggregate(
+        total=models.Count("pk"),
+        active=models.Count("pk", filter=Q(status=Tenant.Status.ACTIVE)),
+        suspended=models.Count("pk", filter=Q(status=Tenant.Status.SUSPENDED)),
+        new_recent=models.Count("pk", filter=Q(created_at__gte=since)),
+    )
+    by_plan = (
+        tenants.values("plan_id", "plan__name")
+        .annotate(count=models.Count("pk"))
+        .order_by("-count", "plan__name")
+    )
+    by_vertical = (
+        tenants.values("vertical").annotate(count=models.Count("pk")).order_by("-count", "vertical")
+    )
+    return {
+        **counts,
+        "by_plan": [
+            {"plan_id": row["plan_id"], "name": row["plan__name"], "count": row["count"]}
+            for row in by_plan
+        ],
+        "by_vertical": list(by_vertical),
+        "latest": list(tenants.select_related("plan").order_by("-created_at")[:latest]),
+    }
+
+
 def get_tenant(tenant_id: uuid.UUID) -> Tenant | None:
     return (
         Tenant.objects.select_related("plan").filter(pk=tenant_id, deleted_at__isnull=True).first()

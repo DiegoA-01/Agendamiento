@@ -4,6 +4,7 @@ import { ApiError } from "../../shared/api/client";
 import { applyServerErrors, describeError, fieldMessage } from "../../shared/api/errors";
 import { isPlatformHost } from "../../shared/host";
 import { contrastRatio, isHexColor, MIN_TEXT_CONTRAST } from "./contrast";
+import { share } from "./summary";
 import {
   changePasswordSchema,
   domainSchema,
@@ -234,5 +235,14 @@ describe("plurales", () => {
     await i18n.changeLanguage(language);
     expect(i18n.t("plans.locationsShort", { count })).toBe(expected);
     await i18n.changeLanguage("es");
+  });
+});
+
+describe("share (S6)", () => {
+  it("redondea el porcentaje y no divide por cero", () => {
+    expect(share(1, 3)).toBe(33);
+    expect(share(2, 3)).toBe(67);
+    expect(share(4, 4)).toBe(100);
+    expect(share(0, 0)).toBe(0);
   });
 });

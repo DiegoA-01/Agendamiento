@@ -15,5 +15,5 @@ export function useMe() {
 }
 
 export function homePathFor(me: Me): string {
-  return me.is_platform_admin ? "/empresas" : "/panel";
+  return me.is_platform_admin ? "/resumen" : "/panel";
 }

@@ -5,6 +5,7 @@ import { useMe } from "../auth/useMe";
 import { useSignOut } from "../auth/useSignOut";
 
 const LINKS = [
+  { to: "/resumen", label: "nav.summary" },
   { to: "/empresas", label: "nav.tenants" },
   { to: "/planes", label: "nav.plans" },
   { to: "/auditoria", label: "nav.audit" },

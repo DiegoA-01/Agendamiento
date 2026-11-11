@@ -87,6 +87,15 @@ class TenantListCreateView(PlatformView):
         return Response(body, status=status.HTTP_201_CREATED)
 
 
+class PlatformSummaryView(PlatformView):
+    @extend_schema(
+        responses=serializers.PlatformSummarySerializer,
+        description="Total de negocios, activos, suspendidos, nuevos, por plan y por tipo (S6).",
+    )
+    def get(self, request):
+        return Response(serializers.PlatformSummarySerializer(platform.platform_summary()).data)
+
+
 class TenantUsageView(PlatformView):
     @extend_schema(
         responses=serializers.TenantUsageSerializer,

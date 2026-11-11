@@ -48,6 +48,24 @@ export const useTenantUsage = (id: string) =>
     queryFn: () => api<TenantUsage>(`/api/v1/tenants/${id}/usage/`),
   });
 
+/** Estado de la plataforma (S6). `new_recent`: negocios creados en los últimos `window_days`. */
+export interface PlatformSummary {
+  window_days: number;
+  total: number;
+  active: number;
+  suspended: number;
+  new_recent: number;
+  by_plan: { plan_id: string; name: string; count: number }[];
+  by_vertical: { vertical: Tenant["vertical"]; count: number }[];
+  latest: Tenant[];
+}
+
+export const usePlatformSummary = () =>
+  useQuery({
+    queryKey: ["platform", "summary"],
+    queryFn: () => api<PlatformSummary>("/api/v1/platform/summary/"),
+  });
+
 export const useTenantModules = (id: string) =>
   useQuery({
     queryKey: ["tenant", id, "modules"],

@@ -1,4 +1,17 @@
 {
+  "summary": {
+    "title": "Platform overview",
+    "description": "How many businesses there are and how they are doing.",
+    "total": "Businesses",
+    "active": "Active",
+    "suspended": "Suspended",
+    "newRecent": "New in {{days}} days",
+    "byPlan": "By plan",
+    "byVertical": "By business type",
+    "latest": "Latest businesses created",
+    "seeAll": "See all",
+    "empty": "There are no businesses yet."
+  },
   "tenants": {
     "title": "Businesses",
     "newButton": "New business",

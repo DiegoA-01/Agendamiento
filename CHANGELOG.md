@@ -1,5 +1,12 @@
 # Changelog
 
+## Mejora S6: resumen de la plataforma (frente B, hecha por el frente A)
+
+- `GET /platform/summary/` (solo Super Admin) devuelve el total de negocios, cuántos están activos y suspendidos, los nuevos de los últimos 30 días, el reparto por plan y por tipo de negocio, y los 5 últimos negocios creados. Los negocios borrados no cuentan.
+- El conteo vive en `tenancy.platform_summary`; `platform_admin` solo le suma la ventana de días.
+- Panel del Super Admin: nueva página **Resumen** (`/resumen`), primera del menú y adonde llega el Super Admin al iniciar sesión. Tarjetas con los cuatro números, barras por plan y por tipo, y la lista de los últimos negocios con enlace a su detalle. Funciona a 375 px sin desplazamiento horizontal.
+- Textos en español e inglés. 4 pruebas nuevas en el backend y 1 en el frontend.
+
 ## Mejora R3: reglas para combinar servicios y un cliente a la vez
 
 - **Solo uno por cita por categoría.** Las categorías tienen el campo `single_choice` (migración `catalog/0002`). Si está activo, una cita no puede llevar dos servicios de esa categoría.
