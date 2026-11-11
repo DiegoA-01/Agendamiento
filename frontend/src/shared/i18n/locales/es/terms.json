@@ -1,0 +1,82 @@
+{
+  "platformTerms": {
+    "link": "Condiciones de uso",
+    "title": "Condiciones de uso de la plataforma",
+    "updated": "Última actualización: 11 de noviembre de 2026",
+    "draftNotice": "Este texto es un borrador de referencia. Debe revisarlo un abogado antes de abrir la plataforma a negocios reales.",
+    "back": "Volver al inicio de sesión",
+    "sections": [
+      {
+        "title": "1. Qué cubren estas condiciones",
+        "body": [
+          "Agenda es un software en la nube para que barberías, salones y negocios parecidos manejen sus citas, su equipo y sus clientes.",
+          "Estas condiciones aplican al negocio que usa la plataforma y a todas las personas de ese negocio que tienen una cuenta: propietario, recepcionistas y profesionales. Los clientes que reservan una cita se rigen por los términos y la política de privacidad que publica cada negocio en su sitio."
+        ]
+      },
+      {
+        "title": "2. Cuentas y acceso",
+        "body": [
+          "El propietario recibe una contraseña temporal y debe cambiarla en su primer ingreso. Cada persona es responsable de guardar su contraseña y su verificación en dos pasos.",
+          "Las cuentas son personales: no se comparten. Si sospechas que alguien entró a tu cuenta sin permiso, cambia la contraseña y avisa al administrador de la plataforma."
+        ]
+      },
+      {
+        "title": "3. Uso permitido",
+        "body": [
+          "La plataforma se usa para gestionar la agenda y los clientes del propio negocio.",
+          "No está permitido intentar ver o modificar datos de otro negocio, saturar o atacar el servicio, enviar mensajes a clientes que no los autorizaron ni publicar contenido ilegal."
+        ]
+      },
+      {
+        "title": "4. Datos de los clientes del negocio",
+        "body": [
+          "Cada negocio es el responsable del tratamiento de los datos de sus clientes, según la Ley 1581 de 2012 de Colombia. La plataforma actúa como encargada: guarda y usa esos datos solo para prestar el servicio.",
+          "El negocio debe publicar su política de tratamiento de datos y contar con la autorización de sus clientes. La reserva en línea incluye una casilla de autorización que el cliente marca por sí mismo.",
+          "Los datos de cada negocio están separados de los de los demás y ningún otro negocio puede verlos."
+        ]
+      },
+      {
+        "title": "5. Avisos por correo y WhatsApp",
+        "body": [
+          "Los avisos de confirmación, cambio, cancelación y recordatorio se envían solo a clientes que dieron su consentimiento. El negocio responde por los datos de contacto que registra."
+        ]
+      },
+      {
+        "title": "6. Planes y funciones",
+        "body": [
+          "Las funciones disponibles dependen del plan de cada negocio. Los cambios de plan se avisan con anticipación. El precio y la forma de pago se acuerdan por separado."
+        ]
+      },
+      {
+        "title": "7. Disponibilidad y copias de seguridad",
+        "body": [
+          "La plataforma hace lo razonable para estar disponible y guarda copias de seguridad cifradas. Los mantenimientos programados se avisan. No se garantiza un servicio sin interrupciones, porque depende también de internet y de proveedores externos."
+        ]
+      },
+      {
+        "title": "8. Suspensión y cierre",
+        "body": [
+          "Una cuenta puede suspenderse si se incumplen estas condiciones o el acuerdo de pago. El negocio puede pedir el cierre de su cuenta y la entrega de sus datos."
+        ]
+      },
+      {
+        "title": "9. Responsabilidad",
+        "body": [
+          "La plataforma no responde por citas perdidas por datos mal registrados por el negocio, ni por fallas de servicios de terceros como el correo, WhatsApp o la conexión a internet."
+        ]
+      },
+      {
+        "title": "10. Cambios a estas condiciones",
+        "body": [
+          "Si estas condiciones cambian, la nueva versión se publica en esta página con su fecha. Seguir usando la plataforma después del cambio significa aceptarla."
+        ]
+      },
+      {
+        "title": "11. Ley aplicable y contacto",
+        "body": [
+          "Estas condiciones se rigen por las leyes de Colombia. Para cualquier duda, escribe al administrador de la plataforma."
+        ]
+      }
+    ]
+  }
+}

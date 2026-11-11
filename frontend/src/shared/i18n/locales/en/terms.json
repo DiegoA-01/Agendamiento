@@ -1,0 +1,82 @@
+{
+  "platformTerms": {
+    "link": "Terms of use",
+    "title": "Platform terms of use",
+    "updated": "Last updated: November 11, 2026",
+    "draftNotice": "This text is a reference draft. A lawyer must review it before the platform opens to real businesses.",
+    "back": "Back to sign in",
+    "sections": [
+      {
+        "title": "1. What these terms cover",
+        "body": [
+          "Agenda is cloud software that lets barbershops, salons and similar businesses manage their appointments, team and customers.",
+          "These terms apply to the business that uses the platform and to everyone in that business who has an account: owner, receptionists and professionals. Customers who book an appointment are covered by the terms and privacy policy each business publishes on its site."
+        ]
+      },
+      {
+        "title": "2. Accounts and access",
+        "body": [
+          "The owner receives a temporary password and must change it on first sign in. Each person is responsible for keeping their password and two-step verification safe.",
+          "Accounts are personal and must not be shared. If you think someone used your account without permission, change your password and tell the platform administrator."
+        ]
+      },
+      {
+        "title": "3. Acceptable use",
+        "body": [
+          "The platform is for managing the business's own schedule and customers.",
+          "You may not try to see or change another business's data, overload or attack the service, message customers who did not agree to it, or publish illegal content."
+        ]
+      },
+      {
+        "title": "4. The business's customer data",
+        "body": [
+          "Each business is the data controller for its customers' data under Colombian Law 1581 of 2012. The platform acts as a processor: it stores and uses that data only to provide the service.",
+          "The business must publish its data processing policy and have its customers' consent. Online booking includes a consent checkbox that customers tick themselves.",
+          "Each business's data is kept apart from the others, and no other business can see it."
+        ]
+      },
+      {
+        "title": "5. Email and WhatsApp notices",
+        "body": [
+          "Confirmation, change, cancellation and reminder notices are sent only to customers who gave their consent. The business is responsible for the contact details it records."
+        ]
+      },
+      {
+        "title": "6. Plans and features",
+        "body": [
+          "The features available depend on each business's plan. Plan changes are announced in advance. Price and payment terms are agreed separately."
+        ]
+      },
+      {
+        "title": "7. Availability and backups",
+        "body": [
+          "The platform makes reasonable efforts to stay available and keeps encrypted backups. Scheduled maintenance is announced. Uninterrupted service is not guaranteed, because it also depends on the internet and outside providers."
+        ]
+      },
+      {
+        "title": "8. Suspension and closing",
+        "body": [
+          "An account can be suspended if these terms or the payment agreement are broken. The business can ask to close its account and receive its data."
+        ]
+      },
+      {
+        "title": "9. Liability",
+        "body": [
+          "The platform is not liable for missed appointments caused by data the business entered incorrectly, or for failures of third-party services such as email, WhatsApp or the internet connection."
+        ]
+      },
+      {
+        "title": "10. Changes to these terms",
+        "body": [
+          "If these terms change, the new version is published on this page with its date. Continuing to use the platform after a change means you accept it."
+        ]
+      },
+      {
+        "title": "11. Governing law and contact",
+        "body": [
+          "These terms are governed by the laws of Colombia. For any question, write to the platform administrator."
+        ]
+      }
+    ]
+  }
+}

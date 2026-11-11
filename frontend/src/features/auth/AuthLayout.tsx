@@ -1,5 +1,7 @@
 import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
+import { Link } from "react-router-dom";
+import { PLATFORM_TERMS_PATH } from "../legal/PlatformTermsPage";
 import { LanguageSwitcher } from "../../shared/ui/LanguageSwitcher";
 import { Card } from "../../shared/ui/primitives";
 
@@ -16,6 +18,9 @@ export function AuthLayout({ title, children }: { title: string; children: React
         <h1 className="text-xl font-semibold text-slate-900">{title}</h1>
         {children}
       </Card>
+      <Link to={PLATFORM_TERMS_PATH} className="text-center text-sm text-slate-600 underline">
+        {t("platformTerms.link")}
+      </Link>
     </main>
   );
 }
