@@ -40,6 +40,7 @@
   },
   "nav": {
     "brand": "Administration",
+    "summary": "Overview",
     "tenants": "Businesses",
     "plans": "Plans",
     "audit": "Audit log",

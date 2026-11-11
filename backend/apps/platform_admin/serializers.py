@@ -200,6 +200,30 @@ class TenantUsageSerializer(serializers.Serializer):
     last_login = serializers.DateTimeField(allow_null=True)
 
 
+class SummaryPlanSerializer(serializers.Serializer):
+    plan_id = serializers.UUIDField()
+    name = serializers.CharField()
+    count = serializers.IntegerField()
+
+
+class SummaryVerticalSerializer(serializers.Serializer):
+    vertical = serializers.ChoiceField(choices=VERTICALS)
+    count = serializers.IntegerField()
+
+
+class PlatformSummarySerializer(serializers.Serializer):
+    """Estado de la plataforma (S6). `new_recent` cuenta los negocios creados en `window_days`."""
+
+    window_days = serializers.IntegerField()
+    total = serializers.IntegerField()
+    active = serializers.IntegerField()
+    suspended = serializers.IntegerField()
+    new_recent = serializers.IntegerField()
+    by_plan = SummaryPlanSerializer(many=True)
+    by_vertical = SummaryVerticalSerializer(many=True)
+    latest = TenantSerializer(many=True)
+
+
 class IntegrationChannelSerializer(serializers.Serializer):
     channel = serializers.ChoiceField(choices=["whatsapp", "email"])
     sent = serializers.IntegerField()

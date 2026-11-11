@@ -279,6 +279,15 @@ def tenant_usage(tenant, *, now=None) -> dict:
     }
 
 
+def platform_summary(*, now=None) -> dict:
+    """Total de negocios, activos, suspendidos y nuevos en la ventana (S6)."""
+    now = now or django_timezone.now()
+    return {
+        "window_days": USAGE_WINDOW_DAYS,
+        **tenancy.platform_summary(since=now - dt.timedelta(days=USAGE_WINDOW_DAYS)),
+    }
+
+
 def tenant_integrations(tenant, *, now=None) -> dict:
     """Configuración y actividad de notificaciones del negocio (S11)."""
     now = now or django_timezone.now()

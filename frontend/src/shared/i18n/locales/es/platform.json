@@ -1,4 +1,17 @@
 {
+  "summary": {
+    "title": "Resumen de la plataforma",
+    "description": "Cuántos negocios hay y cómo están.",
+    "total": "Negocios",
+    "active": "Activos",
+    "suspended": "Suspendidos",
+    "newRecent": "Nuevos en {{days}} días",
+    "byPlan": "Por plan",
+    "byVertical": "Por tipo de negocio",
+    "latest": "Últimos negocios creados",
+    "seeAll": "Ver todos",
+    "empty": "Todavía no hay negocios."
+  },
   "tenants": {
     "title": "Empresas",
     "newButton": "Nueva empresa",
