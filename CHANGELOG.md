@@ -1,5 +1,14 @@
 # Changelog
 
+## Mejora S8: condiciones de uso de la plataforma (frente B, hecha por el frente A)
+
+- Nueva página pública `/condiciones-de-uso`, igual en el host del Super Admin y en el de cada negocio. Es para el Super Admin y el equipo de cada negocio; los clientes que reservan siguen viendo los términos propios del negocio en `/terminos`.
+- El texto es fijo y vive en las traducciones (`locales/<idioma>/terms.json`), en español e inglés. Cubre cuentas y acceso, uso permitido, datos de clientes según la Ley 1581 de 2012 (el negocio es responsable y la plataforma encargada), avisos por correo y WhatsApp, planes, disponibilidad y copias, suspensión y cierre, responsabilidad, cambios y ley aplicable.
+- La página dice que es un **borrador de referencia** que debe revisar un abogado antes de abrir la plataforma a negocios reales.
+- Enlaces: debajo del inicio de sesión (y de recuperar o cambiar la contraseña), al pie del panel del Super Admin y al final del menú del panel del negocio.
+- 2 pruebas nuevas en el frontend: las secciones existen en los dos idiomas con el mismo número de párrafos, y la página no se rompe si falta la traducción.
+- Nota para desarrollo: Vitest 5 guarda en `node_modules/.vitest-cache` el resultado de `import.meta.glob`. Al agregar un archivo de traducciones nuevo, borra esa carpeta si las pruebas no lo ven. El CI empieza sin caché y no se ve afectado.
+
 ## Mejora S6: resumen de la plataforma (frente B, hecha por el frente A)
 
 - `GET /platform/summary/` (solo Super Admin) devuelve el total de negocios, cuántos están activos y suspendidos, los nuevos de los últimos 30 días, el reparto por plan y por tipo de negocio, y los 5 últimos negocios creados. Los negocios borrados no cuentan.

@@ -6,6 +6,7 @@ import { ChangePasswordPage } from "../features/auth/ChangePasswordPage";
 import { LoginPage } from "../features/auth/LoginPage";
 import { ForgotPasswordPage, ResetPasswordPage } from "../features/auth/RecoverPages";
 import { publicRoutes } from "../features/booking/routes";
+import { PLATFORM_TERMS_PATH, PlatformTermsPage } from "../features/legal/PlatformTermsPage";
 import { dashboardRoutes } from "../features/dashboard/routes";
 import { isPlatformHost } from "../shared/host";
 import { Loading } from "../shared/ui/primitives";
@@ -22,6 +23,7 @@ function accountRoutes() {
   return (
     <>
       <Route path="/login" element={<LoginPage />} />
+      <Route path={PLATFORM_TERMS_PATH} element={<PlatformTermsPage />} />
       <Route path="/recuperar" element={<ForgotPasswordPage />} />
       <Route path="/recuperar/confirmar" element={<ResetPasswordPage />} />
       <Route

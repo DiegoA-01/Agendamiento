@@ -1,8 +1,9 @@
 import { useTranslation } from "react-i18next";
-import { NavLink, Outlet } from "react-router-dom";
+import { Link, NavLink, Outlet } from "react-router-dom";
 import { Button } from "../../shared/ui/primitives";
 import { useMe } from "../auth/useMe";
 import { useSignOut } from "../auth/useSignOut";
+import { PLATFORM_TERMS_PATH } from "../legal/PlatformTermsPage";
 
 const LINKS = [
   { to: "/resumen", label: "nav.summary" },
@@ -59,6 +60,11 @@ export function PlatformLayout() {
       <main id="contenido" className="mx-auto max-w-6xl px-4 py-8">
         <Outlet />
       </main>
+      <footer className="mx-auto max-w-6xl px-4 pb-8 text-sm text-slate-600">
+        <Link to={PLATFORM_TERMS_PATH} className="underline">
+          {t("platformTerms.link")}
+        </Link>
+      </footer>
     </div>
   );
 }

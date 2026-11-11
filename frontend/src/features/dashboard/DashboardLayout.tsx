@@ -1,11 +1,12 @@
 import { Suspense, useState, type CSSProperties } from "react";
 import { useTranslation } from "react-i18next";
-import { NavLink, Outlet } from "react-router-dom";
+import { Link, NavLink, Outlet } from "react-router-dom";
 import type { Theme } from "../../shared/api/types";
 import { LanguageSwitcher } from "../../shared/ui/LanguageSwitcher";
 import { Button, Loading } from "../../shared/ui/primitives";
 import { useMe } from "../auth/useMe";
 import { useSignOut } from "../auth/useSignOut";
+import { PLATFORM_TERMS_PATH } from "../legal/PlatformTermsPage";
 import { visibleLinks } from "./navigation";
 
 function themeStyle(theme: Partial<Theme>): CSSProperties {
@@ -92,6 +93,9 @@ export default function DashboardLayout() {
               </li>
             ))}
           </ul>
+          <Link to={PLATFORM_TERMS_PATH} className="mt-4 block px-3 text-xs underline opacity-70">
+            {t("platformTerms.link")}
+          </Link>
         </nav>
         <main id="contenido" className="min-w-0 flex-1">
           <Suspense fallback={<Loading />}>
