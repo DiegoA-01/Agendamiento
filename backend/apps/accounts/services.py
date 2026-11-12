@@ -21,7 +21,7 @@ from apps.tenancy import services as tenancy
 from config.api import ApiError
 from config.net import client_ip
 
-from . import signals, throttle, totp
+from . import recovery, signals, throttle, totp
 from .backends import BACKEND_PATH
 from .messages import PASSWORD_RESET
 from .models import User
@@ -84,6 +84,23 @@ def _verify_totp(user: User, code: str) -> bool:
     return True
 
 
+def _use_recovery_code(user: User, code: str) -> bool:
+    """Gasta un código de recuperación: si sirve, se borra y ya no vuelve a servir."""
+    stored = recovery.match(code, list(user.totp_recovery_codes))
+    if stored is None:
+        return False
+    user.totp_recovery_codes = [h for h in user.totp_recovery_codes if h != stored]
+    user.save(update_fields=["totp_recovery_codes", "updated_at"])
+    return True
+
+
+def _new_recovery_codes(user: User) -> list[str]:
+    codes, hashes = recovery.generate()
+    user.totp_recovery_codes = hashes
+    user.save(update_fields=["totp_recovery_codes", "updated_at"])
+    return codes
+
+
 def login(request: HttpRequest, email: str, password: str, totp_code: str = "") -> User:
     user = _authenticate(request, email, password)
     # REQUIRE_TWO_FACTOR=False solo en desarrollo (prod.py lo impide): entra solo con contraseña.
@@ -91,7 +108,14 @@ def login(request: HttpRequest, email: str, password: str, totp_code: str = "") 
         if user.totp_enabled:
             if not totp_code:
                 raise ApiError("two_factor_required", "Falta el código de verificación.", 401)
-            if not _verify_totp(user, totp_code):
+            if recovery.looks_like_recovery_code(totp_code):
+                if not _use_recovery_code(user, totp_code):
+                    _failed(request, email, user)
+                    raise ApiError(
+                        "invalid_recovery_code", "El código de recuperación no sirve.", 401
+                    )
+                signals.emit(signals.RECOVERY_CODE_USED, request=request, user=user, email=email)
+            elif not _verify_totp(user, totp_code):
                 _failed(request, email, user)
                 raise ApiError("invalid_two_factor_code", "Código de verificación incorrecto.", 401)
         elif user.role in REQUIRED_2FA_ROLES:
@@ -121,8 +145,13 @@ def begin_two_factor_setup(request: HttpRequest, email: str, password: str) -> d
     }
 
 
-def confirm_two_factor(request: HttpRequest, email: str, password: str, code: str) -> User:
-    """Activa el 2FA con un primer código válido y deja la sesión iniciada."""
+def confirm_two_factor(
+    request: HttpRequest, email: str, password: str, code: str
+) -> tuple[User, list[str]]:
+    """Activa el 2FA con un primer código válido y deja la sesión iniciada.
+
+    Devuelve también los códigos de recuperación: es la única vez que se ven en claro.
+    """
     user = _authenticate(request, email, password)
     if user.totp_enabled or not user.totp_secret:
         raise ApiError("two_factor_setup_not_started", "Primero inicia la configuración.", 409)
@@ -131,10 +160,31 @@ def confirm_two_factor(request: HttpRequest, email: str, password: str, code: st
         raise ApiError("invalid_two_factor_code", "Código de verificación incorrecto.", 401)
     user.totp_enabled = True
     user.save(update_fields=["totp_enabled", "updated_at"])
+    codes = _new_recovery_codes(user)
     django_login(request, user, backend=BACKEND_PATH)
     throttle.clear_email(_limit_scope(request), email)
     signals.emit(signals.TWO_FACTOR_ENABLED, request=request, user=user, email=email)
-    return user
+    return user, codes
+
+
+def regenerate_recovery_codes(
+    request: HttpRequest, user: User, password: str, code: str
+) -> list[str]:
+    """Códigos nuevos (los anteriores dejan de servir). Pide contraseña y un código de la app:
+    con la sesión abierta no basta, por si alguien dejó el computador desbloqueado."""
+    if not user.totp_enabled:
+        raise ApiError(
+            "two_factor_not_enabled", "La verificación en dos pasos no está activa.", 409
+        )
+    if not user.check_password(password):
+        _failed(request, user.email, user)
+        raise ApiError("invalid_credentials", "La contraseña no es correcta.", 401)
+    if not _verify_totp(user, code):
+        _failed(request, user.email, user)
+        raise ApiError("invalid_two_factor_code", "Código de verificación incorrecto.", 401)
+    codes = _new_recovery_codes(user)
+    signals.emit(signals.RECOVERY_CODES_REGENERATED, request=request, user=user, email=user.email)
+    return codes
 
 
 def request_password_reset(request: HttpRequest, email: str) -> None:
@@ -248,7 +298,16 @@ def reset_two_factor(user: User) -> None:
     user.totp_secret = ""
     user.totp_enabled = False
     user.totp_last_step = None
-    user.save(update_fields=["totp_secret", "totp_enabled", "totp_last_step", "updated_at"])
+    user.totp_recovery_codes = []
+    user.save(
+        update_fields=[
+            "totp_secret",
+            "totp_enabled",
+            "totp_last_step",
+            "totp_recovery_codes",
+            "updated_at",
+        ]
+    )
     signals.emit(signals.TWO_FACTOR_RESET, user=user, email=user.email)
 
 
@@ -263,6 +322,7 @@ def build_me(request: HttpRequest, user: User) -> dict[str, Any]:
         },
         "role": user.role,
         "two_factor_enabled": user.totp_enabled,
+        "recovery_codes_left": len(user.totp_recovery_codes) if user.totp_enabled else 0,
         "must_change_password": user.must_change_password,
         "is_platform_admin": user.role == User.Role.SUPERADMIN,
         "tenant": None

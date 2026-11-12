@@ -44,6 +44,7 @@
     "tenants": "Empresas",
     "plans": "Planes",
     "audit": "Auditoría",
+    "security": "Seguridad",
     "signOut": "Cerrar sesión",
     "skip": "Saltar al contenido",
     "main": "Navegación principal"
@@ -112,7 +113,9 @@
     "documentDigits": "La cédula solo lleva números.",
     "taxIdFormat": "Escribe el NIT con 6 a 12 dígitos y, si quieres, el dígito de verificación: 900123456-7.",
     "one_per_category": "Solo puedes elegir un servicio de esa categoría por cita.",
-    "customer_overlap": "Ya tienes una cita en ese horario. Elige otra hora."
+    "customer_overlap": "Ya tienes una cita en ese horario. Elige otra hora.",
+    "invalid_recovery_code": "Ese código de recuperación no sirve o ya se usó.",
+    "two_factor_not_enabled": "La verificación en dos pasos no está activa."
   },
   "verticals": {
     "barbershop": "Barbería",

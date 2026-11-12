@@ -67,18 +67,40 @@ class TwoFactorSetupView(_AuthPostView):
 
 class TwoFactorConfirmView(_AuthPostView):
     @extend_schema(
-        request=serializers.TwoFactorConfirmSerializer, responses=serializers.MeSerializer
+        request=serializers.TwoFactorConfirmSerializer,
+        responses=serializers.TwoFactorConfirmResponseSerializer,
     )
     def post(self, request):
         data = serializers.TwoFactorConfirmSerializer(data=request.data)
         data.is_valid(raise_exception=True)
-        user = services.confirm_two_factor(
+        user, codes = services.confirm_two_factor(
             request._request,
             data.validated_data["email"],
             data.validated_data["password"],
             data.validated_data["code"],
         )
-        return Response(services.build_me(request._request, user))
+        return Response({**services.build_me(request._request, user), "recovery_codes": codes})
+
+
+class RecoveryCodesView(APIView):
+    authentication_classes = [CsrfEnforcedSessionAuth]
+    permission_classes = [IsAuthenticated]
+
+    @extend_schema(
+        request=serializers.RecoveryCodesRequestSerializer,
+        responses=serializers.RecoveryCodesSerializer,
+        description="Genera códigos de recuperación nuevos; los anteriores dejan de servir.",
+    )
+    def post(self, request):
+        data = serializers.RecoveryCodesRequestSerializer(data=request.data)
+        data.is_valid(raise_exception=True)
+        codes = services.regenerate_recovery_codes(
+            request._request,
+            request.user,
+            data.validated_data["password"],
+            data.validated_data["code"],
+        )
+        return Response({"recovery_codes": codes})
 
 
 class PasswordResetView(_AuthPostView):

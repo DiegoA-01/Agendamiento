@@ -238,9 +238,23 @@
         "password_reset_request": "Password reset requested",
         "password_reset": "Password reset",
         "two_factor_enable": "2FA enabled",
-        "two_factor_reset": "2FA removed by command"
+        "two_factor_reset": "2FA removed by command",
+        "recovery_code_used": "Sign-in with a recovery code",
+        "recovery_codes_regenerated": "New recovery codes"
       }
     },
     "empty": "No actions recorded yet."
+  },
+  "security": {
+    "title": "Account security",
+    "intro": "Recovery codes for two-step verification.",
+    "twoFactorOff": "Two-step verification is not active on this account.",
+    "left_one": "You have {{count}} unused recovery code left.",
+    "left_other": "You have {{count}} unused recovery codes left.",
+    "none": "You have no recovery codes. Generate some and keep them safe: if you lose your phone, they are how you sign in.",
+    "low": "You are running low: generate new ones.",
+    "regenerateTitle": "Generate new codes",
+    "regenerateIntro": "Your previous codes will stop working. Confirm with your password and the code from your app.",
+    "regenerateSubmit": "Generate new codes"
   }
 }

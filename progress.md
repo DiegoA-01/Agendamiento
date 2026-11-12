@@ -113,7 +113,7 @@ Para no volver a discutirlas. Las que dicen "provisional" se revisan antes de en
 |---|---|---|
 | Autenticación | Sesión por cookie HttpOnly + CSRF, no JWT | `docs/adr/0001-autenticacion-por-sesion.md` |
 | Contraseñas | Argon2id con el perfil mínimo de OWASP. Dependencia `argon2-cffi` aprobada | `pormejorar.md` §7 |
-| 2FA | Obligatorio para el Super Admin y opcional para el propietario. Encendido también en desarrollo desde el 2026-11-11 (`REQUIRE_TWO_FACTOR=1`) | `pormejorar.md` §5 y §33 |
+| 2FA | Obligatorio para el Super Admin y opcional para el propietario. Encendido también en desarrollo desde el 2026-11-11 (`REQUIRE_TWO_FACTOR=1`). 10 códigos de recuperación de un solo uso, guardados con SHA-256; se regeneran en `/seguridad` | `pormejorar.md` §2, §5 y §33 |
 | Aislamiento | Base compartida + `tenant_id` + RLS forzado, con la app conectada por un rol sin superusuario | `CHANGELOG.md` (M1) |
 | Doble reserva | La garantía final es la restricción de exclusión de PostgreSQL; la API revalida antes y responde `409 slot_taken` con sugerencias | `CHANGELOG.md` (M5) |
 | Cliente en dos citas | Un mismo cliente no puede tener dos citas activas que se crucen (`409 customer_overlap`); otra persona sí puede tomar esa hora con otro profesional | `CHANGELOG.md` (R3) |
@@ -168,7 +168,7 @@ Cada hito se da por terminado con su criterio de aceptación de la spec (§14), 
 1. Llevar al encargado las decisiones de §5, las mejoras que cambian la spec y el borrador de las condiciones de uso.
 2. Hacer la prueba manual completa, con atención a la reserva nueva (R9) en el celular.
 3. ~~Reactivar el 2FA y correr todas las pruebas con él encendido~~ (hecho el 2026-11-11).
-4. Revisar los puntos Alta de `pormejorar.md`: servidor de producción, imágenes en producción, cifrado del 2FA y WhatsApp real.
+4. Revisar los puntos Alta de `pormejorar.md` que quedan: servidor de producción, imágenes en producción, cifrado del 2FA y WhatsApp real. Los códigos de recuperación (§2) ya están hechos.
 5. Abrir el PR de `develop` a `main` para la revisión del encargado.
 
 ---
