@@ -16,7 +16,7 @@ DEFAULTS = {
     "slot_step_min": 15,
     "min_notice_min": 60,
     "max_advance_days": 60,
-    "cancel_min_hours": 2,
+    "cancel_min_hours": 1,
 }
 
 

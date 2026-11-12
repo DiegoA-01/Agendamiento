@@ -26,6 +26,7 @@ import {
   usePublicServices,
   useSlots,
 } from "./api";
+import { CancelAppointment } from "./CancelAppointment";
 import { AppointmentSummary } from "./ManagePage";
 import { ServiceDetail } from "./ServiceDetail";
 import {
@@ -45,6 +46,7 @@ import {
   slotsByPeriod,
   todayIn,
   toggleService,
+  tokenFromManageUrl,
   totals,
   type Customer,
   type Step,
@@ -707,6 +709,8 @@ export default function BookPage() {
   // de quien reserva. Se activa con "Reservar otra cita para alguien más".
   const [forOther, setForOther] = useState(false);
   const [attendee, setAttendee] = useState("");
+  // La cita recién reservada se puede cancelar desde la misma confirmación.
+  const [cancelled, setCancelled] = useState(false);
   const [errors, setErrors] = useState<FieldErrors>({});
 
   const professionals = usePublicProfessionals(serviceIds);
@@ -768,6 +772,7 @@ export default function BookPage() {
     setStart("");
     setErrors({});
     setAttendee("");
+    setCancelled(false);
     setForOther(true);
     setStep("services");
   }
@@ -782,19 +787,29 @@ export default function BookPage() {
           tabIndex={-1}
           className="font-display text-3xl leading-tight outline-none"
         >
-          {t("booking.wizard.done")}
+          {cancelled ? t("booking.manage.cancelled") : t("booking.wizard.done")}
         </h1>
-        <p className={MUTED}>{t("booking.wizard.doneHint")}</p>
-        <div className={`rounded-2xl ${PANEL} p-5`}>
+        {!cancelled && <p className={MUTED}>{t("booking.wizard.doneHint")}</p>}
+        <div className={`rounded-2xl ${PANEL} p-5 ${cancelled ? "opacity-60" : ""}`}>
           <AppointmentSummary appointment={book.data} />
         </div>
-        <Link
-          to={manageUrl}
-          className={`inline-flex min-h-14 items-center justify-center rounded-2xl px-4 font-semibold ${ACCENT} ${PRESS}`}
-        >
-          {t("booking.wizard.manageLink")}
-        </Link>
-        <p className={`text-sm ${MUTED}`}>{t("booking.wizard.saveLink")}</p>
+        {!cancelled && (
+          <>
+            <Link
+              to={manageUrl}
+              className={`inline-flex min-h-14 items-center justify-center rounded-2xl px-4 font-semibold ${ACCENT} ${PRESS}`}
+            >
+              {t("booking.wizard.manageLink")}
+            </Link>
+            <p className={`text-sm ${MUTED}`}>{t("booking.wizard.saveLink")}</p>
+            <CancelAppointment
+              token={tokenFromManageUrl(manageUrl)}
+              canCancel={book.data.can_cancel}
+              deadline={book.data.cancel_deadline}
+              onCancelled={() => setCancelled(true)}
+            />
+          </>
+        )}
         <button
           type="button"
           onClick={bookAnother}
