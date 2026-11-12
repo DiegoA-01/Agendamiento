@@ -1,5 +1,19 @@
 # Changelog
 
+## Panel del Super Admin con vidrio, en blanco, negro y verde metalizado
+
+- Nuevo marco del panel siguiendo la referencia de diseño:
+  - **Barra lateral de vidrio oscuro** con la marca, una tarjeta de la plataforma (negocios y planes) y el menú en dos grupos: **Plataforma** (Resumen, Empresas, Planes) y **Control** (Auditoría, Seguridad). La opción activa va en verde metalizado.
+  - Contadores reales en el menú: empresas suspendidas, y códigos de recuperación cuando quedan 3 o menos.
+  - **Barra superior de vidrio** con buscador de empresas (lleva a Empresas con la búsqueda escrita), iniciales y nombre del usuario, y Cerrar sesión.
+  - En el celular, la barra lateral se abre como menú desde un botón.
+- **Resumen** nuevo:
+  - Saludo según la hora ("Buenas tardes, Laura"), mes y botón **Nueva empresa** en verde metalizado.
+  - Cuatro cifras en tarjetas de vidrio con su explicación: negocios, activos, suspendidos y nuevos en 30 días.
+  - Barras de negocios por plan (el plan con más negocios, en metal), reparto por tipo de negocio y últimos negocios creados. Todo sale de la API del resumen (S6), sin datos inventados.
+- Empresas, detalle, planes, auditoría, seguridad y alta de empresa toman el mismo estilo: tarjetas y tablas de vidrio, botón principal metálico y títulos más grandes. Se hace con tokens bajo `.platform` en `index.css`, así el panel de los negocios y la reserva no cambian.
+- Revisado con `design-taste-frontend`: 0 fallas. El vidrio, los degradados metálicos y las sombras van marcados como pedidos expresamente. Probado en el navegador a 1440 px y a 375 px.
+
 ## Reserva: un servicio por categoría por defecto y citas para otra persona
 
 - **"Solo uno por cita" activo por defecto** en todas las categorías (cortes, barba, cejas, líneas, depilación…): no se pueden elegir dos cortes en la misma cita, pero sí corte + barba + cejas. La migración `catalog/0003` lo activa también en las categorías que ya existían; el dueño puede apagarlo en una categoría desde el catálogo. Al crear una categoría nueva, la casilla viene marcada.

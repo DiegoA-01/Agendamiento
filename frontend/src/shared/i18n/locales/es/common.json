@@ -47,7 +47,19 @@
     "security": "Seguridad",
     "signOut": "Cerrar sesión",
     "skip": "Saltar al contenido",
-    "main": "Navegación principal"
+    "main": "Navegación principal",
+    "groupPlatform": "Plataforma",
+    "groupControl": "Control",
+    "workspace": "Plataforma Agenda",
+    "workspaceLine_one": "{{count}} negocio · {{plans}}",
+    "workspaceLine_other": "{{count}} negocios · {{plans}}",
+    "searchLabel": "Buscar empresas",
+    "searchPlaceholder": "Buscar empresas por nombre o subdominio…",
+    "roleSuperadmin": "Super Admin",
+    "openMenu": "Abrir el menú",
+    "closeMenu": "Cerrar el menú",
+    "plansCount_one": "{{count}} plan",
+    "plansCount_other": "{{count}} planes"
   },
   "errors": {
     "unknown": "Algo salió mal. Inténtalo de nuevo.",

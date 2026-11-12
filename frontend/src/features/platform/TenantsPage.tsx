@@ -1,6 +1,6 @@
 import { useDeferredValue, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { describeError } from "../../shared/api/errors";
 import { formatDate } from "../../shared/format";
 import {
@@ -15,9 +15,17 @@ import {
 } from "../../shared/ui/primitives";
 import { useTenantList } from "./api";
 
+/** El buscador de la barra superior llega como `?q=`: una búsqueda nueva vuelve a montar la
+ *  lista con ese texto ya escrito. */
 export function TenantsPage() {
+  const [params] = useSearchParams();
+  const urlQuery = params.get("q") ?? "";
+  return <TenantList key={urlQuery} initialSearch={urlQuery} />;
+}
+
+function TenantList({ initialSearch }: { initialSearch: string }) {
   const { t, i18n } = useTranslation();
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState(initialSearch);
   const [status, setStatus] = useState("");
   const deferredSearch = useDeferredValue(search.trim());
   const query = useTenantList({ q: deferredSearch, status });

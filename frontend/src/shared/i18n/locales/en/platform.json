@@ -10,7 +10,21 @@
     "byVertical": "By business type",
     "latest": "Latest businesses created",
     "seeAll": "See all",
-    "empty": "There are no businesses yet."
+    "empty": "There are no businesses yet.",
+    "greetingMorning": "Good morning",
+    "greetingMorningName": "Good morning, {{name}}",
+    "greetingAfternoon": "Good afternoon",
+    "greetingAfternoonName": "Good afternoon, {{name}}",
+    "greetingEvening": "Good evening",
+    "greetingEveningName": "Good evening, {{name}}",
+    "subtitle": "Platform overview · {{month}}",
+    "totalNote_one": "{{count}} new in {{days}} days",
+    "totalNote_other": "{{count}} new in {{days}} days",
+    "activeNote": "{{percent}}% of the total",
+    "suspendedNote": "Check why they are suspended",
+    "suspendedNone": "None suspended",
+    "newNote": "Since {{date}}",
+    "seePlans": "See plans"
   },
   "tenants": {
     "title": "Businesses",
