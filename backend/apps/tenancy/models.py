@@ -98,8 +98,9 @@ class Tenant(BaseModel):
     max_advance_days = models.PositiveSmallIntegerField(  # hasta cuántos días adelante
         default=60, validators=[MinValueValidator(1), MaxValueValidator(365)]
     )
-    cancel_min_hours = models.PositiveSmallIntegerField(  # ventana para cancelar por enlace
-        default=2, validators=[MaxValueValidator(24 * 7)]
+    # Ventana para que el cliente cancele por su enlace: hasta esta cantidad de horas antes.
+    cancel_min_hours = models.PositiveSmallIntegerField(
+        default=1, validators=[MaxValueValidator(24 * 7)]
     )
 
     class Meta:

@@ -13,6 +13,11 @@ export const STEPS = ["services", "schedule", "details"] as const;
 export type Step = (typeof STEPS)[number];
 
 export const MAX_SERVICES = 10;
+
+/** El token de la cita sale del final de su enlace (`/cita/<token>`). */
+export function tokenFromManageUrl(url: string): string {
+  return url.replace(/\/+$/, "").split("/").pop() ?? "";
+}
 export const PERIODS: SlotPeriod[] = ["morning", "afternoon", "evening"];
 
 export interface Customer {

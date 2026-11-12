@@ -57,7 +57,7 @@ def test_company_info_is_public_and_has_no_private_data(shop):
     body = response.json()
     assert body["name"] == "Barbería El Filo"
     assert body["booking_enabled"] is True
-    assert body["cancel_min_hours"] == 2
+    assert body["cancel_min_hours"] == 1
     assert {"theme", "terms_html", "privacy_html", "cookies_html", "logo"} <= set(body)
     assert "tax_id" not in body and "legal_name" not in body
 
@@ -253,10 +253,19 @@ def test_see_and_cancel_by_token_frees_the_slot(shop):
     )
 
 
+def test_cancel_works_until_just_before_one_hour_and_not_after(shop):
+    ana = shop.professional()
+    token = token_from(book(visitor(shop), shop, at(9), ana))
+    still_ok = at(9) - dt.timedelta(hours=1, minutes=1)
+
+    with mock.patch("django.utils.timezone.now", return_value=still_ok):
+        assert visitor(shop).get(f"{PUBLIC}/appointments/{token}/").json()["can_cancel"] is True
+
+
 def test_cancel_respects_the_business_window(shop):
     ana = shop.professional()
     token = token_from(book(visitor(shop), shop, at(9), ana))
-    too_late = at(9) - dt.timedelta(hours=1)  # la ventana es de 2 h
+    too_late = at(9) - dt.timedelta(hours=1)  # la ventana es de 1 h: faltando 1 h ya no
 
     with mock.patch("django.utils.timezone.now", return_value=too_late):
         seen = visitor(shop).get(f"{PUBLIC}/appointments/{token}/").json()

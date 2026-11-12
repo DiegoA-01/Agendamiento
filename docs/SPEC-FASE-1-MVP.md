@@ -176,7 +176,7 @@ Autenticación: sesión con cookie HttpOnly + CSRF para el dashboard (o JWT cort
 - `GET /public/availability/days/?service_ids=&professional_id=&month=YYYY-MM`
 - `GET /public/availability/slots/?service_ids=&professional_id=&date=YYYY-MM-DD`
 - `POST /public/appointments/` — `{service_ids, professional_id|null, start_at, customer:{full_name,email,phone}, accept_data_policy:true}` → 201 con cita y `manage_url`.
-- `GET /public/appointments/{cancel_token}/` y `POST /public/appointments/{cancel_token}/cancel/` — respeta ventana de cancelación del tenant (`cancel_min_hours`, default 2).
+- `GET /public/appointments/{cancel_token}/` y `POST /public/appointments/{cancel_token}/cancel/` — respeta ventana de cancelación del tenant (`cancel_min_hours`, default 1; era 2 hasta el 2026-11-12, cuando el equipo lo bajó a 1 h). Faltando exactamente esa ventana ya no se puede cancelar.
 - Rate limit: 10 POST/hora por IP y 5 por teléfono; honeypot + captcha activable por config.
 
 **Auth**

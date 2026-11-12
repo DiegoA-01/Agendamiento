@@ -1,5 +1,11 @@
 # Changelog
 
+## Cancelar la cita desde la confirmación, hasta 1 hora antes
+
+- Al confirmar una reserva, la misma ventana trae **Cancelar mi cita** con la hora límite ("Puedes cancelarla en línea hasta el sábado 14 de noviembre, 8:15"). Pide confirmación y un motivo opcional; al cancelar, el título cambia a "Tu cita quedó cancelada" y el horario queda libre. La página de la cita (`/cita/<token>`) usa el mismo componente (`CancelAppointment`).
+- **Ventana de 1 hora por defecto** (antes 2 h): el cliente puede cancelar hasta 1 hora antes; faltando exactamente 1 hora o menos, ya no (`409 cancel_window_closed`, con la hora límite en el mensaje). La migración `tenancy/0003` pasa a 1 h los negocios que seguían en 2 h por defecto; cada negocio puede cambiarla en la configuración de agenda. La spec se actualizó.
+- 1 prueba nueva en el backend (817 en total) y 1 en el frontend (132). Probado en el navegador: reservar y cancelar desde la confirmación.
+
 ## Reserva: un servicio por categoría por defecto y citas para otra persona
 
 - **"Solo uno por cita" activo por defecto** en todas las categorías (cortes, barba, cejas, líneas, depilación…): no se pueden elegir dos cortes en la misma cita, pero sí corte + barba + cejas. La migración `catalog/0003` lo activa también en las categorías que ya existían; el dueño puede apagarlo en una categoría desde el catálogo. Al crear una categoría nueva, la casilla viene marcada.
