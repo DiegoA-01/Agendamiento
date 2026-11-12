@@ -72,6 +72,19 @@ OPEN, CLOSE = dt.time(9, 0), dt.time(19, 0)
 SAMPLE_HOURS = (10, 15)  # citas de muestra a las 10:00 y a las 15:00
 
 
+# Tema de muestra: verde oscuro y dorado, como la referencia de diseño de la reserva (R9). Pasa la
+# validación de contraste (texto 13.5:1 sobre el fondo y 10.6:1 sobre las superficies).
+DEMO_THEMES = {
+    "barbershop": {
+        "primary": "#d4ae63",
+        "secondary": "#d4ae63",
+        "background": "#0e2620",
+        "surface": "#163a2f",
+        "text": "#f3ecdc",
+    },
+}
+
+
 class Command(BaseCommand):
     help = "Crea un negocio de demostración con equipo, servicios, horarios y citas de muestra."
 
@@ -116,6 +129,8 @@ class Command(BaseCommand):
         tenant = tenancy.create_tenant(
             name=f"{names[vertical]} Demo", slug=slug, plan=plan, vertical=vertical
         )
+        if vertical in DEMO_THEMES:
+            tenancy.set_theme(tenant, DEMO_THEMES[vertical])
         company.create_company(tenant)
         owner_email = f"propietario@{slug}.test"
         accounts.create_tenant_user(

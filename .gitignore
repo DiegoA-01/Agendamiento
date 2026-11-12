@@ -41,3 +41,6 @@ frontend/playwright-report/
 
 # Credenciales de prueba locales (nunca al repositorio)
 .local/
+
+# Archivos de trabajo de la skill de diseño (capturas e informes).
+.taste-skill/

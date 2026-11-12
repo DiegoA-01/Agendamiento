@@ -116,7 +116,14 @@
       "removeService": "Remove from my appointment",
       "closeDetail": "Close",
       "chooseOne": "Choose one.",
-      "closeBooking": "Close booking"
+      "closeBooking": "Close booking",
+      "ticket": "Your booking",
+      "ticketEmpty": "Choose your services",
+      "ticketPick": "Then choose with whom and when",
+      "continueAt": "Continue with {{time}}",
+      "pickTime": "Choose a time",
+      "confirmAt": "Confirm for {{time}}",
+      "min": "{{count}} min"
     }
   }
 }

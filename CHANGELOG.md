@@ -1,5 +1,15 @@
 # Changelog
 
+## Rediseño de la reserva pública (sobre R9)
+
+- La ventana de reserva toma el estilo de la referencia de diseño: tarjeta **Tu reserva** fija arriba (servicios, barbero, día, hora, duración y precio, que se actualizan con cada elección), servicios en tarjetas de 2 columnas, barberos en lista compacta con foto o inicial y especialidades, calendario de colores y horas en pestañas **Mañana / Tarde / Noche**. El botón dice lo que hace: "Seguir con las 15:45" y "Confirmar a las 15:45".
+- Siguen los 3 pasos y todo lo anterior: "Cualquiera", detalle del servicio (R2), "Elige uno" (R3), fotos (R1 y R4), especialidades (R5), calendario por estado (R7) y los datos con la autorización de datos. El paso de datos ya no repite el resumen: está en la tarjeta de arriba.
+- **Colores del tema de cada negocio**: todo sale de sus cinco colores y de mezclas de ellos (`.booking` en `index.css`), así funciona igual con un tema claro o uno oscuro. Lo elegido se marca invirtiendo texto y fondo; el color principal va en la hora y el día elegidos, el precio y el botón. Separación por tono, sin sombras ni bordes oscuros.
+- Títulos en serif del sistema (`font-display`), sin descargar fuentes.
+- El negocio de muestra de barbería (`seed_demo --vertical barbershop`) trae ahora el tema verde oscuro y dorado de la referencia. Cumple el contraste AA: texto 13,5:1 sobre el fondo y 10,6:1 sobre las superficies.
+- Revisado con la skill de diseño (`design-taste-frontend`, estilo de app "true-black-flat"): 0 fallas; iconos dibujados en SVG en vez de caracteres que algunos teléfonos pintan como emoji. Probado a 375 px y en escritorio, con el tema oscuro y con el claro por defecto.
+- La prueba de Playwright busca los botones nuevos ("Seguir con las…", "Confirmar a las…"); pasa en local.
+
 ## pormejorar §2: códigos de recuperación del 2FA (frente A)
 
 - Al activar el 2FA, la respuesta de `POST /auth/2fa/confirm/` trae **10 códigos de un solo uso** (`xxxxx-xxxxx`, sin letras que se confundan). Es la única vez que se ven: el servidor guarda solo su SHA-256 en `User.totp_recovery_codes` (migración `accounts/0004`). Son aleatorios y largos (≈ 50 bits), así que no hace falta un hash lento.
