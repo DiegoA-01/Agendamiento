@@ -60,6 +60,7 @@ Los puntos marcados **Requiere aprobación** necesitan una decisión tuya o del 
 | 36 | WhatsApp en producción: plantillas aprobadas por Meta | Alta | Antes de activar WhatsApp real |
 | 37 | Credenciales de WhatsApp por negocio, cifradas | Media | Cuando se apruebe `cryptography` |
 | 38 | Recordatorios configurables por negocio | Baja | Mejora |
+| 39 | **Cuentas del equipo desde el panel** (recepcionistas, profesionales, administradores) | Alta | Antes de un negocio piloto |
 
 ---
 
@@ -546,3 +547,17 @@ Información para quien mantenga el proyecto, no son errores:
 
 **Cómo:** un campo en la configuración de agenda del negocio (`tenancy`, frente A) o en `NotificationSettings`, leído por `tasks.send_reminders` en vez del setting global.
 
+## 39. Cuentas del equipo desde el panel
+
+**Qué es:** la spec define los roles `admin`, `receptionist` y `professional` (§5), y el modelo enlaza cada profesional con un usuario (`Professional.user`). Pero no hay API ni pantalla para crear esas cuentas: hoy solo existe la del propietario, que crea el Super Admin. Para la prueba manual se crean por consola (`docs/PRUEBA-MANUAL.md` §5).
+
+**Por qué importa:** ejemplo: una barbería con recepcionista y tres barberos. El dueño no puede darles acceso, así que nadie más que él usa el panel, y los barberos no ven sus propias citas ni sus comisiones, aunque los permisos ya lo permiten.
+
+**Cuándo:** antes de tener un negocio piloto real.
+
+**Cómo:**
+1. **API** en `accounts` (frente A): listar, crear, editar el rol, desactivar y reenviar el acceso de los usuarios del negocio activo. Solo el propietario (y el `admin`, según la matriz). Nunca puede crear otro propietario ni un Super Admin. Respeta el límite del plan si se define uno.
+2. **Alta por enlace**, no con contraseña escrita por el dueño: el usuario recibe un correo para definir su contraseña (reusar el flujo de recuperación). Ver también §14 y §27.
+3. **Enlace con el profesional:** al crear una cuenta `professional`, elegir a qué barbero de `Equipo` corresponde (`Professional.user`, único).
+4. **Pantalla** en `/equipo` o en una sección nueva **Usuarios** del panel (frente B), con textos en español e inglés.
+5. **Auditoría** de altas, cambios de rol y desactivaciones, y pruebas por rol (un recepcionista no puede crear usuarios; un usuario de otro negocio no aparece).

@@ -124,7 +124,7 @@ Entra en http://demo-barbershop.localhost:8080/login con el propietario del demo
 
 ## 5. Permisos por rol
 
-El panel todavía no tiene pantalla para crear cuentas del equipo, y el demo no las trae. Créalas por comando. El profesional queda enlazado al primer barbero del demo. Elige tú las contraseñas (mínimo 10 caracteres) y no las subas al repositorio:
+El panel todavía no tiene pantalla para crear cuentas del equipo (`pormejorar.md` §39), y el demo no las trae. Créalas por comando. El profesional queda enlazado al primer barbero del demo. Elige tú las contraseñas (mínimo 10 caracteres) y no las subas al repositorio:
 
 ```bash
 docker compose exec api python manage.py shell
