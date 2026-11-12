@@ -2,7 +2,7 @@ import { type Page, expect, test } from "@playwright/test";
 
 /** Criterio de aceptación de M10 (spec §14): reservar → completar → comisión.
  *
- *  1. Un cliente reserva en `/reservar` sin cuenta.
+ *  1. Un cliente abre la reserva desde la portada (una ventana de 3 pasos, R9) sin cuenta.
  *  2. El dueño entra al panel, encuentra la cita en `/citas`, la inicia y la completa.
  *  3. La comisión aparece en `/reportes`.
  */
@@ -26,8 +26,13 @@ test("un cliente reserva, el dueño completa la cita y ve la comisión", async (
   const customer = `Cliente E2E ${Date.now().toString(36)}`;
 
   // --- 1. Reserva pública ---------------------------------------------------------------------
-  await page.goto(businessUrl("/reservar"));
+  // El aviso de cookies se cierra antes de abrir la ventana: con ella abierta, el fondo no recibe
+  // clics.
+  await page.goto(businessUrl("/"));
   await dismissCookies(page);
+  await page.getByRole("link", { name: "Reservar cita" }).click();
+  const booking = page.getByRole("dialog", { name: "¿Qué te quieres hacer?" });
+  await expect(booking).toBeVisible();
 
   // El nombre del botón de elegir empieza por el servicio; el de "Ver el detalle de …" no.
   await page.getByRole("button", { name: new RegExp(`^${SERVICE}`) }).click();
@@ -42,8 +47,8 @@ test("un cliente reserva, el dueño completa la cita y ve la comisión", async (
     await professionalButton.locator("span.font-medium").first().innerText()
   ).trim();
   await professionalButton.click();
-  await next(page);
 
+  // Día y hora van en el mismo paso que el profesional (R9).
   // Primer día disponible; si el mes ya no tiene, el siguiente.
   const available = page.getByRole("button", { name: /: Disponible$/ });
   await expect(page.getByRole("list", { name: "Convenciones del calendario" })).toBeVisible();
@@ -52,7 +57,6 @@ test("un cliente reserva, el dueño completa la cita y ve la comisión", async (
     await expect(available.first()).toBeVisible();
   }
   await available.first().click();
-  await next(page);
 
   await page
     .getByRole("button", { name: /^\d{1,2}:\d{2}/ })
@@ -73,8 +77,8 @@ test("un cliente reserva, el dueño completa la cita y ve la comisión", async (
   await page.getByRole("button", { name: "Confirmar reserva" }).click();
   const response = await created;
   expect(response.status()).toBe(201);
-  const booking = (await response.json()) as { start_at: string };
-  const day = booking.start_at.slice(0, 10); // fecha local del negocio (lleva el desfase)
+  const booked = (await response.json()) as { start_at: string };
+  const day = booked.start_at.slice(0, 10); // fecha local del negocio (lleva el desfase)
   await expect(page.getByText("¡Listo, tu cita está reservada!")).toBeVisible();
 
   // --- 2. El dueño completa la cita -----------------------------------------------------------

@@ -167,7 +167,7 @@ function ServicesStep({
   );
 }
 
-// --- Paso 2: profesional ------------------------------------------------------------------------
+// --- Paso 2a: profesional -----------------------------------------------------------------------
 
 function ProfessionalStep({
   professionals,
@@ -245,7 +245,7 @@ function ProfessionalStep({
   );
 }
 
-// --- Paso 3: fecha ------------------------------------------------------------------------------
+// --- Paso 2b: fecha ------------------------------------------------------------------------------
 
 function DateStep({
   serviceIds,
@@ -352,7 +352,7 @@ function DateStep({
   );
 }
 
-// --- Paso 4: hora -------------------------------------------------------------------------------
+// --- Paso 2c: hora -------------------------------------------------------------------------------
 
 function TimeStep({
   serviceIds,
@@ -410,7 +410,7 @@ function TimeStep({
   );
 }
 
-// --- Paso 5: datos y confirmación ---------------------------------------------------------------
+// --- Paso 3: datos y confirmación ---------------------------------------------------------------
 
 type FieldErrors = Partial<Record<keyof Customer | "accept", string>>;
 
@@ -540,12 +540,16 @@ function serverFieldErrors(error: unknown): FieldErrors {
   return result;
 }
 
+/** Id del título de la reserva: la ventana (R9) lo usa como su nombre accesible. */
+export const BOOKING_TITLE_ID = "booking-title";
+
 export default function BookPage() {
   const { t, i18n } = useTranslation();
   const company = usePublicCompany().data;
   const services = usePublicServices();
   const { money, time, timeZone } = useCompanyFormat();
   const heading = useRef<HTMLHeadingElement>(null);
+  const timeSection = useRef<HTMLElement>(null);
 
   const [step, setStep] = useState<Step>("services");
   const [serviceIds, setServiceIds] = useState<string[]>([]);
@@ -582,8 +586,17 @@ export default function BookPage() {
   });
 
   const stepIndex = STEPS.indexOf(step);
-  // Al cambiar de paso, el foco va al título: así lo anuncia un lector de pantalla.
-  useEffect(() => heading.current?.focus(), [step, book.isSuccess]);
+  // Al cambiar de paso, el foco va al título: así lo anuncia un lector de pantalla. Dentro de la
+  // ventana (R9) además se vuelve arriba, para ver el número de paso.
+  useEffect(() => {
+    const element = heading.current;
+    element?.focus({ preventScroll: true });
+    element?.closest("dialog")?.scrollTo?.({ top: 0 });
+  }, [step, book.isSuccess]);
+  // Con profesional, día y hora en la misma vista, al elegir el día se baja a las horas.
+  useEffect(() => {
+    if (date) timeSection.current?.scrollIntoView?.({ behavior: "smooth", block: "start" });
+  }, [date]);
 
   if (company && !company.booking_enabled) {
     return <Notice tone="warning">{t("booking.disabled")}</Notice>;
@@ -602,7 +615,12 @@ export default function BookPage() {
     const manageUrl = new URL(book.data.manage_url, window.location.origin).pathname;
     return (
       <div className="flex flex-col gap-5">
-        <h1 ref={heading} tabIndex={-1} className="text-2xl font-semibold outline-none">
+        <h1
+          id={BOOKING_TITLE_ID}
+          ref={heading}
+          tabIndex={-1}
+          className="text-2xl font-semibold outline-none"
+        >
           {t("booking.wizard.done")}
         </h1>
         <Notice tone="success">{t("booking.wizard.doneHint")}</Notice>
@@ -621,10 +639,7 @@ export default function BookPage() {
   }
 
   const canContinue =
-    (step === "services" && serviceIds.length > 0) ||
-    (step === "professional" && professional !== null) ||
-    (step === "date" && Boolean(date)) ||
-    (step === "time" && Boolean(start));
+    (step === "services" && serviceIds.length > 0) || (step === "schedule" && Boolean(start));
 
   function go(next: Step) {
     book.reset();
@@ -650,7 +665,8 @@ export default function BookPage() {
       : (professionals.data?.find((p) => p.id === professional)?.display_name ?? "");
 
   return (
-    <div className="flex flex-col gap-5">
+    // Ocupa toda la altura de la ventana: la barra de botones queda abajo aunque haya poco contenido.
+    <div className="flex flex-1 flex-col gap-5">
       <div className="flex flex-col gap-2">
         <p className="text-sm font-medium opacity-70">
           {t("booking.wizard.stepOf", { step: stepIndex + 1, total: STEPS.length })}
@@ -665,7 +681,12 @@ export default function BookPage() {
             />
           ))}
         </div>
-        <h1 ref={heading} tabIndex={-1} className="text-2xl font-semibold outline-none">
+        <h1
+          id={BOOKING_TITLE_ID}
+          ref={heading}
+          tabIndex={-1}
+          className="text-2xl font-semibold outline-none"
+        >
           {t(`booking.wizard.steps.${step}`)}
         </h1>
       </div>
@@ -683,44 +704,66 @@ export default function BookPage() {
           }}
         />
       )}
-      {step === "professional" &&
-        (professionals.isPending ? (
-          <Loading />
-        ) : professionals.isError ? (
-          <ErrorBox
-            message={describeError(t, professionals.error)}
-            onRetry={() => void professionals.refetch()}
-          />
-        ) : (
-          <ProfessionalStep
-            professionals={professionals.data}
-            selected={professional}
-            onSelect={(id) => {
-              setProfessional(id);
-              setDate("");
-              setStart("");
-            }}
-          />
-        ))}
-      {step === "date" && (
-        <DateStep
-          serviceIds={orderedIds}
-          professionalId={professionalId}
-          selected={date}
-          onSelect={(value) => {
-            setDate(value);
-            setStart("");
-          }}
-        />
-      )}
-      {step === "time" && (
-        <TimeStep
-          serviceIds={orderedIds}
-          professionalId={professionalId}
-          date={date}
-          selected={start}
-          onSelect={setStart}
-        />
+      {step === "schedule" && (
+        <div className="flex flex-col gap-6">
+          <section className="flex flex-col gap-3" aria-labelledby="schedule-professional">
+            <h2 id="schedule-professional" className="text-lg font-semibold">
+              {t("booking.wizard.steps.professional")}
+            </h2>
+            {professionals.isPending ? (
+              <Loading />
+            ) : professionals.isError ? (
+              <ErrorBox
+                message={describeError(t, professionals.error)}
+                onRetry={() => void professionals.refetch()}
+              />
+            ) : (
+              <ProfessionalStep
+                professionals={professionals.data}
+                selected={professional}
+                onSelect={(id) => {
+                  setProfessional(id);
+                  setDate("");
+                  setStart("");
+                }}
+              />
+            )}
+          </section>
+          {professional !== null && (
+            <section className="flex flex-col gap-3" aria-labelledby="schedule-date">
+              <h2 id="schedule-date" className="text-lg font-semibold">
+                {t("booking.wizard.steps.date")}
+              </h2>
+              <DateStep
+                serviceIds={orderedIds}
+                professionalId={professionalId}
+                selected={date}
+                onSelect={(value) => {
+                  setDate(value);
+                  setStart("");
+                }}
+              />
+            </section>
+          )}
+          {professional !== null && date && (
+            <section
+              ref={timeSection}
+              className="flex scroll-mt-4 flex-col gap-3"
+              aria-labelledby="schedule-time"
+            >
+              <h2 id="schedule-time" className="text-lg font-semibold">
+                {t("booking.wizard.steps.time")}
+              </h2>
+              <TimeStep
+                serviceIds={orderedIds}
+                professionalId={professionalId}
+                date={date}
+                selected={start}
+                onSelect={setStart}
+              />
+            </section>
+          )}
+        </div>
       )}
       {step === "details" && (
         <DetailsStep
@@ -772,7 +815,7 @@ export default function BookPage() {
       )}
 
       {/* Barra fija abajo en el celular: el botón principal siempre a mano. */}
-      <div className="sticky bottom-0 -mx-4 flex gap-2 border-t border-black/10 bg-[var(--color-background,#f8fafc)] px-4 py-3">
+      <div className="sticky bottom-0 -mx-4 mt-auto flex gap-2 border-t border-black/10 bg-[var(--color-background,#f8fafc)] px-4 py-3">
         {stepIndex > 0 && (
           <Button variant="secondary" onClick={() => go(STEPS[stepIndex - 1])}>
             {t("common.back")}

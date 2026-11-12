@@ -62,6 +62,7 @@
       "stepOf": "Paso {{step}} de {{total}}",
       "steps": {
         "services": "¿Qué te quieres hacer?",
+        "schedule": "¿Con quién y cuándo?",
         "professional": "¿Con quién?",
         "date": "Elige el día",
         "time": "Elige la hora",
@@ -114,7 +115,8 @@
       "addService": "Agregar a mi cita",
       "removeService": "Quitar de mi cita",
       "closeDetail": "Cerrar",
-      "chooseOne": "Elige uno."
+      "chooseOne": "Elige uno.",
+      "closeBooking": "Cerrar la reserva"
     }
   }
 }

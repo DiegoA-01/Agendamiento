@@ -8,7 +8,8 @@ import type {
 } from "../../shared/api/types";
 
 /** Pasos del asistente de reserva (spec §13): servicios → profesional → fecha → hora → datos. */
-export const STEPS = ["services", "professional", "date", "time", "details"] as const;
+// R9: tres pasos. Profesional, día y hora van juntos en `schedule`.
+export const STEPS = ["services", "schedule", "details"] as const;
 export type Step = (typeof STEPS)[number];
 
 export const MAX_SERVICES = 10;
