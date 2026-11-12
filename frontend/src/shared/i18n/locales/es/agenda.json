@@ -65,6 +65,7 @@
     "selectedTime": "Horario elegido: {{time}}",
     "customerFilter": "Citas de {{name}}",
     "selectedCustomer": "el cliente seleccionado",
-    "clearCustomer": "Ver todas"
+    "clearCustomer": "Ver todas",
+    "attendee": "Para {{name}}"
   }
 }

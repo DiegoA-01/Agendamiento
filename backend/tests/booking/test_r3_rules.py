@@ -18,7 +18,7 @@ pytestmark = pytest.mark.django_db
 
 
 class RulesShop(Shop):
-    """Cortes es "solo uno por cita"; Barba y Cejas no."""
+    """Cortes es "solo uno por cita" (el valor por defecto); en Barba y cejas el dueño lo apagó."""
 
     def __init__(self):
         super().__init__()
@@ -28,7 +28,7 @@ class RulesShop(Shop):
             cuts.name, cuts.single_choice = "Cortes", True
             cuts.save()
             self.fade = ServiceFactory(category=cuts, name="Fade", duration_min=30)
-            extras = ServiceCategoryFactory(name="Barba y cejas")
+            extras = ServiceCategoryFactory(name="Barba y cejas", single_choice=False)
             self.beard = ServiceFactory(category=extras, name="Barba", duration_min=15)
             self.brows = ServiceFactory(category=extras, name="Cejas", duration_min=15)
 
@@ -201,3 +201,62 @@ def test_the_public_booking_also_blocks_a_second_appointment_at_the_same_time(sh
 
     assert again.status_code == 409
     assert again.json()["code"] == "customer_overlap"
+
+
+# --- Por defecto, un servicio por categoría ----------------------------------------------------
+
+
+def test_new_categories_allow_only_one_service_by_default(shop):
+    client, _ = shop.client()
+
+    created = client.post("/api/v1/categories/", {"name": "Depilación"}, format="json")
+
+    assert created.status_code == 201, created.json()
+    assert created.json()["single_choice"] is True
+
+
+# --- Reservar para otra persona ----------------------------------------------------------------
+
+
+def test_a_parent_books_for_himself_and_for_his_son_at_the_same_time(shop):
+    shop.professional("Ana")
+    shop.professional("Beto")
+    shop.professional("Caro")  # libre a las 9:15: el bloqueo es por la persona, no por el hueco
+    client = visitor(shop)
+    own = client.post(f"{PUBLIC}/appointments/", booking(shop, at(9)), format="json")
+    assert own.status_code == 201, own.json()
+    assert own.json()["attendee_name"] == ""
+
+    # Mismo celular, misma hora, para su hijo: entra con el otro barbero.
+    son = client.post(
+        f"{PUBLIC}/appointments/",
+        {**booking(shop, at(9)), "attendee_name": "  Juan   Pérez "},
+        format="json",
+    )
+    assert son.status_code == 201, son.json()
+    assert son.json()["attendee_name"] == "Juan Pérez"
+
+    # Pero el hijo no puede tener dos citas cruzadas (mayúsculas y espacios no cambian quién es).
+    again = client.post(
+        f"{PUBLIC}/appointments/",
+        {**booking(shop, at(9, 15)), "attendee_name": "juan pérez"},
+        format="json",
+    )
+    assert again.status_code == 409
+    assert again.json()["code"] == "customer_overlap"
+
+
+def test_the_panel_shows_and_keeps_who_the_appointment_is_for(shop):
+    ana, beto = shop.professional("Ana"), shop.professional("Beto")
+    client, _ = shop.client()
+    assert post_json(client, shop.payload(at(9), ana)).status_code == 201
+
+    created = post_json(client, {**shop.payload(at(9), beto), "attendee_name": "Sofía"})
+
+    assert created.status_code == 201, created.json()
+    assert created.json()["attendee_name"] == "Sofía"
+    moved = client.post(
+        f"{URL}{created.json()['id']}/reschedule/", {"start_at": at(10).isoformat()}, format="json"
+    )
+    assert moved.status_code in (200, 201), moved.json()
+    assert moved.json()["attendee_name"] == "Sofía"

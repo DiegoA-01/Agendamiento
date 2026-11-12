@@ -356,6 +356,8 @@ export interface PublicAppointment {
   location: string;
   address: string;
   customer_name: string;
+  /** Para quién es la cita si no es para quien reservó (vacío = para el cliente). */
+  attendee_name: string;
   items: { name: string; duration_min: number; price: string }[];
   price_total: string;
   can_cancel: boolean;
@@ -390,6 +392,8 @@ export interface Appointment {
   resource_id: string | null;
   location_id: string;
   customer: Pick<CustomerRecord, "id" | "full_name" | "phone" | "email">;
+  /** Para quién es la cita si no es para el cliente (vacío = para el cliente). */
+  attendee_name: string;
   items: { service_id: string; price_charged: string; duration_min: number }[];
   price_total: string;
   cancelled_at: string | null;

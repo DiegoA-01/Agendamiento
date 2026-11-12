@@ -97,6 +97,7 @@ def book(tenant, request, data: dict) -> Appointment:
         customer=customer,
         professional_id=data.get("professional_id"),
         source=Appointment.Source.WEB,
+        attendee_name=data.get("attendee_name", ""),
     )
 
 

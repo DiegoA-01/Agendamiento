@@ -1,5 +1,13 @@
 # Changelog
 
+## Reserva: un servicio por categoría por defecto y citas para otra persona
+
+- **"Solo uno por cita" activo por defecto** en todas las categorías (cortes, barba, cejas, líneas, depilación…): no se pueden elegir dos cortes en la misma cita, pero sí corte + barba + cejas. La migración `catalog/0003` lo activa también en las categorías que ya existían; el dueño puede apagarlo en una categoría desde el catálogo. Al crear una categoría nueva, la casilla viene marcada.
+- **Reservar para otra persona** (el hijo, el papá, el hermano): al terminar una reserva aparece **Reservar otra cita para alguien más**. Abre la reserva de nuevo con los datos de contacto ya llenos y pide el nombre de quien va. La cita guarda ese nombre en `Appointment.attendee_name` (migración `booking/0002`).
+- La regla de R3 ahora es por persona: el mismo cliente puede tener a la misma hora una cita para él y otra para su hijo (con otro profesional), pero no dos citas cruzadas para la misma persona (`409 customer_overlap`). El nombre se compara sin mayúsculas ni espacios de más.
+- `attendee_name` (opcional) en `POST /public/appointments/` y `POST /appointments/`; se devuelve en la cita del panel y en la del enlace público, y se conserva al reprogramar. El panel muestra "Para Juan" en el detalle de la cita y el enlace de la cita muestra la fila **Para**.
+- 3 pruebas nuevas en el backend (816 en total) y 1 en el frontend (131). Probado en el navegador: tres cortes seguidos dejan solo el último; un papá reservó para él y para su hijo a la misma hora con dos barberos.
+
 ## Rediseño de la reserva pública (sobre R9)
 
 - La ventana de reserva toma el estilo de la referencia de diseño: tarjeta **Tu reserva** fija arriba (servicios, barbero, día, hora, duración y precio, que se actualizan con cada elección), servicios en tarjetas de 2 columnas, barberos en lista compacta con foto o inicial y especialidades, calendario de colores y horas en pestañas **Mañana / Tarde / Noche**. El botón dice lo que hace: "Seguir con las 15:45" y "Confirmar a las 15:45".

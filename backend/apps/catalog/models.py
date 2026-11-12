@@ -13,7 +13,8 @@ class ServiceCategory(TenantOwnedModel):
     sort_order = models.PositiveIntegerField(default=0)
     # R3: "solo uno por cita". Ej.: Cortes. Una cita no puede llevar dos cortes, pero sí un corte
     # más servicios de otras categorías (barba, cejas, diseño).
-    single_choice = models.BooleanField(default=False)
+    # Un solo servicio de esta categoría por cita (un corte, una barba). Activo por defecto.
+    single_choice = models.BooleanField(default=True)
 
     class Meta:
         verbose_name_plural = "service categories"

@@ -270,7 +270,7 @@ def get_category(user, category_id) -> ServiceCategory:
 
 
 def create_category(
-    *, name: str, sort_order: int = 0, single_choice: bool = False
+    *, name: str, sort_order: int = 0, single_choice: bool = True
 ) -> ServiceCategory:
     return ServiceCategory.objects.create(
         name=name, sort_order=sort_order, single_choice=single_choice

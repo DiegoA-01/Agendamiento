@@ -37,6 +37,9 @@ export function AppointmentSummary({ appointment }: { appointment: Appointment }
         )}
       </p>
       <p className="font-semibold">{appointment.customer.full_name}</p>
+      {appointment.attendee_name && (
+        <p className="text-xs">{t("agenda.attendee", { name: appointment.attendee_name })}</p>
+      )}
       <p className="text-xs">
         {appointment.items
           .map(

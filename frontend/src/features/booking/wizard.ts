@@ -77,6 +77,8 @@ export function bookingPayload(input: {
   acceptDataPolicy: boolean;
   marketingConsent: boolean;
   website: string;
+  /** Para quién es la cita si no es para quien reserva. Vacío = para el cliente. */
+  attendeeName?: string;
 }) {
   return {
     service_ids: input.serviceIds,
@@ -90,6 +92,7 @@ export function bookingPayload(input: {
     accept_data_policy: input.acceptDataPolicy,
     marketing_consent: input.marketingConsent,
     website: input.website,
+    attendee_name: (input.attendeeName ?? "").trim(),
   };
 }
 

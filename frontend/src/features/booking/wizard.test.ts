@@ -113,6 +113,20 @@ describe("datos y envío", () => {
     expect(looksLikePhone(phone)).toBe(valid);
   });
 
+  it("manda para quién es la cita cuando es para otra persona", () => {
+    const body = bookingPayload({
+      serviceIds: ["corte"],
+      professionalId: null,
+      start: "2026-11-09T10:00:00-05:00",
+      customer: { full_name: "Pedro", phone: "3001112233", email: "" },
+      acceptDataPolicy: true,
+      marketingConsent: false,
+      website: "",
+      attendeeName: "  Juan  ",
+    });
+    expect(body.attendee_name).toBe("Juan");
+  });
+
   it("arma el cuerpo de la reserva con el honeypot y sin espacios de más", () => {
     expect(
       bookingPayload({
@@ -132,6 +146,7 @@ describe("datos y envío", () => {
       accept_data_policy: true,
       marketing_consent: false,
       website: "",
+      attendee_name: "",
     });
   });
 });
