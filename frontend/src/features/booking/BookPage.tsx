@@ -87,8 +87,10 @@ function Ticket({
   minutes,
   price,
   note,
+  forName,
 }: {
   services: string;
+  forName?: string;
   who: string;
   when: string;
   minutes: number;
@@ -104,7 +106,10 @@ function Ticket({
       className={`sticky top-0 z-10 -mx-4 bg-[var(--color-background)] px-4 pt-1 pb-3`}
     >
       <div className={`rounded-2xl ${PANEL} px-4 py-3`}>
-        <p className={`text-sm ${MUTED}`}>{t("booking.wizard.ticket")}</p>
+        <p className={`text-sm ${MUTED}`}>
+          {t("booking.wizard.ticket")}
+          {forName ? ` · ${t("booking.wizard.forName", { name: forName })}` : ""}
+        </p>
         <p className="font-display mt-0.5 line-clamp-2 text-2xl leading-tight">
           {services || t("booking.wizard.ticketEmpty")}
         </p>
@@ -698,6 +703,10 @@ export default function BookPage() {
   const [accept, setAccept] = useState(false);
   const [marketing, setMarketing] = useState(false);
   const [honeypot, setHoneypot] = useState("");
+  // Cita para otra persona (su hijo, su papá): se pide su nombre; los datos de contacto son los
+  // de quien reserva. Se activa con "Reservar otra cita para alguien más".
+  const [forOther, setForOther] = useState(false);
+  const [attendee, setAttendee] = useState("");
   const [errors, setErrors] = useState<FieldErrors>({});
 
   const professionals = usePublicProfessionals(serviceIds);
@@ -718,6 +727,7 @@ export default function BookPage() {
           acceptDataPolicy: accept,
           marketingConsent: marketing,
           website: honeypot,
+          attendeeName: forOther ? attendee : "",
         }),
       }),
     onError: (error) => setErrors(serverFieldErrors(error)),
@@ -749,6 +759,19 @@ export default function BookPage() {
     );
   }
 
+  /** Nueva cita para otra persona, con los datos de contacto ya llenos. */
+  function bookAnother() {
+    book.reset();
+    setServiceIds([]);
+    setProfessional(null);
+    setDate("");
+    setStart("");
+    setErrors({});
+    setAttendee("");
+    setForOther(true);
+    setStep("services");
+  }
+
   if (book.isSuccess) {
     const manageUrl = new URL(book.data.manage_url, window.location.origin).pathname;
     return (
@@ -772,12 +795,20 @@ export default function BookPage() {
           {t("booking.wizard.manageLink")}
         </Link>
         <p className={`text-sm ${MUTED}`}>{t("booking.wizard.saveLink")}</p>
+        <button
+          type="button"
+          onClick={bookAnother}
+          className={`min-h-14 rounded-2xl px-4 font-medium ${PANEL} ${INK} focus-visible:outline-2 ${PRESS}`}
+        >
+          {t("booking.wizard.anotherBooking")}
+        </button>
       </div>
     );
   }
 
   const canContinue =
-    (step === "services" && serviceIds.length > 0) || (step === "schedule" && Boolean(start));
+    (step === "services" && serviceIds.length > 0 && (!forOther || attendee.trim() !== "")) ||
+    (step === "schedule" && Boolean(start));
 
   function go(next: Step) {
     book.reset();
@@ -829,6 +860,7 @@ export default function BookPage() {
     <div className="flex flex-1 flex-col gap-6 tabular-nums">
       <Ticket
         services={chosen.map((s) => s.name).join(" + ")}
+        forName={forOther ? attendee.trim() : ""}
         who={step === "services" ? "" : professionalName}
         when={step === "services" ? "" : when}
         minutes={total.minutes}
@@ -860,6 +892,34 @@ export default function BookPage() {
         </h1>
       </div>
 
+      {step === "services" && forOther && (
+        <section
+          aria-labelledby="booking-who"
+          className={`flex flex-col gap-3 rounded-2xl ${PANEL} p-4`}
+        >
+          <h2 id="booking-who" className="font-display text-xl leading-tight">
+            {t("booking.wizard.whoTitle")}
+          </h2>
+          <TextField
+            label={t("booking.wizard.whoLabel")}
+            hint={t("booking.wizard.whoHint")}
+            autoComplete="off"
+            className="min-h-12 text-base"
+            value={attendee}
+            onChange={(e) => setAttendee(e.target.value)}
+          />
+          <button
+            type="button"
+            onClick={() => {
+              setForOther(false);
+              setAttendee("");
+            }}
+            className={`self-start text-sm underline underline-offset-4 ${MUTED} focus-visible:outline-2`}
+          >
+            {t("booking.wizard.forMe")}
+          </button>
+        </section>
+      )}
       {step === "services" && (
         <ServicesStep
           categories={services.data}

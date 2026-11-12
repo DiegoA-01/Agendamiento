@@ -112,6 +112,7 @@ class AppointmentListCreateView(BookingView):
             customer=customer,
             professional_id=values["professional_id"],
             created_by=request.user,
+            attendee_name=values["attendee_name"],
         )
         return Response(_data(appointment), status=status.HTTP_201_CREATED)
 

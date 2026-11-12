@@ -65,6 +65,7 @@
     "selectedTime": "Selected time: {{time}}",
     "customerFilter": "Appointments of {{name}}",
     "selectedCustomer": "the selected customer",
-    "clearCustomer": "Show all"
+    "clearCustomer": "Show all",
+    "attendee": "For {{name}}"
   }
 }

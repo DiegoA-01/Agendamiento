@@ -42,6 +42,12 @@ export function AppointmentSummary({ appointment }: { appointment: PublicAppoint
         {formatDateTime(appointment.start_at, i18n.language, timeZone)} –{" "}
         {formatTime(appointment.end_at, i18n.language, timeZone)}
       </dd>
+      {appointment.attendee_name && (
+        <>
+          <dt className="text-sm opacity-70">{t("booking.summary.for")}</dt>
+          <dd className="font-medium">{appointment.attendee_name}</dd>
+        </>
+      )}
       <dt className="text-sm opacity-70">{t("booking.summary.with")}</dt>
       <dd>{appointment.professional}</dd>
       <dt className="text-sm opacity-70">{t("booking.summary.where")}</dt>

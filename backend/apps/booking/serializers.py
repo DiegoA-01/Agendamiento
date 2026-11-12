@@ -26,6 +26,7 @@ class AppointmentSerializer(serializers.Serializer):
     resource_id = serializers.UUIDField(allow_null=True)
     location_id = serializers.UUIDField()
     customer = CustomerSerializer()
+    attendee_name = serializers.CharField(help_text="Para quién es, si no es para el cliente.")
     items = AppointmentItemSerializer(many=True, source="items.all")
     price_total = serializers.DecimalField(max_digits=12, decimal_places=2)
     cancelled_at = serializers.DateTimeField(allow_null=True)
@@ -50,6 +51,9 @@ class AppointmentCreateSerializer(serializers.Serializer):
     start_at = serializers.DateTimeField()
     customer_id = serializers.UUIDField(required=False, allow_null=True, default=None)
     customer = NewCustomerSerializer(required=False, allow_null=True, default=None)
+    attendee_name = serializers.CharField(
+        max_length=150, required=False, allow_blank=True, default=""
+    )
 
     def validate(self, attrs):
         if (attrs["customer_id"] is None) == (attrs["customer"] is None):

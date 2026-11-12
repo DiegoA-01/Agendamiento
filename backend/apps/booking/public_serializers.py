@@ -93,6 +93,13 @@ class PublicBookingSerializer(serializers.Serializer):
     professional_id = serializers.UUIDField(required=False, allow_null=True, default=None)
     start_at = serializers.DateTimeField()
     customer = PublicCustomerSerializer()
+    attendee_name = serializers.CharField(
+        max_length=150,
+        required=False,
+        allow_blank=True,
+        default="",
+        help_text="Para quién es la cita si no es para quien reserva (p. ej. su hijo).",
+    )
     accept_data_policy = serializers.BooleanField(
         help_text="Autorización de tratamiento de datos (Ley 1581). Debe ser true."
     )
@@ -120,6 +127,7 @@ class PublicAppointmentSerializer(serializers.Serializer):
     location = serializers.CharField(source="location.name")
     address = serializers.CharField(source="location.address")
     customer_name = serializers.CharField(source="customer.full_name")
+    attendee_name = serializers.CharField()
     items = PublicItemSerializer(many=True, source="items.all")
     price_total = serializers.DecimalField(max_digits=12, decimal_places=2)
     can_cancel = serializers.BooleanField()

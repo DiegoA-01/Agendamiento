@@ -210,8 +210,11 @@ def create_appointment(
     source: str = Appointment.Source.DASHBOARD,
     created_by=None,
     rescheduled_from: Appointment | None = None,
+    attendee_name: str = "",
 ) -> Appointment:
     """Crea una cita confirmada (spec §7: web y panel nacen `confirmed`).
+
+    `attendee_name` es para quién es la cita si no es para el cliente que reserva (su hijo).
 
     `professional_id=None` es "cualquiera": se asigna el profesional libre con menos citas ese día.
     La reserva web aplica las reglas del negocio (anticipación mínima, días hacia adelante y solo
@@ -222,6 +225,7 @@ def create_appointment(
     services = availability.resolve_services(service_ids)
     candidates = availability.candidates(services, professional_id, public=public)
     start_at = start_at.astimezone(ZoneInfo(tenant.timezone))
+    attendee_name = " ".join(attendee_name.split())
 
     for professional in _pick_professional(tenant, services, candidates, start_at, public=public):
         quote = catalog.quote(professional, services)
@@ -235,9 +239,10 @@ def create_appointment(
                 continue
         try:
             with transaction.atomic():
-                _check_customer_is_free(customer, start_at, end_at)
+                _check_customer_is_free(customer, start_at, end_at, attendee_name)
                 appointment = Appointment.objects.create(
                     customer=customer,
+                    attendee_name=attendee_name,
                     professional=professional,
                     resource=resource,
                     location_id=professional.location_id,
@@ -356,12 +361,13 @@ def appointments_for_report(
     return appointments
 
 
-def _check_customer_is_free(customer: Customer, start_at, end_at) -> None:
-    """409 si el cliente ya tiene una cita activa que se cruza con este horario (R3).
+def _check_customer_is_free(customer: Customer, start_at, end_at, attendee_name: str = "") -> None:
+    """409 si la misma persona ya tiene una cita activa que se cruza con este horario (R3).
 
-    Bloquea la fila del cliente: dos reservas simultáneas del mismo cliente se atienden en fila,
-    así la segunda ve la primera. Otro cliente sí puede reservar la misma hora con otro
-    profesional; con el mismo profesional lo impide la restricción de exclusión.
+    La persona es el cliente más `attendee_name`: un papá puede reservar a la misma hora para él y
+    para su hijo (con otro profesional), pero no dos citas cruzadas para el mismo. Bloquea la fila
+    del cliente: dos reservas simultáneas del mismo cliente se atienden en fila, así la segunda ve
+    la primera. Con el mismo profesional lo impide además la restricción de exclusión.
     """
     if customer.pk is None:
         return
@@ -369,6 +375,7 @@ def _check_customer_is_free(customer: Customer, start_at, end_at) -> None:
     clash = (
         Appointment.objects.filter(
             customer=customer,
+            attendee_name__iexact=attendee_name,
             status__in=ACTIVE_STATUSES,
             start_at__lt=end_at,
             end_at__gt=start_at,
@@ -458,6 +465,7 @@ def reschedule(
             source=original.source,
             created_by=user,
             rescheduled_from=original,
+            attendee_name=original.attendee_name,
         )
 
 

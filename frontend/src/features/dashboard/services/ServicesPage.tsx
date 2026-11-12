@@ -49,7 +49,7 @@ function CategoryForm({ category, onDone }: { category?: Category; onDone: () =>
   const queryClient = useQueryClient();
   const form = useForm<CategoryValues>({
     resolver: zodResolver(categorySchema),
-    defaultValues: { name: category?.name ?? "", single_choice: category?.single_choice ?? false },
+    defaultValues: { name: category?.name ?? "", single_choice: category?.single_choice ?? true },
   });
   const save = useMutation({
     mutationFn: (values: CategoryValues) =>

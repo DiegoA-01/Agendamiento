@@ -179,7 +179,7 @@ def _appointment_data(tenant, appointment) -> dict:
         {
             **{
                 field: getattr(appointment, field)
-                for field in ("status", "start_at", "end_at", "price_total")
+                for field in ("status", "start_at", "end_at", "price_total", "attendee_name")
             },
             "professional": appointment.professional,
             "location": appointment.location,

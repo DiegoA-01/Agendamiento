@@ -34,7 +34,8 @@
       "services": "Servicios",
       "total": "Total",
       "referencePrice": "Precio de referencia",
-      "priceMayVary": "El precio final puede variar según quién te atienda; lo verás en la confirmación."
+      "priceMayVary": "El precio final puede variar según quién te atienda; lo verás en la confirmación.",
+      "for": "Para"
     },
     "status": {
       "pending": "Pendiente",
@@ -123,7 +124,13 @@
       "continueAt": "Seguir con las {{time}}",
       "pickTime": "Elige una hora",
       "confirmAt": "Confirmar a las {{time}}",
-      "min": "{{count}} min"
+      "min": "{{count}} min",
+      "forName": "para {{name}}",
+      "anotherBooking": "Reservar otra cita para alguien más",
+      "whoTitle": "¿Para quién es la cita?",
+      "whoLabel": "Nombre de quien va",
+      "whoHint": "Tus datos de contacto se mantienen; la cita queda a nombre de esta persona.",
+      "forMe": "Es para mí"
     }
   }
 }

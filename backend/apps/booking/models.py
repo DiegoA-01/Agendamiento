@@ -86,6 +86,9 @@ class Appointment(TenantOwnedModel):
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.CONFIRMED)
     source = models.CharField(max_length=20, choices=Source.choices)
     price_total = models.DecimalField(**MONEY, default=0)
+    # Para quién es la cita cuando no es para quien reserva (su hijo, su papá). Vacío = para el
+    # cliente. Así una misma persona puede reservar a la misma hora para varios.
+    attendee_name = models.CharField(max_length=150, blank=True)
     cancel_token = models.CharField(max_length=64, unique=True, default=_new_cancel_token)
     cancelled_at = models.DateTimeField(null=True, blank=True)
     cancel_reason = models.CharField(max_length=250, blank=True)

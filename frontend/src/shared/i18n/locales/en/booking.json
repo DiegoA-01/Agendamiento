@@ -34,7 +34,8 @@
       "services": "Services",
       "total": "Total",
       "referencePrice": "Reference price",
-      "priceMayVary": "The final price may vary depending on who serves you; you will see it in the confirmation."
+      "priceMayVary": "The final price may vary depending on who serves you; you will see it in the confirmation.",
+      "for": "For"
     },
     "status": {
       "pending": "Pending",
@@ -123,7 +124,13 @@
       "continueAt": "Continue with {{time}}",
       "pickTime": "Choose a time",
       "confirmAt": "Confirm for {{time}}",
-      "min": "{{count}} min"
+      "min": "{{count}} min",
+      "forName": "for {{name}}",
+      "anotherBooking": "Book another appointment for someone else",
+      "whoTitle": "Who is the appointment for?",
+      "whoLabel": "Name of the person going",
+      "whoHint": "Your contact details stay the same; the appointment is in this person's name.",
+      "forMe": "It's for me"
     }
   }
 }
