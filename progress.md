@@ -2,22 +2,21 @@
 
 Estado del SaaS de agendamiento y plan a seguir. Se actualiza al cerrar cada hito o cada PR importante.
 
-**Corte:** 2026-11-11 · `develop` en `3150508` (PR #41) · `main` en M0 (`12343f6`, espera la revisión del encargado).
+**Corte:** 2026-11-11 · `develop` en `e3ab105` (PR #46) · `main` en M0 (`12343f6`, espera la revisión del encargado). La rama por defecto de GitHub ya es `develop`.
 
 ---
 
 ## 1. Resumen en 30 segundos
 
-- **Hecho:** los hitos M0 a M9 completos, con backend y pantallas. De M10 está todo salvo Sentry y el servidor de producción. También están hechas casi todas las mejoras de Fase 1 que salieron de las pruebas manuales (§10).
-- **Avance aproximado:** la API cubre los 37 grupos de la spec, y el proyecto completo va en ≈ 90–95 %.
-- **Frente A:** no le queda trabajo de backlog. Solo quedan S2, si el encargado la aprueba, y lo que necesita aprobación (§5).
-- **Frente B:** le quedan R9, S6 y S8.
+- **Hecho:** los hitos M0 a M9 completos, con backend y pantallas. De M10 está todo salvo Sentry y el servidor de producción. **Todas las mejoras de Fase 1** que salieron de las pruebas manuales están hechas (§10).
+- **Avance aproximado:** la API cubre los 37 grupos de la spec, y el proyecto completo va en ≈ 95 %.
+- **Backlog:** a ningún frente le queda trabajo de Fase 1. Las últimas del frente B (S6, S8 y R9) las hizo el frente A con permiso. Solo quedan S2, si el encargado la aprueba, y lo que necesita aprobación (§5).
 - **Antes de entregar:**
   - Reactivar la verificación en dos pasos (2FA), que está **apagada en desarrollo** (`pormejorar.md` §33).
   - Decidir el servidor de producción y Sentry.
   - Pasar la revisión del encargado y hacer el PR de `develop` a `main`.
 - **Pruebas sobre `develop`:**
-  - Backend: **800**. Frontend: **126**.
+  - Backend: **804**. Frontend: **129**.
   - Playwright: 1 prueba de punta a punta.
   - Todo en verde en el CI.
 
@@ -37,7 +36,7 @@ Estado del SaaS de agendamiento y plan a seguir. Se actualiza al cerrar cada hit
 - **Push:** el agente de Diego nunca hace push sin una confirmación explícita.
 - **Apps del otro frente:**
   - Solo el dueño de una app crea migraciones en ella. Si un frente necesita una función en una app ajena, la agrega mínima y avisa en el PR.
-  - Varias tareas de B las hizo el frente A con permiso: pantallas de M9, R5 y R7, la migración de `catalog` de R3 y los conflictos de los PR #37, #38 y #40.
+  - Varias tareas de B las hizo el frente A con permiso: pantallas de M9, R5 y R7, la migración de `catalog` de R3, S6, S8 y R9, y los conflictos de los PR #37, #38 y #40.
 - **Antes de empezar una tarea:** `git fetch`, revisar los PR abiertos y hacer `git pull` de la propia rama, que puede tener merges del otro frente.
 - Reglas completas en [`docs/REPARTO.md`](docs/REPARTO.md).
 
@@ -61,7 +60,7 @@ Estado del SaaS de agendamiento y plan a seguir. Se actualiza al cerrar cada hit
 | **M8** — Notificaciones | Base de tareas de Celery por negocio (`TenantTask`); `NotificationLog` idempotente, confirmación, cancelación, reprogramación y recordatorios a 24 h y 2 h, reintentos con paso a correo si falla WhatsApp, `FakeProvider` y `CloudApiProvider` | Diego (base) y Yehiron | #29, #37 |
 | **M9** — Comisiones y reportes | `CommissionEntry` inmutable (también por trigger de PostgreSQL) que se crea al completar la cita; ajustes como filas nuevas (solo el propietario); reportes de ventas (por día, semana, mes, profesional o servicio) y de reservas; exportación CSV protegida contra fórmulas; pantalla `/reportes`. **Aceptación:** los valores cuadran con un negocio de prueba calculado a mano | Diego | #31, #33 |
 | **M10** — Endurecimiento | Límite de fallos de login por IP y por correo y de recuperaciones de contraseña (Redis); auditoría de ingresos, fallos, cambios de contraseña y 2FA; logs JSON con `request_id` y negocio; scripts `backup.sh` y `restore.sh` cifrados con prueba de restauración (`docs/OPERACION.md`); **Playwright** reservar → completar → comisión, corriendo en el CI | Diego | #36, #39 |
-| **Mejoras de Fase 1** (§10) | R1, R2, R3, R4, R5, R7, S1, S3, S4, S5, S10 y S11 | Diego y Yehiron | #32–#35, #38, #40, #41 |
+| **Mejoras de Fase 1** (§10) | R1 a R5, R7, R9, S1, S3 a S6, S8, S10 y S11 | Diego y Yehiron | #32–#35, #38, #40, #41, #43, #45, #46 |
 
 ### Qué hay en el código hoy
 
@@ -71,7 +70,7 @@ Estado del SaaS de agendamiento y plan a seguir. Se actualiza al cerrar cada hit
 |---|---|
 | `tenancy` | Negocios, dominios, planes, módulos, RLS, contexto del negocio activo, configuración de agenda y tareas de Celery por negocio |
 | `accounts` | Usuarios (con tipo y número de documento), roles, sesión, 2FA, recuperación, matriz de permisos, `/me/`, límite de intentos y la señal `security_event` |
-| `platform_admin` | API del Super Admin, auditoría (incluye los eventos de seguridad), uso por negocio (S10), integraciones por negocio (S11) y `seed_demo` |
+| `platform_admin` | API del Super Admin, auditoría (incluye los eventos de seguridad), resumen de la plataforma (S6), uso por negocio (S10), integraciones por negocio (S11) y `seed_demo` |
 | `company` | Empresa (con NIT), sedes y textos legales limpios de HTML peligroso |
 | `catalog` | Categorías (con "uno por cita", R3), servicios, especialidades, profesionales, servicios por profesional y puestos |
 | `scheduling` | Horarios, bloqueos, configuración de agenda, motor de disponibilidad y calendario por estado del día (R7) |
@@ -83,19 +82,21 @@ Estado del SaaS de agendamiento y plan a seguir. Se actualiza al cerrar cada hit
 
 **Frontend** (React):
 - **Login:** con 2FA, cambio forzado de contraseña y recuperación.
+- **Condiciones de uso de la plataforma** (S8): página `/condiciones-de-uso` en los dos hosts, enlazada desde el login y los paneles. Es un borrador que debe revisar un abogado.
 - **Panel del Super Admin:**
+  - Resumen de la plataforma (S6), que es la página de inicio: negocios activos, suspendidos y nuevos, por plan y por tipo, y los últimos creados.
   - Empresas con alta simplificada (S3 y S4) y datos del propietario (S5).
   - Detalle con datos, tema, módulos, dominios, uso (S10) e integraciones (S11).
   - Planes y auditoría.
 - **Panel del negocio:** agenda en tiempo real, citas, clientes, servicios, equipo, puestos, horarios, empresa y `/reportes`.
 - **Sitio público del negocio:**
-  - Portada.
-  - Asistente de reserva con fotos de servicios y barberos, detalle del servicio, especialidades, calendario de colores y regla de "elige uno".
+  - Portada, con el botón que abre la reserva en una ventana (R9; a pantalla completa en el celular).
+  - Reserva en 3 pasos: servicios; profesional, día y hora juntos; y tus datos. Con fotos de servicios y barberos, detalle del servicio, especialidades, calendario de colores y regla de "elige uno".
   - Gestión de la cita por enlace, páginas legales y aviso de cookies.
 - **Idiomas:** textos en español e inglés.
 
 **Calidad:**
-- **Pruebas:** **800** en el backend, **126** en el frontend y la prueba de Playwright, en verde sobre `develop`. Ruff, mypy, ESLint, tipos, build y OpenAPI sin avisos.
+- **Pruebas:** **804** en el backend, **129** en el frontend y la prueba de Playwright, en verde sobre `develop`. Ruff, mypy, ESLint, tipos, build y OpenAPI sin avisos.
 - **El CI tiene tres trabajos:**
   - `backend`.
   - `frontend`.
@@ -126,7 +127,9 @@ Para no volver a discutirlas. Las que dicen "provisional" se revisan antes de en
 | Límite de intentos | 20 fallos por IP y 10 por correo en 15 minutos; 3 recuperaciones por correo | `CHANGELOG.md` (M10) |
 | Copias de seguridad | `pg_dump` cifrado con AES-256 y suma sha256; la restauración se prueba en una base aparte | `docs/OPERACION.md` |
 | Dependencias | Playwright aprobado (solo desarrollo y CI). Sentry, servidor de producción y `cryptography` siguen sin aprobar | §5 |
-| Flujo de Git | Rama por tarea, PR a `develop`, nunca a `main`; `main` solo con revisión del encargado | `docs/REPARTO.md` |
+| Reserva | Ventana de 3 pasos encima de la portada (`<dialog>` nativo); `/reservar` abre la misma ventana | `CHANGELOG.md` (R9) |
+| Condiciones de uso | Texto fijo en las traducciones (`terms.json`), igual para todos los negocios; borrador pendiente de abogado | `CHANGELOG.md` (S8) |
+| Flujo de Git | Rama por tarea, PR a `develop`, nunca a `main`; `main` solo con revisión del encargado. `develop` es la rama por defecto de GitHub | `docs/REPARTO.md` |
 
 ---
 
@@ -136,6 +139,7 @@ Para no volver a discutirlas. Las que dicen "provisional" se revisan antes de en
 - **Las mejoras marcadas "Cambia la spec" o "Fuera de alcance"** en la §10 (R6, R10, S2, S7, S9 y el wallet de S11) necesitan la aprobación del encargado.
 - **Qué pasa al bajar de plan** con los profesionales o sedes que sobran.
 - **Precio por profesional en la reserva pública:** hoy el asistente muestra un precio de referencia.
+- **Condiciones de uso (S8):** que un abogado revise el borrador antes de abrir la plataforma a negocios reales.
 
 ### Aprobaciones de dependencias
 
@@ -156,25 +160,25 @@ Cada hito se da por terminado con su criterio de aceptación de la spec (§14), 
 |---|---|---|---|
 | **M0 a M9** | — | — | ✓ |
 | **M10** | ~~Límites, auditoría de ingresos, logs, copias~~ (#36), ~~Playwright~~ (#39). Falta: servidor de producción y cifrado del secreto 2FA (necesitan aprobación) | Sentry (necesita aprobación), revisión de accesibilidad | Casi listo |
-| **Mejoras de Fase 1** | ~~R3, R5, R7, S5, S10~~. S2 solo si se aprueba | ~~R1, R2, R4, S1, S3, S4, S11~~. **Faltan R9, S6 y S8** | En curso (B) |
+| **Mejoras de Fase 1** | ~~R3, R5, R7, S5, S10~~ y, por B, ~~S6, S8, R9~~. S2 solo si se aprueba | ~~R1, R2, R4, S1, S3, S4, S11~~ | ✓ |
 | **Prueba manual completa** | Recorrer el negocio demo y el Super Admin; confirmar R8 | Lo mismo en celular (375 px) | Pendiente |
 | **Cierre** | **Reactivar el 2FA**, resolver los puntos Alta de `pormejorar.md`, revisión del encargado y PR de `develop` a `main` | | Pendiente |
 
 **Orden sugerido:**
-1. Yehiron cierra R9, S6 y S8.
-2. Llevar al encargado las decisiones de §5 y las mejoras que cambian la spec.
-3. Hacer la prueba manual completa.
-4. Reactivar el 2FA y correr todas las pruebas con él encendido.
-5. Revisar los puntos Alta de `pormejorar.md`: servidor de producción, imágenes en producción, cifrado del 2FA y WhatsApp real.
-6. Abrir el PR de `develop` a `main` para la revisión del encargado.
+1. Llevar al encargado las decisiones de §5, las mejoras que cambian la spec y el borrador de las condiciones de uso.
+2. Hacer la prueba manual completa, con atención a la reserva nueva (R9) en el celular.
+3. Reactivar el 2FA y correr todas las pruebas con él encendido.
+4. Revisar los puntos Alta de `pormejorar.md`: servidor de producción, imágenes en producción, cifrado del 2FA y WhatsApp real.
+5. Abrir el PR de `develop` a `main` para la revisión del encargado.
 
 ---
 
 ## 7. Riesgos y alertas
 
-1. **PRs que se van a `main`.** El #5 y el #28 se mezclaron en `main` por error.
-   - Revisar en GitHub que la rama por defecto sea `develop`: Settings → General → Default branch.
-   - Al abrir un PR, confirmar siempre que la base sea `develop`.
+1. **PRs que se van a `main`.** El #5, el #28 y el #44 (S8) se mezclaron en `main` por error. Las tres veces `main` se devolvió a M0; con el #44, S8 entró a `develop` por un PR nuevo (#45).
+   - Desde el 2026-11-11 la rama por defecto de GitHub es `develop`, así que los PR nuevos ya la proponen como base.
+   - Al abrir un PR, confirmar igual que la base sea `develop`.
+   - Conviene proteger `main` en Settings → Branches (PR con aprobación obligatoria).
 2. **2FA apagado en desarrollo.** Reactivarlo es obligatorio antes de entregar (`pormejorar.md` §33).
 3. **Claves foráneas entre negocios.** RLS impide *ver* datos de otro negocio pero no *enlazarlos*. Cada `services.py` busca los ids recibidos dentro del negocio activo antes de usarlos.
 4. **Servidor de desarrollo.** `runserver` no sirve para producción, y cada conexión SSE ocupa un hilo (`pormejorar.md` §4).
@@ -182,7 +186,8 @@ Cada hito se da por terminado con su criterio de aceptación de la spec (§14), 
 6. **CI de punta a punta.**
    - La descarga de Chromium a veces falla por la red del runner. Ya hay caché y reintentos.
    - Si falla igual, reintentar el trabajo `e2e` antes de buscar un error en el código.
-   - Si un cambio de pantalla rompe la prueba, revisar los selectores de `frontend/e2e/`.
+   - Si un cambio de pantalla rompe la prueba, revisar los selectores de `frontend/e2e/`. La prueba abre la reserva desde la portada (R9).
+   - En local, Vitest 5 guarda en `node_modules/.vitest-cache` la lista de archivos de traducción. Si una prueba no ve un archivo nuevo, borra esa carpeta.
 7. **Docker Desktop en Windows** se apaga con frecuencia. Si aparece el error de `dockerInference`: Quit, volver a abrir y, si sigue, `wsl --shutdown`.
 8. **Imágenes en producción.** Falta definir cómo se sirven los archivos subidos (`pormejorar.md` §34).
 9. **WhatsApp real.** Necesita plantillas aprobadas por Meta y credenciales cifradas por negocio (`pormejorar.md` §36 y §37). Hasta entonces se usa `FakeProvider`.
@@ -231,7 +236,7 @@ Salieron de probar el negocio demo y el panel del Super Admin.
 | R6 | Calificación por barbero | — | **Fuera de alcance** (§12: reseñas) | Para el encargado |
 | R7 | Calendario con colores: disponible, lleno, cerrado | A y B | Fase 1 | ✓ #32, #33 |
 | R8 | Solo horas libres, sin mostrar quién reservó | — | Ya funcionaba desde M5 | Confirmar en la prueba manual |
-| R9 | Todo el flujo en un solo modal, con menos pasos | B | Fase 1 (decisión de UX) | **Pendiente** |
+| R9 | Todo el flujo en una ventana, con menos pasos (de 5 a 3) | B (hecha por A) | Fase 1 | ✓ #46 |
 | R10 | Agregar la cita al wallet del celular | — | **Fuera de alcance**. Alternativa: botón "Agregar al calendario" con `.ics` | Para el encargado |
 
 ### Super Admin
@@ -243,9 +248,9 @@ Salieron de probar el negocio demo y el panel del Super Admin.
 | S3 | Quitar zona horaria y moneda del alta | B | Fase 1 | ✓ #38 |
 | S4 | Quitar el idioma del alta | B | Fase 1 | ✓ #38 |
 | S5 | Datos del propietario: documento, NIT y teléfono (la contraseña sigue siendo temporal, por seguridad) | A y B | Fase 1 | ✓ #34 |
-| S6 | Resumen de la plataforma: total de negocios, activos, suspendidos, nuevos | B | Fase 1 | **Pendiente** |
+| S6 | Resumen de la plataforma: total de negocios, activos, suspendidos, nuevos | B (hecha por A) | Fase 1 | ✓ #43 |
 | S7 | Soporte con tickets | — | **Nuevo módulo, no está en la spec** | Fase siguiente |
-| S8 | Términos y condiciones de la plataforma | B | Fase 1 (texto estático) | **Pendiente** |
+| S8 | Términos y condiciones de la plataforma | B (hecha por A) | Fase 1 (texto estático) | ✓ #45 (borrador para revisar con abogado) |
 | S9 | Pagos de la suscripción | — | **Fuera de alcance** (§1 y §12) | Fase siguiente |
 | S10 | Uso del sistema por negocio | A y B | Fase 1 | ✓ #35 |
 | S11 | Integraciones por negocio (WhatsApp y correo) | B | Fase 1; wallet fuera de alcance | ✓ #40 |
