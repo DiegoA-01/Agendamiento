@@ -22,7 +22,7 @@ Los puntos marcados **Requiere aprobación** necesitan una decisión tuya o del 
 
 | # | Tema | Prioridad | Hito sugerido |
 |---|---|---|---|
-| 33 | **REACTIVAR el 2FA antes de entregar** (hoy está apagado en desarrollo) | **Alta** | **Al final, obligatorio** |
+| 33 | ~~REACTIVAR el 2FA antes de entregar~~ **Hecho el 2026-11-11** | Alta | Hecho |
 | 1 | Límite de intentos de login | Alta | M10 (antes si se puede) |
 | 2 | Códigos de recuperación del 2FA (el comando `reset_2fa` ya existe) | Alta | Pronto |
 | 3 | Cifrar el secreto del 2FA | Alta | M10 |
@@ -464,6 +464,8 @@ Información para quien mantenga el proyecto, no son errores:
 **Cómo:** sumar una revisión automática a las pruebas de extremo a extremo (Playwright) y probar el flujo de reserva con un lector de pantalla.
 
 ## 33. REACTIVAR el 2FA antes de entregar
+
+> **Hecho el 2026-11-11.** `.env.example` trae `REQUIRE_TWO_FACTOR=1` y cada `.env` local debe tenerlo igual. Las pruebas pasan con el 2FA encendido. Lo que sigue abajo queda como referencia, por si alguien lo apaga para una prueba puntual.
 
 **Qué es:** para facilitar las pruebas, la verificación en dos pasos está **apagada en desarrollo**: `REQUIRE_TWO_FACTOR=0` en el `.env` (y en `.env.example`). Con eso el Super Admin entra solo con correo y contraseña, incluso si ya tenía el 2FA activo.
 

@@ -12,7 +12,7 @@ Estado del SaaS de agendamiento y plan a seguir. Se actualiza al cerrar cada hit
 - **Avance aproximado:** la API cubre los 37 grupos de la spec, y el proyecto completo va en ≈ 95 %.
 - **Backlog:** a ningún frente le queda trabajo de Fase 1. Las últimas del frente B (S6, S8 y R9) las hizo el frente A con permiso. Solo quedan S2, si el encargado la aprueba, y lo que necesita aprobación (§5).
 - **Antes de entregar:**
-  - Reactivar la verificación en dos pasos (2FA), que está **apagada en desarrollo** (`pormejorar.md` §33).
+  - ~~Reactivar la verificación en dos pasos (2FA)~~: **hecho el 2026-11-11** (`pormejorar.md` §33).
   - Decidir el servidor de producción y Sentry.
   - Pasar la revisión del encargado y hacer el PR de `develop` a `main`.
 - **Pruebas sobre `develop`:**
@@ -113,7 +113,7 @@ Para no volver a discutirlas. Las que dicen "provisional" se revisan antes de en
 |---|---|---|
 | Autenticación | Sesión por cookie HttpOnly + CSRF, no JWT | `docs/adr/0001-autenticacion-por-sesion.md` |
 | Contraseñas | Argon2id con el perfil mínimo de OWASP. Dependencia `argon2-cffi` aprobada | `pormejorar.md` §7 |
-| 2FA | Obligatorio para el Super Admin y opcional para el propietario. **Provisional: apagado en desarrollo** (`REQUIRE_TWO_FACTOR=0`) | `pormejorar.md` §5 y §33 |
+| 2FA | Obligatorio para el Super Admin y opcional para el propietario. Encendido también en desarrollo desde el 2026-11-11 (`REQUIRE_TWO_FACTOR=1`) | `pormejorar.md` §5 y §33 |
 | Aislamiento | Base compartida + `tenant_id` + RLS forzado, con la app conectada por un rol sin superusuario | `CHANGELOG.md` (M1) |
 | Doble reserva | La garantía final es la restricción de exclusión de PostgreSQL; la API revalida antes y responde `409 slot_taken` con sugerencias | `CHANGELOG.md` (M5) |
 | Cliente en dos citas | Un mismo cliente no puede tener dos citas activas que se crucen (`409 customer_overlap`); otra persona sí puede tomar esa hora con otro profesional | `CHANGELOG.md` (R3) |
@@ -162,12 +162,12 @@ Cada hito se da por terminado con su criterio de aceptación de la spec (§14), 
 | **M10** | ~~Límites, auditoría de ingresos, logs, copias~~ (#36), ~~Playwright~~ (#39). Falta: servidor de producción y cifrado del secreto 2FA (necesitan aprobación) | Sentry (necesita aprobación), revisión de accesibilidad | Casi listo |
 | **Mejoras de Fase 1** | ~~R3, R5, R7, S5, S10~~ y, por B, ~~S6, S8, R9~~. S2 solo si se aprueba | ~~R1, R2, R4, S1, S3, S4, S11~~ | ✓ |
 | **Prueba manual completa** | Recorrer el negocio demo y el Super Admin; confirmar R8 | Lo mismo en celular (375 px) | Pendiente |
-| **Cierre** | **Reactivar el 2FA**, resolver los puntos Alta de `pormejorar.md`, revisión del encargado y PR de `develop` a `main` | | Pendiente |
+| **Cierre** | ~~Reactivar el 2FA~~, resolver los puntos Alta de `pormejorar.md`, revisión del encargado y PR de `develop` a `main` | | En curso |
 
 **Orden sugerido:**
 1. Llevar al encargado las decisiones de §5, las mejoras que cambian la spec y el borrador de las condiciones de uso.
 2. Hacer la prueba manual completa, con atención a la reserva nueva (R9) en el celular.
-3. Reactivar el 2FA y correr todas las pruebas con él encendido.
+3. ~~Reactivar el 2FA y correr todas las pruebas con él encendido~~ (hecho el 2026-11-11).
 4. Revisar los puntos Alta de `pormejorar.md`: servidor de producción, imágenes en producción, cifrado del 2FA y WhatsApp real.
 5. Abrir el PR de `develop` a `main` para la revisión del encargado.
 
@@ -179,7 +179,7 @@ Cada hito se da por terminado con su criterio de aceptación de la spec (§14), 
    - Desde el 2026-11-11 la rama por defecto de GitHub es `develop`, así que los PR nuevos ya la proponen como base.
    - Al abrir un PR, confirmar igual que la base sea `develop`.
    - Conviene proteger `main` en Settings → Branches (PR con aprobación obligatoria).
-2. **2FA apagado en desarrollo.** Reactivarlo es obligatorio antes de entregar (`pormejorar.md` §33).
+2. **2FA.** Ya está encendido. Cada quien debe poner `REQUIRE_TWO_FACTOR=1` en su `.env` local; el Super Admin activa el 2FA con una app de autenticación en su siguiente login. Si se pierde el celular: `docker compose exec api python manage.py reset_2fa --email <correo>`.
 3. **Claves foráneas entre negocios.** RLS impide *ver* datos de otro negocio pero no *enlazarlos*. Cada `services.py` busca los ids recibidos dentro del negocio activo antes de usarlos.
 4. **Servidor de desarrollo.** `runserver` no sirve para producción, y cada conexión SSE ocupa un hilo (`pormejorar.md` §4).
 5. **Pruebas que dependen de la hora.** Una prueba de R7 fallaba de noche en Bogotá porque usaba la fecha en UTC (ya corregida). Toda prueba con "hoy" o "ayer" debe usar la fecha local del negocio.

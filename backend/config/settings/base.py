@@ -106,7 +106,7 @@ MEDIA_MAX_UPLOAD_BYTES = 10 * 1024 * 1024
 
 # Verificación en dos pasos. Encendida por defecto. Se apaga SOLO en desarrollo para probar sin
 # autenticador (REQUIRE_TWO_FACTOR=0 en .env); producción no arranca con ella apagada (prod.py).
-# REACTIVAR antes de entregar: ver pormejorar.md.
+# Se reactivó en desarrollo el 2026-11-11 (pormejorar.md §33).
 REQUIRE_TWO_FACTOR = env_bool("REQUIRE_TWO_FACTOR", True)
 
 # Reserva pública (M6, spec §9). Límites por hora contra reservas basura.
