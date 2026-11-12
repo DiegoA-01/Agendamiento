@@ -121,6 +121,8 @@ export const AUDIT_ACTIONS = [
   "auth.password_reset",
   "auth.two_factor_enable",
   "auth.two_factor_reset",
+  "auth.recovery_code_used",
+  "auth.recovery_codes_regenerated",
 ] as const;
 
 export const useTenantIntegrations = (id: string) =>

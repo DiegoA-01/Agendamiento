@@ -16,6 +16,17 @@ class TwoFactorConfirmSerializer(TwoFactorSetupSerializer):
     code = serializers.CharField()
 
 
+class RecoveryCodesRequestSerializer(serializers.Serializer):
+    password = serializers.CharField(write_only=True, trim_whitespace=False)
+    code = serializers.CharField()
+
+
+class RecoveryCodesSerializer(serializers.Serializer):
+    """Se muestran una sola vez: el servidor solo guarda su hash."""
+
+    recovery_codes = serializers.ListField(child=serializers.CharField())
+
+
 class PasswordResetRequestSerializer(serializers.Serializer):
     email = serializers.EmailField()
 
@@ -53,6 +64,7 @@ class MeSerializer(serializers.Serializer):
     user = UserSummarySerializer()
     role = serializers.CharField()
     two_factor_enabled = serializers.BooleanField()
+    recovery_codes_left = serializers.IntegerField()
     must_change_password = serializers.BooleanField()
     is_platform_admin = serializers.BooleanField()
     tenant = MeTenantSerializer(allow_null=True)
@@ -60,6 +72,10 @@ class MeSerializer(serializers.Serializer):
     modules = serializers.ListField(child=serializers.CharField())
     # {recurso: {"scope": "all" | "own", "actions": [...]}}; solo guía a la interfaz.
     permissions = serializers.DictField(child=serializers.DictField())
+
+
+class TwoFactorConfirmResponseSerializer(MeSerializer):
+    recovery_codes = serializers.ListField(child=serializers.CharField())
 
 
 class TwoFactorSetupResponseSerializer(serializers.Serializer):

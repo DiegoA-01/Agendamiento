@@ -65,6 +65,8 @@ class User(BaseModel, AbstractBaseUser):
     totp_secret = models.CharField(max_length=64, blank=True)
     totp_enabled = models.BooleanField(default=False)
     totp_last_step = models.BigIntegerField(null=True, blank=True)
+    # SHA-256 de los códigos de recuperación sin usar (pormejorar §2). Nunca el código en claro.
+    totp_recovery_codes = models.JSONField(default=list, blank=True)
 
     objects = UserManager()
 

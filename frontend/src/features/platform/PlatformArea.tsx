@@ -1,6 +1,7 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 import { AuditPage } from "./AuditPage";
 import { PlansPage } from "./PlansPage";
+import { SecurityPage } from "./SecurityPage";
 import { PlatformLayout } from "./PlatformLayout";
 import { SummaryPage } from "./SummaryPage";
 import { TenantCreatePage } from "./TenantCreatePage";
@@ -19,6 +20,7 @@ export default function PlatformArea() {
         <Route path="empresas/:id" element={<TenantDetailPage />} />
         <Route path="planes" element={<PlansPage />} />
         <Route path="auditoria" element={<AuditPage />} />
+        <Route path="seguridad" element={<SecurityPage />} />
         <Route path="*" element={<Navigate to="/resumen" replace />} />
       </Route>
     </Routes>

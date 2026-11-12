@@ -6,11 +6,12 @@ import { useTranslation } from "react-i18next";
 import { Link, useNavigate } from "react-router-dom";
 import { ApiError, api } from "../../shared/api/client";
 import { describeError } from "../../shared/api/errors";
-import type { Me, TwoFactorSetup } from "../../shared/api/types";
+import type { Me, TwoFactorConfirmed, TwoFactorSetup } from "../../shared/api/types";
 import { isPlatformHost } from "../../shared/host";
 import { Button, CopyButton, Notice, TextField } from "../../shared/ui/primitives";
 import { loginSchema, type LoginValues } from "../platform/schemas";
 import { AuthLayout } from "./AuthLayout";
+import { RecoveryCodes } from "./RecoveryCodes";
 import { ME_KEY, homePathFor } from "./useMe";
 
 type Step = "credentials" | "code" | "setup";
@@ -22,6 +23,8 @@ export function LoginPage() {
   const [step, setStep] = useState<Step>("credentials");
   const [setup, setSetup] = useState<TwoFactorSetup | null>(null);
   const [message, setMessage] = useState<string | null>(null);
+  // Al activar el 2FA se muestran los códigos de recuperación antes de entrar (pormejorar §2).
+  const [issued, setIssued] = useState<TwoFactorConfirmed | null>(null);
 
   const form = useForm<LoginValues>({
     resolver: zodResolver(loginSchema),
@@ -38,7 +41,7 @@ export function LoginPage() {
     mutationFn: (values: LoginValues) => {
       const credentials = { email: values.email, password: values.password };
       if (step === "setup") {
-        return api<Me>("/api/v1/auth/2fa/confirm/", {
+        return api<TwoFactorConfirmed>("/api/v1/auth/2fa/confirm/", {
           method: "POST",
           body: { ...credentials, code: values.totp_code },
         });
@@ -48,7 +51,10 @@ export function LoginPage() {
         body: { ...credentials, totp_code: values.totp_code },
       });
     },
-    onSuccess: finish,
+    onSuccess: (me: Me | TwoFactorConfirmed) => {
+      if ("recovery_codes" in me && me.recovery_codes.length > 0) setIssued(me);
+      else finish(me);
+    },
     onError: async (error, values) => {
       setMessage(null);
       if (error instanceof ApiError && error.code === "two_factor_required") {
@@ -96,6 +102,18 @@ export function LoginPage() {
         ? t("auth.adminLoginTitle")
         : t("auth.loginTitle");
 
+  if (issued) {
+    return (
+      <AuthLayout title={t("auth.recoveryTitle")}>
+        <RecoveryCodes
+          codes={issued.recovery_codes}
+          email={issued.user.email}
+          onDone={() => finish(issued)}
+        />
+      </AuthLayout>
+    );
+  }
+
   return (
     <AuthLayout title={title}>
       <form onSubmit={form.handleSubmit(onSubmit)} noValidate className="flex flex-col gap-4">
@@ -137,10 +155,12 @@ export function LoginPage() {
         {locked && (
           <TextField
             label={t("auth.codeLabel")}
-            hint={t("auth.codeHint")}
-            inputMode="numeric"
+            // Al entrar también vale un código de recuperación (letras y guion); al activar, no.
+            hint={step === "code" ? t("auth.codeHintRecovery") : t("auth.codeHint")}
+            inputMode={step === "code" ? "text" : "numeric"}
+            autoCapitalize="none"
             autoComplete="one-time-code"
-            maxLength={7}
+            maxLength={step === "code" ? 13 : 7}
             autoFocus
             error={errors.totp_code?.message}
             {...form.register("totp_code")}

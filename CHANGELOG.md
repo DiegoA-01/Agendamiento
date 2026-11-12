@@ -1,5 +1,17 @@
 # Changelog
 
+## pormejorar §2: códigos de recuperación del 2FA (frente A)
+
+- Al activar el 2FA, la respuesta de `POST /auth/2fa/confirm/` trae **10 códigos de un solo uso** (`xxxxx-xxxxx`, sin letras que se confundan). Es la única vez que se ven: el servidor guarda solo su SHA-256 en `User.totp_recovery_codes` (migración `accounts/0004`). Son aleatorios y largos (≈ 50 bits), así que no hace falta un hash lento.
+- **Al entrar**, el campo del código acepta un código de recuperación en lugar de los 6 dígitos, con o sin guion y en mayúsculas o minúsculas. Cada uno sirve una vez. Uno inválido cuenta como intento fallido (`invalid_recovery_code`) para el límite de intentos.
+- `POST /auth/2fa/recovery-codes/` (con sesión) genera códigos nuevos y anula los anteriores. Pide la contraseña y un código de la app, por si alguien dejó la sesión abierta.
+- `/me/` trae `recovery_codes_left`. `reset_2fa` también borra los códigos.
+- Auditoría: `auth.recovery_code_used` y `auth.recovery_codes_regenerated`, con su nombre en el filtro de la pantalla de auditoría.
+- **Pantallas:**
+  - Después de activar el 2FA aparece **Guarda tus códigos de recuperación**, con Copiar todos y Descargar .txt. No se sigue hasta marcar "Ya los guardé".
+  - En el panel del Super Admin hay una página nueva, **Seguridad** (`/seguridad`). Muestra cuántos códigos quedan, avisa cuando quedan 3 o menos y permite generar otros.
+- 9 pruebas nuevas en el backend (812 en total) y 1 en el frontend. Probado en el navegador con un Super Admin de prueba (ya borrado): activar, guardar, entrar con un código y generar otros.
+
 ## Mejora R9: la reserva en una ventana de 3 pasos (frente B, hecha por el frente A)
 
 - El botón **Reservar cita** de la portada abre la reserva en una ventana encima de la portada. En el celular ocupa toda la pantalla; en pantallas grandes es una ventana centrada. `/reservar` sigue funcionando: abre la portada con la ventana encima.

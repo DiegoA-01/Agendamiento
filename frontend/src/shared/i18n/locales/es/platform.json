@@ -238,9 +238,23 @@
         "password_reset_request": "Recuperación de contraseña solicitada",
         "password_reset": "Contraseña recuperada",
         "two_factor_enable": "2FA activado",
-        "two_factor_reset": "2FA quitado por comando"
+        "two_factor_reset": "2FA quitado por comando",
+        "recovery_code_used": "Ingreso con código de recuperación",
+        "recovery_codes_regenerated": "Códigos de recuperación nuevos"
       }
     },
     "empty": "Todavía no hay acciones registradas."
+  },
+  "security": {
+    "title": "Seguridad de tu cuenta",
+    "intro": "Códigos de recuperación de la verificación en dos pasos.",
+    "twoFactorOff": "La verificación en dos pasos no está activa en esta cuenta.",
+    "left_one": "Te queda {{count}} código de recuperación sin usar.",
+    "left_other": "Te quedan {{count}} códigos de recuperación sin usar.",
+    "none": "No tienes códigos de recuperación. Genera unos y guárdalos: si pierdes el celular, son la forma de entrar.",
+    "low": "Te quedan pocos: genera unos nuevos.",
+    "regenerateTitle": "Generar códigos nuevos",
+    "regenerateIntro": "Los códigos anteriores dejarán de servir. Confirma con tu contraseña y el código de tu app.",
+    "regenerateSubmit": "Generar códigos nuevos"
   }
 }

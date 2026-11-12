@@ -16,6 +16,8 @@ export interface Me {
   user: { id: string; email: string; full_name: string; phone: string };
   role: Role;
   two_factor_enabled: boolean;
+  /** Códigos de recuperación del 2FA sin usar (0 si el 2FA está apagado). */
+  recovery_codes_left: number;
   must_change_password: boolean;
   is_platform_admin: boolean;
   tenant: {
@@ -49,6 +51,9 @@ export type PermissionScope = "all" | "own";
 export type Permissions = Partial<
   Record<PermissionResource, { scope: PermissionScope; actions: string[] }>
 >;
+
+/** Respuesta al activar el 2FA: la sesión y los códigos, que solo se ven esta vez. */
+export type TwoFactorConfirmed = Me & { recovery_codes: string[] };
 
 export interface TwoFactorSetup {
   secret: string;

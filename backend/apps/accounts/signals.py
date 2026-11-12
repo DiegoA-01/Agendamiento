@@ -19,6 +19,8 @@ PASSWORD_RESET_REQUESTED = "auth.password_reset_request"
 PASSWORD_RESET = "auth.password_reset"
 TWO_FACTOR_ENABLED = "auth.two_factor_enable"
 TWO_FACTOR_RESET = "auth.two_factor_reset"
+RECOVERY_CODE_USED = "auth.recovery_code_used"
+RECOVERY_CODES_REGENERATED = "auth.recovery_codes_regenerated"
 
 
 def emit(action: str, *, request=None, user=None, email: str = "") -> None:

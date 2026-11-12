@@ -44,6 +44,7 @@
     "tenants": "Businesses",
     "plans": "Plans",
     "audit": "Audit log",
+    "security": "Security",
     "signOut": "Sign out",
     "skip": "Skip to content",
     "main": "Main navigation"
@@ -112,7 +113,9 @@
     "documentDigits": "A citizenship ID only has digits.",
     "taxIdFormat": "Type 6 to 12 digits and, optionally, the check digit: 900123456-7.",
     "one_per_category": "You can only choose one service from that category per appointment.",
-    "customer_overlap": "You already have an appointment at that time. Choose another time."
+    "customer_overlap": "You already have an appointment at that time. Choose another time.",
+    "invalid_recovery_code": "That recovery code does not work or was already used.",
+    "two_factor_not_enabled": "Two-step verification is not active."
   },
   "verticals": {
     "barbershop": "Barbershop",

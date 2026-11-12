@@ -23,15 +23,15 @@ Los puntos marcados **Requiere aprobación** necesitan una decisión tuya o del 
 | # | Tema | Prioridad | Hito sugerido |
 |---|---|---|---|
 | 33 | ~~REACTIVAR el 2FA antes de entregar~~ **Hecho el 2026-11-11** | Alta | Hecho |
-| 1 | Límite de intentos de login | Alta | M10 (antes si se puede) |
-| 2 | Códigos de recuperación del 2FA (el comando `reset_2fa` ya existe) | Alta | Pronto |
+| 1 | ~~Límite de intentos de login~~ **Hecho en M10** | Alta | Hecho |
+| 2 | ~~Códigos de recuperación del 2FA~~ **Hecho el 2026-11-11** (y el comando `reset_2fa`) | Alta | Hecho |
 | 3 | Cifrar el secreto del 2FA | Alta | M10 |
 | 4 | Servidor de producción | Alta | Antes de desplegar |
 | 5 | 2FA obligatorio para el propietario | Media | Decisión del equipo |
 | 6 | Activación del 2FA solo con contraseña | Media | Pronto |
 | 7 | Ajustar Argon2id al servidor real | Media | Al elegir el VPS |
 | 8 | Caché de la búsqueda de tenant | Media | M5 o M10 |
-| 9 | Contexto del tenant en respuestas en streaming (SSE) | Alta | M7 |
+| 9 | ~~Contexto del tenant en respuestas en streaming (SSE)~~ **Resuelto en M7** | Alta | Hecho |
 | 10 | Tareas de Celery con tenant | Media | M8 |
 | 11 | Modo solo lectura para tenants suspendidos (el bloqueo total ya existe) | Baja | Decisión de producto |
 | 12 | Subdominios borrados siguen reservados | Baja | Cuando haga falta |
@@ -45,7 +45,7 @@ Los puntos marcados **Requiere aprobación** necesitan una decisión tuya o del 
 | 20 | Pruebas de pantallas del frontend | Media | M4 en adelante |
 | 21 | Dependencias fuera de la lista | Media | Decisión del equipo |
 | 22 | HTTPS automático para dominios propios (la verificación por DNS ya existe) | Media | Antes de desplegar |
-| 23 | Copias de seguridad y observabilidad | Alta | M10 |
+| 23 | Copias de seguridad y observabilidad: **copias y logs hechos en M10**; falta Sentry | Alta | Parcial |
 | 24 | Detalles técnicos que conviene conocer | Baja | Informativo |
 | 25 | QR para activar el 2FA | Media | Decisión del equipo |
 | 26 | Verificación de dominios depende de Google | Media | Antes de desplegar |
@@ -78,6 +78,8 @@ Los puntos marcados **Requiere aprobación** necesitan una decisión tuya o del 
 - Los tests deben limpiar el contador entre pruebas, o se vuelven inestables.
 
 ## 2. Códigos de recuperación del 2FA
+
+> **Hecho el 2026-11-11.** Al activar el 2FA se entregan 10 códigos de un solo uso (`xxxxx-xxxxx`), que se pueden copiar o descargar. Se guardan solo como SHA-256 (`User.totp_recovery_codes`). Al entrar, el campo del código acepta uno de ellos en lugar de los 6 dígitos; usarlo queda en la auditoría (`auth.recovery_code_used`). En **Seguridad** (`/seguridad`), el Super Admin ve cuántos le quedan y genera otros con su contraseña y un código de la app (`POST /auth/2fa/recovery-codes/`). `reset_2fa` también los borra.
 
 **Qué es:** si el Super Admin pierde el celular, hoy **no hay forma de entrar**. No existe recuperación.
 

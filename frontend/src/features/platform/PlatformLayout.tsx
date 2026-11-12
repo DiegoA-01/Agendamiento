@@ -10,6 +10,7 @@ const LINKS = [
   { to: "/empresas", label: "nav.tenants" },
   { to: "/planes", label: "nav.plans" },
   { to: "/auditoria", label: "nav.audit" },
+  { to: "/seguridad", label: "nav.security" },
 ] as const;
 
 export function PlatformLayout() {

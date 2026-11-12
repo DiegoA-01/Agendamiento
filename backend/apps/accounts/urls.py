@@ -8,6 +8,11 @@ urlpatterns = [
     path("auth/logout/", views.LogoutView.as_view(), name="auth-logout"),
     path("auth/2fa/setup/", views.TwoFactorSetupView.as_view(), name="auth-2fa-setup"),
     path("auth/2fa/confirm/", views.TwoFactorConfirmView.as_view(), name="auth-2fa-confirm"),
+    path(
+        "auth/2fa/recovery-codes/",
+        views.RecoveryCodesView.as_view(),
+        name="auth-2fa-recovery-codes",
+    ),
     path("auth/password-reset/", views.PasswordResetView.as_view(), name="auth-password-reset"),
     path(
         "auth/password-reset/confirm/",
