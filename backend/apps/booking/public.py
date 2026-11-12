@@ -124,7 +124,8 @@ def cancel_deadline(tenant, appointment: Appointment) -> dt.datetime:
 
 def can_cancel(tenant, appointment: Appointment, now: dt.datetime | None = None) -> bool:
     now = now or timezone.now()
-    return appointment.status in CANCELLABLE and now <= cancel_deadline(tenant, appointment)
+    # Estricto: faltando justo `cancel_min_hours` (1 h) ya no se puede cancelar.
+    return appointment.status in CANCELLABLE and now < cancel_deadline(tenant, appointment)
 
 
 def cancel(tenant, token: str, *, reason: str = "") -> Appointment:
@@ -137,8 +138,8 @@ def cancel(tenant, token: str, *, reason: str = "") -> Appointment:
         local = timezone.localtime(cancel_deadline(tenant, appointment), ZoneInfo(tenant.timezone))
         raise ApiError(
             "cancel_window_closed",
-            f"Solo se puede cancelar hasta {tenant.cancel_min_hours} h antes "
-            f"({local:%d/%m %H:%M}). Comunícate con el negocio.",
+            f"Solo se puede cancelar con más de {tenant.cancel_min_hours} h de anticipación "
+            f"(antes de las {local:%H:%M} del {local:%d/%m}). Comunícate con el negocio.",
             409,
         )
     appointment.status = Appointment.Status.CANCELLED

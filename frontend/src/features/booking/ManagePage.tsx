@@ -1,21 +1,14 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useParams } from "react-router-dom";
-import { ApiError, api } from "../../shared/api/client";
+import { ApiError } from "../../shared/api/client";
 import { describeError } from "../../shared/api/errors";
 import type { AppointmentStatus, PublicAppointment } from "../../shared/api/types";
 import { formatMoney } from "../../shared/money";
-import {
-  Badge,
-  Button,
-  Card,
-  ErrorBox,
-  Loading,
-  Notice,
-  TextField,
-} from "../../shared/ui/primitives";
+import { Badge, Card, ErrorBox, Loading, Notice } from "../../shared/ui/primitives";
 import { usePublicAppointment, usePublicCompany } from "./api";
+import { CancelAppointment } from "./CancelAppointment";
 import { formatDateTime, formatTime } from "./wizard";
 
 const TONE: Partial<Record<AppointmentStatus, "success" | "warning" | "danger" | "info">> = {
@@ -74,25 +67,11 @@ export function AppointmentSummary({ appointment }: { appointment: PublicAppoint
 }
 
 export default function ManagePage() {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const { token = "" } = useParams();
   const queryClient = useQueryClient();
   const appointment = usePublicAppointment(token);
-  const timeZone = usePublicCompany().data?.timezone ?? "America/Bogota";
-  const [confirming, setConfirming] = useState(false);
-  const [reason, setReason] = useState("");
-
-  const cancel = useMutation({
-    mutationFn: () =>
-      api<PublicAppointment>(`/api/v1/public/appointments/${encodeURIComponent(token)}/cancel/`, {
-        method: "POST",
-        body: { reason },
-      }),
-    onSuccess: (updated) => {
-      queryClient.setQueryData(["public", "appointment", token], updated);
-      setConfirming(false);
-    },
-  });
+  const [justCancelled, setJustCancelled] = useState(false);
 
   if (appointment.isPending) return <Loading />;
   if (appointment.isError) {
@@ -118,44 +97,17 @@ export default function ManagePage() {
       <Card className="!bg-[var(--color-surface,#ffffff)]">
         <AppointmentSummary appointment={data} />
       </Card>
-      {cancel.isSuccess && <Notice tone="success">{t("booking.manage.cancelled")}</Notice>}
-      {data.can_cancel && !confirming && (
-        <div className="flex flex-col gap-2">
-          <p className="text-sm opacity-80">
-            {t("booking.manage.cancelUntil", {
-              deadline: formatDateTime(data.cancel_deadline, i18n.language, timeZone),
-            })}
-          </p>
-          <div>
-            <Button variant="secondary" onClick={() => setConfirming(true)}>
-              {t("booking.manage.cancel")}
-            </Button>
-          </div>
-        </div>
-      )}
-      {data.can_cancel && confirming && (
-        <Card className="flex flex-col gap-3">
-          <p className="font-medium">{t("booking.manage.confirmCancel")}</p>
-          <TextField
-            label={t("booking.manage.reason")}
-            optional
-            maxLength={250}
-            value={reason}
-            onChange={(event) => setReason(event.target.value)}
-          />
-          {cancel.isError && <Notice tone="danger">{describeError(t, cancel.error)}</Notice>}
-          <div className="flex flex-wrap gap-2">
-            <Button variant="danger" disabled={cancel.isPending} onClick={() => cancel.mutate()}>
-              {cancel.isPending ? t("common.saving") : t("booking.manage.confirmCancelButton")}
-            </Button>
-            <Button variant="ghost" onClick={() => setConfirming(false)}>
-              {t("booking.manage.keep")}
-            </Button>
-          </div>
-        </Card>
-      )}
-      {!data.can_cancel && data.status === "confirmed" && (
-        <Notice tone="info">{t("booking.manage.tooLate")}</Notice>
+      {justCancelled && <Notice tone="success">{t("booking.manage.cancelled")}</Notice>}
+      {(data.status === "confirmed" || data.status === "pending") && (
+        <CancelAppointment
+          token={token}
+          canCancel={data.can_cancel}
+          deadline={data.cancel_deadline}
+          onCancelled={(updated) => {
+            queryClient.setQueryData(["public", "appointment", token], updated);
+            setJustCancelled(true);
+          }}
+        />
       )}
       <Link to="/reservar" className="underline">
         {t("booking.manage.bookAnother")}

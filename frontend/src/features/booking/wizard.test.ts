@@ -3,6 +3,7 @@ import type { PublicCategory, Slot } from "../../shared/api/types";
 import {
   addMonths,
   bookingPayload,
+  tokenFromManageUrl,
   calendarCells,
   dayStatuses,
   formatTime,
@@ -111,6 +112,11 @@ describe("datos y envío", () => {
     ["llámame", false],
   ])("celular %s parece válido: %s", (phone, valid) => {
     expect(looksLikePhone(phone)).toBe(valid);
+  });
+
+  it("saca el token del enlace de la cita", () => {
+    expect(tokenFromManageUrl("/cita/abc123")).toBe("abc123");
+    expect(tokenFromManageUrl("http://demo.localhost:8080/cita/abc123/")).toBe("abc123");
   });
 
   it("manda para quién es la cita cuando es para otra persona", () => {
