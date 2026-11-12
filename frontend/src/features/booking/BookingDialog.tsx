@@ -38,7 +38,7 @@ export function BookingDialog({
       ref={dialog}
       aria-labelledby={labelledBy}
       onClose={() => navigate("/")}
-      className="m-0 h-dvh max-h-none flex-col open:flex w-full max-w-none overflow-y-auto bg-[var(--color-background,#f8fafc)] p-0 text-[var(--color-text,#0f172a)] shadow-xl backdrop:bg-black/50 sm:m-auto sm:h-auto sm:max-h-[90dvh] sm:max-w-2xl sm:rounded-2xl"
+      className="booking m-0 h-dvh max-h-none w-full max-w-none flex-col overflow-y-auto bg-[var(--color-background,#f8fafc)] p-0 text-[var(--color-text,#0f172a)] backdrop:bg-black/60 open:flex sm:m-auto sm:h-auto sm:max-h-[90dvh] sm:max-w-2xl sm:rounded-3xl"
     >
       <div className="flex justify-end px-2 pt-2">
         <button

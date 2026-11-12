@@ -1,5 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { ApiError, api } from "../../shared/api/client";
@@ -12,8 +12,6 @@ import type {
 } from "../../shared/api/types";
 import { formatMoney } from "../../shared/money";
 import {
-  Button,
-  Card,
   CheckboxField,
   EmptyState,
   ErrorBox,
@@ -53,14 +51,18 @@ import {
 } from "./wizard";
 
 const ANY = "any";
-const OPTION =
-  "flex w-full items-center gap-3 rounded-xl border-2 p-3 text-left transition-colors focus-visible:outline-2";
-const optionStyle = (selected: boolean) =>
-  `${OPTION} ${
-    selected
-      ? "border-[var(--color-primary,#0f172a)] bg-[var(--color-surface,#ffffff)]"
-      : "border-black/10 bg-[var(--color-surface,#ffffff)] hover:border-black/30"
-  }`;
+
+// Colores de la reserva (R9): solo los cinco del tema del negocio y sus mezclas (`.booking` en
+// index.css). Lo elegido se marca invirtiendo tinta y fondo; el color principal va en la hora, el
+// precio y el botón de seguir.
+const INK = "text-[var(--color-text)]";
+const MUTED = "text-[var(--bk-muted)]";
+const PANEL = "bg-[var(--color-surface)]";
+const RAISED = "bg-[var(--bk-raised)]";
+const INVERSE = "bg-[var(--color-text)] text-[var(--color-background)]";
+const ACCENT = "bg-[var(--color-primary)] text-[var(--color-background)]";
+const PRESS = "transition-[transform,background-color,color] active:scale-[0.98]";
+const SECTION_TITLE = "font-display text-2xl leading-tight";
 
 function useCompanyFormat() {
   const { i18n } = useTranslation();
@@ -72,6 +74,57 @@ function useCompanyFormat() {
     money: (value: string) => formatMoney(value, currency, i18n.language),
     time: (iso: string) => formatTime(iso, i18n.language, timeZone),
   };
+}
+
+// --- La reserva hasta ahora --------------------------------------------------------------------
+
+/** Lo elegido hasta el momento, fijo arriba mientras se baja (R9). Es lo único que repite la
+ *  selección: el paso de datos ya no trae otro resumen. */
+function Ticket({
+  services,
+  who,
+  when,
+  minutes,
+  price,
+  note,
+}: {
+  services: string;
+  who: string;
+  when: string;
+  minutes: number;
+  price: string;
+  note?: string;
+}) {
+  const { t } = useTranslation();
+  const detail = [who, when].filter(Boolean).join(" · ");
+  return (
+    <section
+      aria-label={t("booking.wizard.ticket")}
+      aria-live="polite"
+      className={`sticky top-0 z-10 -mx-4 bg-[var(--color-background)] px-4 pt-1 pb-3`}
+    >
+      <div className={`rounded-2xl ${PANEL} px-4 py-3`}>
+        <p className={`text-sm ${MUTED}`}>{t("booking.wizard.ticket")}</p>
+        <p className="font-display mt-0.5 line-clamp-2 text-2xl leading-tight">
+          {services || t("booking.wizard.ticketEmpty")}
+        </p>
+        <p className={`mt-0.5 truncate text-sm first-letter:uppercase ${MUTED}`}>
+          {detail || t("booking.wizard.ticketPick")}
+        </p>
+        {minutes > 0 && (
+          <div className="mt-2 flex items-baseline justify-between gap-3">
+            <span className={`text-sm ${MUTED}`}>
+              {t("booking.wizard.min", { count: minutes })}
+            </span>
+            <span className="font-display text-2xl text-[var(--color-primary)] tabular-nums">
+              {price}
+            </span>
+          </div>
+        )}
+        {note && <p className={`mt-1 text-xs ${MUTED}`}>{note}</p>}
+      </div>
+    </section>
+  );
 }
 
 // --- Paso 1: servicios --------------------------------------------------------------------------
@@ -90,67 +143,70 @@ function ServicesStep({
   const [detail, setDetail] = useState<PublicService | null>(null);
   if (categories.length === 0) return <EmptyState>{t("booking.wizard.noServices")}</EmptyState>;
   return (
-    <div className="flex flex-col gap-5">
+    <div className="flex flex-col gap-8">
       {categories.map((category) => (
-        <section key={category.id} className="flex flex-col gap-2">
-          <div>
-            <h2 className="font-semibold">{category.name}</h2>
+        <section key={category.id} className="flex flex-col gap-3">
+          <div className="flex flex-wrap items-baseline justify-between gap-x-3">
+            <h2 className={SECTION_TITLE}>{category.name}</h2>
             {category.single_choice && (
-              <p className="text-sm opacity-80">{t("booking.wizard.chooseOne")}</p>
+              <p className={`text-sm ${MUTED}`}>{t("booking.wizard.chooseOne")}</p>
             )}
           </div>
-          {category.services.map((service) => {
-            const isSelected = selected.includes(service.id);
-            return (
-              <div key={service.id} className="flex items-stretch gap-2">
-                <button
-                  type="button"
-                  aria-pressed={isSelected}
-                  disabled={
-                    !isSelected &&
-                    selected.length >= MAX_SERVICES &&
-                    !(
-                      category.single_choice &&
-                      category.services.some((s) => selected.includes(s.id))
-                    )
-                  }
-                  className={optionStyle(isSelected)}
-                  onClick={() => onToggle(service.id)}
+          <div className="grid grid-cols-2 gap-3">
+            {category.services.map((service) => {
+              const isSelected = selected.includes(service.id);
+              const blocked =
+                !isSelected &&
+                selected.length >= MAX_SERVICES &&
+                !(category.single_choice && category.services.some((s) => selected.includes(s.id)));
+              return (
+                <div
+                  key={service.id}
+                  className={`flex flex-col overflow-hidden rounded-2xl ${
+                    isSelected ? INVERSE : `${PANEL} ${INK}`
+                  } ${blocked ? "opacity-50" : ""} transition-colors`}
                 >
-                  {service.image?.thumb && (
-                    <img
-                      src={service.image.thumb}
-                      alt=""
-                      className="size-14 rounded-lg object-cover"
-                    />
-                  )}
-                  <span className="min-w-0 flex-1">
-                    <span className="block font-medium">{service.name}</span>
-                    <span className="block text-sm opacity-80">
-                      {money(service.price)} ·{" "}
-                      {t("catalog.services.minutes", { count: service.duration_min })}
-                    </span>
-                    {service.description && (
-                      <span className="mt-1 line-clamp-2 block text-sm opacity-70">
-                        {service.description}
-                      </span>
+                  <button
+                    type="button"
+                    aria-pressed={isSelected}
+                    disabled={blocked}
+                    className={`flex flex-1 flex-col text-left focus-visible:outline-2 focus-visible:-outline-offset-2 ${PRESS}`}
+                    onClick={() => onToggle(service.id)}
+                  >
+                    {service.image?.medium && (
+                      <img
+                        src={service.image.medium}
+                        alt=""
+                        className="aspect-[4/3] w-full object-cover"
+                      />
                     )}
-                  </span>
-                  <span aria-hidden="true" className="text-xl">
-                    {isSelected ? "✓" : "+"}
-                  </span>
-                </button>
-                <button
-                  type="button"
-                  className="shrink-0 rounded-xl border-2 border-black/10 bg-[var(--color-surface,#ffffff)] px-3 text-sm font-medium hover:border-black/30 focus-visible:outline-2"
-                  aria-label={t("booking.wizard.detailOf", { name: service.name })}
-                  onClick={() => setDetail(service)}
-                >
-                  {t("booking.wizard.detail")}
-                </button>
-              </div>
-            );
-          })}
+                    <span className="flex flex-1 flex-col gap-3 px-4 pt-3 pb-2">
+                      <span className="flex items-start justify-between gap-2">
+                        <span className="font-medium">{service.name}</span>
+                        {isSelected && <CheckIcon />}
+                      </span>
+                      <span className="mt-auto flex items-baseline justify-between gap-2 text-sm">
+                        <span className={isSelected ? "opacity-80" : MUTED}>
+                          {t("booking.wizard.min", { count: service.duration_min })}
+                        </span>
+                        <span className="font-medium tabular-nums">{money(service.price)}</span>
+                      </span>
+                    </span>
+                  </button>
+                  <button
+                    type="button"
+                    className={`self-start px-4 pt-1 pb-3 text-sm underline underline-offset-4 focus-visible:outline-2 ${
+                      isSelected ? "opacity-80" : MUTED
+                    } hover:opacity-100`}
+                    aria-label={t("booking.wizard.detailOf", { name: service.name })}
+                    onClick={() => setDetail(service)}
+                  >
+                    {t("booking.wizard.detail")}
+                  </button>
+                </div>
+              );
+            })}
+          </div>
         </section>
       ))}
       {detail && (
@@ -169,6 +225,96 @@ function ServicesStep({
 
 // --- Paso 2a: profesional -----------------------------------------------------------------------
 
+function Radio({ on }: { on: boolean }) {
+  return (
+    <span
+      aria-hidden="true"
+      className={`flex size-6 shrink-0 items-center justify-center rounded-full border-2 ${
+        on ? "border-[var(--color-primary)]" : "border-[var(--bk-line)]"
+      }`}
+    >
+      {on && <span className="size-2.5 rounded-full bg-[var(--color-primary)]" />}
+    </span>
+  );
+}
+
+function ProfessionalRow({
+  selected,
+  onClick,
+  avatar,
+  name,
+  sub,
+}: {
+  selected: boolean;
+  onClick: () => void;
+  avatar: ReactNode;
+  name: string;
+  sub?: ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      aria-pressed={selected}
+      onClick={onClick}
+      className={`flex min-h-16 w-full items-center gap-3 rounded-2xl px-4 py-3 text-left focus-visible:outline-2 ${PRESS} ${
+        selected
+          ? `${RAISED} ring-1 ring-[var(--color-primary)]`
+          : `${PANEL} hover:bg-[var(--bk-raised)]`
+      }`}
+    >
+      {avatar}
+      <span className="min-w-0 flex-1">
+        <span className="block font-medium">{name}</span>
+        {sub}
+      </span>
+      <Radio on={selected} />
+    </button>
+  );
+}
+
+// Íconos dibujados con el color del texto, en vez de caracteres que algunos teléfonos pintan como emoji.
+function CheckIcon() {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 20 20" className="mt-0.5 size-5 shrink-0" fill="none">
+      <path
+        d="M4 10.5l4 4 8-9"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function AnyoneIcon() {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 24 24" className="size-6" fill="none">
+      <circle cx="9" cy="8" r="3.2" stroke="currentColor" strokeWidth="1.8" />
+      <circle cx="16.5" cy="9" r="2.6" stroke="currentColor" strokeWidth="1.8" />
+      <path
+        d="M3.5 19c.6-3.2 2.8-5 5.5-5s4.9 1.8 5.5 5M14.5 14.3c.6-.2 1.3-.3 2-.3 2.3 0 4 1.5 4.5 4.3"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+function Initial({ letter, on }: { letter: ReactNode; on: boolean }) {
+  return (
+    <span
+      aria-hidden="true"
+      className={`font-display flex size-11 shrink-0 items-center justify-center rounded-full text-lg ${
+        on ? ACCENT : RAISED
+      }`}
+    >
+      {letter}
+    </span>
+  );
+}
+
 function ProfessionalStep({
   professionals,
   selected,
@@ -184,63 +330,46 @@ function ProfessionalStep({
   }
   return (
     <div className="flex flex-col gap-2">
-      <button
-        type="button"
-        aria-pressed={selected === ANY}
-        className={optionStyle(selected === ANY)}
+      <ProfessionalRow
+        selected={selected === ANY}
         onClick={() => onSelect(ANY)}
-      >
-        <span className="flex size-12 items-center justify-center rounded-full bg-black/10 text-xl">
-          ★
-        </span>
-        <span>
-          <span className="block font-medium">{t("booking.wizard.anyone")}</span>
-          <span className="block text-sm opacity-80">{t("booking.wizard.anyoneHint")}</span>
-        </span>
-      </button>
-      {professionals.map((professional) => (
-        <button
-          key={professional.id}
-          type="button"
-          aria-pressed={selected === professional.id}
-          className={optionStyle(selected === professional.id)}
-          onClick={() => onSelect(professional.id)}
-        >
-          {professional.photo?.thumb ? (
-            <img
-              src={professional.photo.thumb}
-              alt=""
-              className="size-12 rounded-full object-cover"
-            />
-          ) : (
-            <span
-              aria-hidden="true"
-              className="flex size-12 items-center justify-center rounded-full bg-black/10 font-semibold"
-            >
-              {professional.display_name.charAt(0).toUpperCase()}
-            </span>
-          )}
-          <span className="min-w-0">
-            <span className="block font-medium">{professional.display_name}</span>
-            {professional.bio && (
-              <span className="block truncate text-sm opacity-80">{professional.bio}</span>
-            )}
-            {professional.specialties?.length > 0 && (
-              <span className="mt-1 flex flex-wrap gap-1">
-                <span className="sr-only">{t("booking.wizard.specialties")}:</span>
-                {professional.specialties.map((specialty) => (
-                  <span
-                    key={specialty.id}
-                    className="rounded-full bg-black/5 px-2 py-0.5 text-xs font-medium"
-                  >
-                    {specialty.name}
-                  </span>
-                ))}
-              </span>
-            )}
-          </span>
-        </button>
-      ))}
+        avatar={<Initial letter={<AnyoneIcon />} on={selected === ANY} />}
+        name={t("booking.wizard.anyone")}
+        sub={<span className={`block text-sm ${MUTED}`}>{t("booking.wizard.anyoneHint")}</span>}
+      />
+      {professionals.map((professional) => {
+        const on = selected === professional.id;
+        const specialties = professional.specialties?.map((s) => s.name) ?? [];
+        return (
+          <ProfessionalRow
+            key={professional.id}
+            selected={on}
+            onClick={() => onSelect(professional.id)}
+            avatar={
+              professional.photo?.thumb ? (
+                <img
+                  src={professional.photo.thumb}
+                  alt=""
+                  className="size-11 shrink-0 rounded-full object-cover"
+                />
+              ) : (
+                <Initial letter={professional.display_name.charAt(0).toUpperCase()} on={on} />
+              )
+            }
+            name={professional.display_name}
+            sub={
+              specialties.length > 0 ? (
+                <span className={`block truncate text-sm ${MUTED}`}>
+                  <span className="sr-only">{t("booking.wizard.specialties")}: </span>
+                  {specialties.join(" · ")}
+                </span>
+              ) : professional.bio ? (
+                <span className={`block truncate text-sm ${MUTED}`}>{professional.bio}</span>
+              ) : undefined
+            }
+          />
+        );
+      })}
     </div>
   );
 }
@@ -270,39 +399,44 @@ function DateStep({
     timeZone: "UTC",
   }).format(new Date(`${month}-15T12:00:00Z`));
   const weekdays = Array.from({ length: 7 }, (_, i) =>
-    new Intl.DateTimeFormat(i18n.language, { weekday: "short", timeZone: "UTC" }).format(
+    new Intl.DateTimeFormat(i18n.language, { weekday: "narrow", timeZone: "UTC" }).format(
       new Date(Date.UTC(2026, 10, 2 + i, 12)), // 2 nov 2026 es lunes
     ),
   );
+  const arrow = `flex size-10 items-center justify-center rounded-full text-xl ${PANEL} disabled:opacity-40 focus-visible:outline-2 ${PRESS}`;
 
   return (
     <div className="flex flex-col gap-3">
       <div className="flex items-center justify-between gap-2">
-        <Button
-          variant="ghost"
-          aria-label={t("booking.wizard.prevMonth")}
-          disabled={month <= monthOf(today)}
-          onClick={() => setMonth((m) => addMonths(m, -1))}
-        >
-          ‹
-        </Button>
-        <h2 className="font-semibold first-letter:uppercase" aria-live="polite">
+        <p className="font-medium first-letter:uppercase" aria-live="polite">
           {monthLabel}
-        </h2>
-        <Button
-          variant="ghost"
-          aria-label={t("booking.wizard.nextMonth")}
-          onClick={() => setMonth((m) => addMonths(m, 1))}
-        >
-          ›
-        </Button>
+        </p>
+        <div className="flex gap-2">
+          <button
+            type="button"
+            className={arrow}
+            aria-label={t("booking.wizard.prevMonth")}
+            disabled={month <= monthOf(today)}
+            onClick={() => setMonth((m) => addMonths(m, -1))}
+          >
+            ‹
+          </button>
+          <button
+            type="button"
+            className={arrow}
+            aria-label={t("booking.wizard.nextMonth")}
+            onClick={() => setMonth((m) => addMonths(m, 1))}
+          >
+            ›
+          </button>
+        </div>
       </div>
       {days.isError && (
         <ErrorBox message={describeError(t, days.error)} onRetry={() => void days.refetch()} />
       )}
-      <div className="grid grid-cols-7 gap-1 text-center" role="grid" aria-busy={days.isPending}>
-        {weekdays.map((name) => (
-          <span key={name} className="py-1 text-xs font-medium uppercase opacity-70">
+      <div className="grid grid-cols-7 gap-1.5 text-center" role="grid" aria-busy={days.isPending}>
+        {weekdays.map((name, index) => (
+          <span key={`${name}-${index}`} className={`py-1 text-xs font-medium ${MUTED}`}>
             {name}
           </span>
         ))}
@@ -320,8 +454,8 @@ function DateStep({
                 status: t(`booking.wizard.dayStatus.${status}`),
               })}
               onClick={() => onSelect(date)}
-              className={`aspect-square rounded-lg text-sm font-medium ${
-                selected === date ? "bg-slate-900 text-white" : DAY_STYLES[status]
+              className={`aspect-square rounded-xl text-sm font-medium tabular-nums focus-visible:outline-2 ${PRESS} ${
+                selected === date ? ACCENT : DAY_STYLES[status]
               }`}
             >
               {Number(date.slice(8))}
@@ -332,14 +466,16 @@ function DateStep({
       {days.isSuccess && (
         <ul
           aria-label={t("booking.wizard.legend")}
-          className="flex flex-wrap justify-center gap-x-4 gap-y-1 text-xs"
+          className={`flex flex-wrap gap-x-5 gap-y-1 text-sm ${MUTED}`}
         >
           {(["available", "full", "closed"] as const).map((status) => (
-            <li key={status} className="flex items-center gap-1.5">
+            <li key={status} className="flex items-center gap-2">
               <span
                 aria-hidden="true"
-                className={`size-3 rounded border border-slate-400/60 ${DAY_STYLES[status]}`}
-              />
+                className={`flex size-6 items-center justify-center rounded-md text-xs ${DAY_STYLES[status]}`}
+              >
+                1
+              </span>
               {t(`booking.wizard.dayStatus.${status}`)}
             </li>
           ))}
@@ -367,9 +503,10 @@ function TimeStep({
   selected: string;
   onSelect: (start: string) => void;
 }) {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const { time } = useCompanyFormat();
   const slots = useSlots(serviceIds, professionalId, date);
+  const [period, setPeriod] = useState<(typeof PERIODS)[number] | null>(null);
   if (slots.isPending) return <Loading />;
   if (slots.isError) {
     return (
@@ -378,34 +515,43 @@ function TimeStep({
   }
   if (slots.data.length === 0) return <EmptyState>{t("booking.wizard.noSlots")}</EmptyState>;
   const groups = slotsByPeriod(slots.data);
+  const periods = PERIODS.filter((p) => groups[p].length > 0);
+  const chosenPeriod = periods.find((p) => groups[p].some((s) => s.start === selected));
+  const active = period && periods.includes(period) ? period : (chosenPeriod ?? periods[0]);
 
   return (
-    <div className="flex flex-col gap-5">
-      <p className="font-medium first-letter:uppercase">{formatDay(date, i18n.language)}</p>
-      {PERIODS.filter((period) => groups[period].length > 0).map((period) => (
-        <section key={period} className="flex flex-col gap-2">
-          <h2 className="text-sm font-semibold uppercase opacity-70">
-            {t(`booking.wizard.periods.${period}`)}
-          </h2>
-          <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
-            {groups[period].map((slot) => (
-              <button
-                key={slot.start}
-                type="button"
-                aria-pressed={selected === slot.start}
-                onClick={() => onSelect(slot.start)}
-                className={`min-h-11 rounded-lg border text-sm font-medium ${
-                  selected === slot.start
-                    ? "border-slate-900 bg-slate-900 text-white"
-                    : "border-black/15 bg-[var(--color-surface,#ffffff)] hover:border-black/40"
-                }`}
-              >
-                {time(slot.start)}
-              </button>
-            ))}
-          </div>
-        </section>
-      ))}
+    <div className="flex flex-col gap-4">
+      <div role="tablist" aria-label={t("booking.wizard.steps.time")} className="flex gap-2">
+        {periods.map((p) => (
+          <button
+            key={p}
+            type="button"
+            role="tab"
+            aria-selected={p === active}
+            onClick={() => setPeriod(p)}
+            className={`min-h-10 rounded-full px-4 text-sm font-medium focus-visible:outline-2 ${PRESS} ${
+              p === active ? INVERSE : `ring-1 ring-[var(--bk-line)] ring-inset ${MUTED}`
+            }`}
+          >
+            {t(`booking.wizard.periods.${p}`)}
+          </button>
+        ))}
+      </div>
+      <div role="tabpanel" className="grid grid-cols-3 gap-2 sm:grid-cols-4">
+        {groups[active].map((slot) => (
+          <button
+            key={slot.start}
+            type="button"
+            aria-pressed={selected === slot.start}
+            onClick={() => onSelect(slot.start)}
+            className={`min-h-12 rounded-xl text-sm font-medium tabular-nums focus-visible:outline-2 ${PRESS} ${
+              selected === slot.start ? ACCENT : `${PANEL} ${INK}`
+            }`}
+          >
+            {time(slot.start)}
+          </button>
+        ))}
+      </div>
     </div>
   );
 }
@@ -415,7 +561,6 @@ function TimeStep({
 type FieldErrors = Partial<Record<keyof Customer | "accept", string>>;
 
 function DetailsStep({
-  summary,
   customer,
   onCustomer,
   accept,
@@ -426,7 +571,6 @@ function DetailsStep({
   onHoneypot,
   errors,
 }: {
-  summary: { services: string; when: string; with: string; total: string };
   customer: Customer;
   onCustomer: (customer: Customer) => void;
   accept: boolean;
@@ -439,74 +583,68 @@ function DetailsStep({
 }) {
   const { t } = useTranslation();
   return (
-    <div className="flex flex-col gap-5">
-      <Card className="!bg-[var(--color-surface,#ffffff)]">
-        <dl className="grid gap-2 text-sm sm:grid-cols-[auto_1fr] sm:gap-x-6">
-          <dt className="opacity-70">{t("booking.summary.services")}</dt>
-          <dd className="font-medium">{summary.services}</dd>
-          <dt className="opacity-70">{t("booking.summary.when")}</dt>
-          <dd className="font-medium first-letter:uppercase">{summary.when}</dd>
-          <dt className="opacity-70">{t("booking.summary.with")}</dt>
-          <dd>{summary.with}</dd>
-          <dt className="opacity-70">{t("booking.summary.referencePrice")}</dt>
-          <dd className="font-semibold">{summary.total}</dd>
-        </dl>
-        <p className="mt-3 text-xs opacity-70">{t("booking.summary.priceMayVary")}</p>
-      </Card>
-      <div className="flex flex-col gap-4">
-        <TextField
-          label={t("booking.wizard.fullName")}
-          autoComplete="name"
-          value={customer.full_name}
-          error={errors.full_name}
-          onChange={(e) => onCustomer({ ...customer, full_name: e.target.value })}
-        />
-        <TextField
-          label={t("booking.wizard.phone")}
-          hint={t("booking.wizard.phoneHint")}
-          type="tel"
-          inputMode="tel"
-          autoComplete="tel"
-          value={customer.phone}
-          error={errors.phone}
-          onChange={(e) => onCustomer({ ...customer, phone: e.target.value })}
-        />
-        <TextField
-          label={t("booking.wizard.email")}
-          type="email"
-          autoComplete="email"
-          optional
-          value={customer.email}
-          error={errors.email}
-          onChange={(e) => onCustomer({ ...customer, email: e.target.value })}
-        />
-        {/* Honeypot: invisible para las personas; si llega con texto, el servidor rechaza. */}
-        <div aria-hidden="true" className="absolute -left-[9999px] h-0 overflow-hidden">
-          <label>
-            Website
-            <input
-              tabIndex={-1}
-              autoComplete="off"
-              value={honeypot}
-              onChange={(e) => onHoneypot(e.target.value)}
-            />
-          </label>
-        </div>
-        <div className="flex flex-col gap-1">
-          <CheckboxField
-            label={t("booking.wizard.acceptPolicy")}
-            checked={accept}
-            onChange={(e) => onAccept(e.target.checked)}
+    <div className="flex flex-col gap-4">
+      <TextField
+        label={t("booking.wizard.fullName")}
+        autoComplete="name"
+        className="min-h-12 text-base"
+        value={customer.full_name}
+        error={errors.full_name}
+        onChange={(e) => onCustomer({ ...customer, full_name: e.target.value })}
+      />
+      <TextField
+        label={t("booking.wizard.phone")}
+        hint={t("booking.wizard.phoneHint")}
+        type="tel"
+        inputMode="tel"
+        autoComplete="tel"
+        className="min-h-12 text-base"
+        value={customer.phone}
+        error={errors.phone}
+        onChange={(e) => onCustomer({ ...customer, phone: e.target.value })}
+      />
+      <TextField
+        label={t("booking.wizard.email")}
+        type="email"
+        autoComplete="email"
+        optional
+        className="min-h-12 text-base"
+        value={customer.email}
+        error={errors.email}
+        onChange={(e) => onCustomer({ ...customer, email: e.target.value })}
+      />
+      {/* Honeypot: invisible para las personas; si llega con texto, el servidor rechaza. */}
+      <div aria-hidden="true" className="absolute -left-[9999px] h-0 overflow-hidden">
+        <label>
+          Website
+          <input
+            tabIndex={-1}
+            autoComplete="off"
+            value={honeypot}
+            onChange={(e) => onHoneypot(e.target.value)}
           />
-          <Link to="/privacidad" target="_blank" className="ml-8 text-sm underline">
-            {t("booking.wizard.readPolicy")}
-          </Link>
-          {errors.accept && (
-            <p role="alert" className="ml-8 text-xs font-medium text-red-700">
-              {errors.accept}
-            </p>
-          )}
-        </div>
+        </label>
+      </div>
+      <div className={`flex flex-col gap-1 rounded-2xl ${PANEL} p-4`}>
+        <CheckboxField
+          label={t("booking.wizard.acceptPolicy")}
+          checked={accept}
+          onChange={(e) => onAccept(e.target.checked)}
+        />
+        <Link
+          to="/privacidad"
+          target="_blank"
+          className={`ml-8 text-sm underline underline-offset-4 ${MUTED}`}
+        >
+          {t("booking.wizard.readPolicy")}
+        </Link>
+        {errors.accept && (
+          <p role="alert" className="ml-8 text-sm font-medium">
+            {errors.accept}
+          </p>
+        )}
+      </div>
+      <div className={`rounded-2xl ${PANEL} p-4`}>
         <CheckboxField
           label={t("booking.wizard.marketing")}
           hint={t("booking.wizard.marketingHint")}
@@ -614,26 +752,26 @@ export default function BookPage() {
   if (book.isSuccess) {
     const manageUrl = new URL(book.data.manage_url, window.location.origin).pathname;
     return (
-      <div className="flex flex-col gap-5">
+      <div className="flex flex-col gap-5 pb-6">
         <h1
           id={BOOKING_TITLE_ID}
           ref={heading}
           tabIndex={-1}
-          className="text-2xl font-semibold outline-none"
+          className="font-display text-3xl leading-tight outline-none"
         >
           {t("booking.wizard.done")}
         </h1>
-        <Notice tone="success">{t("booking.wizard.doneHint")}</Notice>
-        <Card className="!bg-[var(--color-surface,#ffffff)]">
+        <p className={MUTED}>{t("booking.wizard.doneHint")}</p>
+        <div className={`rounded-2xl ${PANEL} p-5`}>
           <AppointmentSummary appointment={book.data} />
-        </Card>
+        </div>
         <Link
           to={manageUrl}
-          className="inline-flex min-h-11 items-center justify-center rounded-lg bg-slate-900 px-4 font-medium text-white"
+          className={`inline-flex min-h-14 items-center justify-center rounded-2xl px-4 font-semibold ${ACCENT} ${PRESS}`}
         >
           {t("booking.wizard.manageLink")}
         </Link>
-        <p className="text-sm opacity-80">{t("booking.wizard.saveLink")}</p>
+        <p className={`text-sm ${MUTED}`}>{t("booking.wizard.saveLink")}</p>
       </div>
     );
   }
@@ -663,29 +801,60 @@ export default function BookPage() {
     professional === ANY
       ? t("booking.wizard.anyone")
       : (professionals.data?.find((p) => p.id === professional)?.display_name ?? "");
+  const shortDay = (iso: string) =>
+    new Intl.DateTimeFormat(i18n.language, {
+      weekday: "short",
+      day: "numeric",
+      month: "short",
+      timeZone,
+    }).format(new Date(iso));
+  const when = start
+    ? `${shortDay(start)} · ${time(start)}`
+    : date
+      ? formatDay(date, i18n.language)
+      : "";
+  const ctaLabel =
+    step === "services"
+      ? t("booking.wizard.continue")
+      : step === "schedule"
+        ? start
+          ? t("booking.wizard.continueAt", { time: time(start) })
+          : t("booking.wizard.pickTime")
+        : book.isPending
+          ? t("booking.wizard.booking")
+          : t("booking.wizard.confirmAt", { time: time(start) });
 
   return (
     // Ocupa toda la altura de la ventana: la barra de botones queda abajo aunque haya poco contenido.
-    <div className="flex flex-1 flex-col gap-5">
-      <div className="flex flex-col gap-2">
-        <p className="text-sm font-medium opacity-70">
-          {t("booking.wizard.stepOf", { step: stepIndex + 1, total: STEPS.length })}
-        </p>
-        <div className="flex gap-1" aria-hidden="true">
+    <div className="flex flex-1 flex-col gap-6 tabular-nums">
+      <Ticket
+        services={chosen.map((s) => s.name).join(" + ")}
+        who={step === "services" ? "" : professionalName}
+        when={step === "services" ? "" : when}
+        minutes={total.minutes}
+        price={money(total.price)}
+        note={step === "details" ? t("booking.summary.priceMayVary") : undefined}
+      />
+
+      <div className="flex flex-col gap-3">
+        <div className="flex gap-1.5" aria-hidden="true">
           {STEPS.map((name, index) => (
             <span
               key={name}
-              className={`h-1.5 flex-1 rounded-full ${
-                index <= stepIndex ? "bg-[var(--color-primary,#0f172a)]" : "bg-black/10"
+              className={`h-1 flex-1 rounded-full ${
+                index <= stepIndex ? "bg-[var(--color-primary)]" : "bg-[var(--bk-raised)]"
               }`}
             />
           ))}
         </div>
+        <p className={`text-sm ${MUTED}`}>
+          {t("booking.wizard.stepOf", { step: stepIndex + 1, total: STEPS.length })}
+        </p>
         <h1
           id={BOOKING_TITLE_ID}
           ref={heading}
           tabIndex={-1}
-          className="text-2xl font-semibold outline-none"
+          className="font-display text-3xl leading-tight outline-none"
         >
           {t(`booking.wizard.steps.${step}`)}
         </h1>
@@ -705,9 +874,9 @@ export default function BookPage() {
         />
       )}
       {step === "schedule" && (
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-10">
           <section className="flex flex-col gap-3" aria-labelledby="schedule-professional">
-            <h2 id="schedule-professional" className="text-lg font-semibold">
+            <h2 id="schedule-professional" className={SECTION_TITLE}>
               {t("booking.wizard.steps.professional")}
             </h2>
             {professionals.isPending ? (
@@ -731,7 +900,7 @@ export default function BookPage() {
           </section>
           {professional !== null && (
             <section className="flex flex-col gap-3" aria-labelledby="schedule-date">
-              <h2 id="schedule-date" className="text-lg font-semibold">
+              <h2 id="schedule-date" className={SECTION_TITLE}>
                 {t("booking.wizard.steps.date")}
               </h2>
               <DateStep
@@ -748,11 +917,11 @@ export default function BookPage() {
           {professional !== null && date && (
             <section
               ref={timeSection}
-              className="flex scroll-mt-4 flex-col gap-3"
+              className="flex scroll-mt-44 flex-col gap-3"
               aria-labelledby="schedule-time"
             >
-              <h2 id="schedule-time" className="text-lg font-semibold">
-                {t("booking.wizard.steps.time")}
+              <h2 id="schedule-time" className={`${SECTION_TITLE} first-letter:uppercase`}>
+                {formatDay(date, i18n.language)}
               </h2>
               <TimeStep
                 serviceIds={orderedIds}
@@ -767,12 +936,6 @@ export default function BookPage() {
       )}
       {step === "details" && (
         <DetailsStep
-          summary={{
-            services: chosen.map((s) => s.name).join(", "),
-            when: `${new Intl.DateTimeFormat(i18n.language, { dateStyle: "full", timeZone }).format(new Date(start))}, ${time(start)}`,
-            with: professionalName,
-            total: money(total.price),
-          }}
           customer={customer}
           onCustomer={setCustomer}
           accept={accept}
@@ -791,49 +954,42 @@ export default function BookPage() {
           {suggestions.length > 0 && (
             <span className="mt-3 flex flex-wrap gap-2">
               {suggestions.map((iso) => (
-                <Button
+                <button
                   key={iso}
-                  variant="secondary"
+                  type="button"
+                  className="min-h-10 rounded-full bg-white px-4 text-sm font-medium text-slate-900 ring-1 ring-slate-300"
                   onClick={() => {
                     setStart(iso);
                     book.reset();
                   }}
                 >
                   {time(iso)}
-                </Button>
+                </button>
               ))}
             </span>
           )}
         </Notice>
       )}
 
-      {serviceIds.length > 0 && step === "services" && (
-        <p className="text-sm opacity-80">
-          {t("booking.wizard.selection", { count: serviceIds.length })} ·{" "}
-          {t("catalog.services.minutes", { count: total.minutes })} · {money(total.price)}
-        </p>
-      )}
-
       {/* Barra fija abajo en el celular: el botón principal siempre a mano. */}
-      <div className="sticky bottom-0 -mx-4 mt-auto flex gap-2 border-t border-black/10 bg-[var(--color-background,#f8fafc)] px-4 py-3">
+      <div className="sticky bottom-0 -mx-4 mt-auto flex gap-2 bg-[var(--color-background)] px-4 pt-2 pb-4">
         {stepIndex > 0 && (
-          <Button variant="secondary" onClick={() => go(STEPS[stepIndex - 1])}>
-            {t("common.back")}
-          </Button>
-        )}
-        {step !== "details" ? (
-          <Button
-            className="flex-1"
-            disabled={!canContinue}
-            onClick={() => go(STEPS[stepIndex + 1])}
+          <button
+            type="button"
+            onClick={() => go(STEPS[stepIndex - 1])}
+            className={`min-h-14 rounded-2xl px-5 font-medium ${PANEL} ${INK} focus-visible:outline-2 ${PRESS}`}
           >
-            {t("booking.wizard.continue")}
-          </Button>
-        ) : (
-          <Button className="flex-1" disabled={book.isPending} onClick={submit}>
-            {book.isPending ? t("booking.wizard.booking") : t("booking.wizard.confirm")}
-          </Button>
+            {t("common.back")}
+          </button>
         )}
+        <button
+          type="button"
+          disabled={step === "details" ? book.isPending : !canContinue}
+          onClick={step === "details" ? submit : () => go(STEPS[stepIndex + 1])}
+          className={`min-h-14 flex-1 rounded-2xl px-4 font-semibold focus-visible:outline-2 ${PRESS} ${ACCENT} disabled:cursor-not-allowed disabled:bg-[var(--bk-raised)] disabled:text-[var(--bk-muted)]`}
+        >
+          {ctaLabel} <span aria-hidden="true">→</span>
+        </button>
       </div>
     </div>
   );

@@ -9,9 +9,42 @@
   --color-text: #111827;
 }
 
+@theme {
+  /* Títulos de la reserva pública: serif del sistema, sin descargar fuentes. */
+  --font-display: ui-serif, "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+}
+
 body {
   background: var(--color-background);
   color: var(--color-text);
+}
+
+/* Reserva pública (R9): todo sale de los cinco colores del tema del negocio, así funciona igual con
+   un tema claro o uno oscuro. Separación por un paso de tono, nunca por sombras. */
+.booking {
+  --bk-raised: color-mix(in srgb, var(--color-text) 9%, var(--color-surface));
+  --bk-line: color-mix(in srgb, var(--color-text) 22%, var(--color-background));
+  --bk-muted: color-mix(in srgb, var(--color-text) 72%, var(--color-background));
+  --bk-error: color-mix(in srgb, #e5484d 72%, var(--color-text));
+}
+.booking label {
+  color: var(--color-text);
+}
+.booking .text-slate-500,
+.booking .text-slate-600 {
+  color: var(--bk-muted);
+}
+.booking [role="alert"]:not([class*="bg-"]) {
+  color: var(--bk-error);
+}
+.booking input:not([type="checkbox"]),
+.booking textarea {
+  background: var(--color-surface);
+  color: var(--color-text);
+  border-color: var(--bk-line);
+}
+.booking input[type="checkbox"] {
+  accent-color: var(--color-primary);
 }
 
 :focus-visible {

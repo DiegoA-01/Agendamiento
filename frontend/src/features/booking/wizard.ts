@@ -139,11 +139,11 @@ export function dayStatuses(data: AvailableDays | undefined): Map<string, DaySta
 /** Clases de cada estado en el calendario. El color nunca va solo: el estado también va en el
  *  nombre accesible del botón y en la leyenda. */
 export const DAY_STYLES: Record<DayStatus, string> = {
-  available:
-    "bg-[var(--color-surface,#ffffff)] ring-1 ring-emerald-600/40 hover:bg-emerald-50 text-slate-900",
-  full: "bg-rose-100 text-rose-800 line-through decoration-rose-400",
-  closed: "bg-slate-200 text-slate-500",
-  unavailable: "text-slate-400 opacity-50",
+  // Colores del tema del negocio (R9): sirven igual con un tema claro o uno oscuro.
+  available: "bg-[var(--color-surface)] text-[var(--color-text)] hover:bg-[var(--bk-raised)]",
+  full: "text-[var(--bk-muted)] line-through ring-1 ring-inset ring-[var(--bk-line)]",
+  closed: "text-[var(--bk-muted)] opacity-60",
+  unavailable: "text-[var(--bk-muted)] opacity-30",
 };
 
 /** Agrega o quita un servicio de la selección (R3). En una categoría "solo uno por cita", elegir

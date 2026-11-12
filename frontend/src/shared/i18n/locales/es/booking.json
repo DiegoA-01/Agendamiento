@@ -116,7 +116,14 @@
       "removeService": "Quitar de mi cita",
       "closeDetail": "Cerrar",
       "chooseOne": "Elige uno.",
-      "closeBooking": "Cerrar la reserva"
+      "closeBooking": "Cerrar la reserva",
+      "ticket": "Tu reserva",
+      "ticketEmpty": "Elige tus servicios",
+      "ticketPick": "Luego eliges con quién y cuándo",
+      "continueAt": "Seguir con las {{time}}",
+      "pickTime": "Elige una hora",
+      "confirmAt": "Confirmar a las {{time}}",
+      "min": "{{count}} min"
     }
   }
 }

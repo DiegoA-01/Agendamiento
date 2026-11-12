@@ -75,3 +75,14 @@ def test_an_existing_subdomain_is_not_overwritten():
 def test_an_unknown_vertical_is_rejected():
     with pytest.raises(CommandError):
         seed("--vertical", "spa-lunar")
+
+
+def test_the_barbershop_demo_uses_the_dark_green_and_gold_theme():
+    seed("--vertical", "barbershop", "--password", PASSWORD)
+    seed("--vertical", "salon", "--password", PASSWORD)
+
+    barbershop = tenancy.get_tenant_by_slug("demo-barbershop")
+    assert barbershop.theme["background"] == "#0e2620"
+    assert barbershop.theme["primary"] == "#d4ae63"
+    # Los otros tipos de negocio siguen con el tema por defecto.
+    assert tenancy.get_tenant_by_slug("demo-salon").theme.get("background", "#ffffff") == "#ffffff"

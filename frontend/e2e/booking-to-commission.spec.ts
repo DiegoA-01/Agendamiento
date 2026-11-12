@@ -18,8 +18,9 @@ async function dismissCookies(page: Page) {
   if (await banner.isVisible().catch(() => false)) await banner.click();
 }
 
+// El botón de seguir dice "Continuar" en el paso 1 y "Seguir con las 9:00" en el 2.
 async function next(page: Page) {
-  await page.getByRole("button", { name: "Continuar" }).click();
+  await page.getByRole("button", { name: /^(Continuar|Seguir con las)/ }).click();
 }
 
 test("un cliente reserva, el dueño completa la cita y ve la comisión", async ({ page }) => {
@@ -74,7 +75,7 @@ test("un cliente reserva, el dueño completa la cita y ve la comisión", async (
       response.url().endsWith("/api/v1/public/appointments/") &&
       response.request().method() === "POST",
   );
-  await page.getByRole("button", { name: "Confirmar reserva" }).click();
+  await page.getByRole("button", { name: /^Confirmar a las/ }).click();
   const response = await created;
   expect(response.status()).toBe(201);
   const booked = (await response.json()) as { start_at: string };
