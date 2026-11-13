@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState, type KeyboardEvent } from "react";
 import { useTranslation } from "react-i18next";
+import { ConfirmAction } from "../../shared/ui/ConfirmAction";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { ApiError, api } from "../../shared/api/client";
 import { describeError } from "../../shared/api/errors";
@@ -64,13 +65,20 @@ function StatusAndDanger({ tenant }: { tenant: TenantDetail }) {
       <div className="mt-4 flex flex-col gap-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <p className="max-w-prose text-sm text-slate-600">{t("tenants.detail.suspendHelp")}</p>
-          <Button
-            variant={suspended ? "primary" : "danger"}
-            onClick={() => toggle.mutate()}
-            disabled={toggle.isPending}
-          >
-            {suspended ? t("tenants.detail.activate") : t("tenants.detail.suspend")}
-          </Button>
+          {suspended ? (
+            <Button onClick={() => toggle.mutate()} disabled={toggle.isPending}>
+              {t("tenants.detail.activate")}
+            </Button>
+          ) : (
+            <ConfirmAction
+              label={t("tenants.detail.suspend")}
+              title={t("tenants.detail.suspendConfirm", { name: tenant.name })}
+              message={t("tenants.detail.suspendHelp")}
+              confirmLabel={t("tenants.detail.suspendYes")}
+              pending={toggle.isPending}
+              onConfirm={() => toggle.mutate()}
+            />
+          )}
         </div>
         <div className="flex flex-wrap items-end gap-3">
           <div className="min-w-64 flex-1">
@@ -83,13 +91,15 @@ function StatusAndDanger({ tenant }: { tenant: TenantDetail }) {
               spellCheck={false}
             />
           </div>
-          <Button
-            variant="danger"
-            onClick={() => remove.mutate()}
-            disabled={remove.isPending || confirmSlug.trim() !== tenant.slug}
-          >
-            {t("tenants.detail.deleteConfirm")}
-          </Button>
+          <ConfirmAction
+            label={t("tenants.detail.deleteConfirm")}
+            title={t("tenants.detail.deleteTitle", { name: tenant.name })}
+            message={t("tenants.detail.deleteMessage")}
+            confirmLabel={t("tenants.detail.deleteYes")}
+            disabled={confirmSlug.trim() !== tenant.slug}
+            pending={remove.isPending}
+            onConfirm={() => remove.mutate()}
+          />
         </div>
       </div>
     </Card>

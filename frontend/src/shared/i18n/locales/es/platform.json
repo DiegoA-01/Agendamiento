@@ -82,7 +82,12 @@
       "deleteConfirm": "Confirmar eliminación",
       "dangerZone": "Zona de riesgo",
       "usage": "Uso",
-      "integrations": "Integraciones"
+      "integrations": "Integraciones",
+      "suspendConfirm": "¿Suspender {{name}}?",
+      "suspendYes": "Sí, suspender",
+      "deleteTitle": "¿Eliminar {{name}}?",
+      "deleteMessage": "La empresa deja de estar disponible para todos sus usuarios y clientes. Los datos no se borran.",
+      "deleteYes": "Sí, eliminar la empresa"
     },
     "ownerPhone": "Celular del propietario",
     "ownerDocumentType": "Tipo de documento",
@@ -194,7 +199,10 @@
     "verifyDone": "Dominio verificado. Ya abre el negocio.",
     "verifyTxtMissing": "No encontramos el registro TXT todavía. Los cambios de DNS pueden tardar unos minutos.",
     "cnameMissing": "El CNAME todavía no apunta al negocio; sin él el dominio no abrirá el sitio.",
-    "cnameFound": "El CNAME ya apunta al negocio."
+    "cnameFound": "El CNAME ya apunta al negocio.",
+    "removeConfirm": "¿Quitar el dominio {{host}}?",
+    "removeMessage": "El negocio dejará de abrir en esa dirección. Podrás agregarlo de nuevo, pero habrá que verificarlo otra vez.",
+    "removeYes": "Sí, quitar el dominio"
   },
   "plans": {
     "title": "Planes",
@@ -212,7 +220,9 @@
     "professionalsShort_one": "{{count}} profesional",
     "professionalsShort_other": "{{count}} profesionales",
     "locationsShort_one": "{{count}} sede",
-    "locationsShort_other": "{{count}} sedes"
+    "locationsShort_other": "{{count}} sedes",
+    "deleteMessage": "Los negocios que lo usan deben estar en otro plan. Esta acción no se puede deshacer.",
+    "deleteYes": "Sí, eliminar el plan"
   },
   "audit": {
     "title": "Auditoría",

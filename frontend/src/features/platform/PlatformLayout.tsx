@@ -4,6 +4,8 @@ import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
 import { useMe } from "../auth/useMe";
 import { useSignOut } from "../auth/useSignOut";
 import { PLATFORM_TERMS_PATH } from "../legal/PlatformTermsPage";
+import { BrandMark } from "../../shared/ui/brand";
+import { DARK_GLASS } from "../../shared/ui/brandStyles";
 import { usePlatformSummary } from "./api";
 
 // Íconos de línea del menú, dibujados con el color del texto.
@@ -43,8 +45,7 @@ function Icon({ name }: { name: string }) {
 }
 
 // Vidrio oscuro de la barra lateral, como la referencia.
-const SIDEBAR_SURFACE =
-  "flex h-full flex-col gap-6 overflow-y-auto rounded-[28px] border border-white/10 bg-[linear-gradient(180deg,rgba(18,22,20,0.9),rgba(40,46,43,0.84))] p-4 text-white shadow-[0_1px_0_rgba(255,255,255,0.14)_inset,0_24px_48px_-20px_rgba(11,13,12,0.6)] backdrop-blur-xl"; // taste-skill-ignore: vidrio líquido pedido por el cliente
+const SIDEBAR_SURFACE = `flex h-full flex-col gap-6 overflow-y-auto p-4 ${DARK_GLASS}`;
 
 const GROUPS = [
   {
@@ -100,14 +101,8 @@ export function PlatformLayout() {
 
   const sidebar = (
     <nav aria-label={t("nav.main")} className={SIDEBAR_SURFACE}>
-      <Link to="/resumen" className="flex items-center gap-3 px-1 pt-1">
-        <span
-          aria-hidden="true"
-          className="metal flex size-10 items-center justify-center rounded-xl text-lg font-bold"
-        >
-          A
-        </span>
-        <span className="text-xl font-bold tracking-tight">{t("app.name")}</span>
+      <Link to="/resumen" className="px-1 pt-1">
+        <BrandMark />
       </Link>
 
       <div className="rounded-2xl border border-white/12 bg-white/8 px-4 py-3">
