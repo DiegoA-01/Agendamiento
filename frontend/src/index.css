@@ -119,6 +119,50 @@ body {
   --bk-line: color-mix(in srgb, var(--color-text) 22%, var(--color-background));
   --bk-muted: color-mix(in srgb, var(--color-text) 72%, var(--color-background));
   --bk-error: color-mix(in srgb, #e5484d 72%, var(--color-text));
+  /* Riesgo (cancelar una cita): un rojo apagado mezclado con la superficie del negocio, con el
+     texto del tema encima. Se nota como peligro y combina con un tema claro o uno oscuro. */
+  --bk-risk: color-mix(in srgb, #b4231a 38%, var(--color-surface));
+  --bk-risk-edge: color-mix(in srgb, #e5484d 55%, transparent);
+}
+.booking .risk-button {
+  background-color: var(--bk-risk);
+  color: var(--color-text);
+  border: 1px solid var(--bk-risk-edge);
+}
+
+/* Efecto vidrio al pasar el cursor o tocar cualquier botón con forma (los que llevan `rounded-*`):
+   un brillo diagonal y un filo de luz arriba, encima del color del botón. Va en un pseudoelemento
+   para que aparezca suave y no tape los anillos de selección. */
+.booking :is(button, a)[class*="rounded"] {
+  position: relative;
+  isolation: isolate;
+}
+.booking :is(button, a)[class*="rounded"]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1; /* encima del color del botón y debajo del texto */
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 180ms ease;
+  background:
+    linear-gradient(to bottom, rgb(255 255 255 / 0.5), transparent 2px),
+    linear-gradient(
+      135deg,
+      rgb(255 255 255 / 0.28),
+      rgb(255 255 255 / 0.05) 55%,
+      rgb(255 255 255 / 0.16)
+    ); /* taste-skill-ignore: vidrio pedido */
+}
+.booking
+  :is(button, a)[class*="rounded"]:not(:disabled):is(:hover, :focus-visible, :active)::after {
+  opacity: 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  .booking :is(button, a)[class*="rounded"]::after {
+    transition: none;
+  }
 }
 .booking label {
   color: var(--color-text);

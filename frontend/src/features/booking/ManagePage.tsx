@@ -109,7 +109,22 @@ export default function ManagePage() {
           }}
         />
       )}
-      <Link to="/reservar" className="underline">
+      <Link
+        to="/reservar"
+        className="inline-flex min-h-12 items-center justify-center gap-2 self-start rounded-2xl border border-[var(--bk-line)] bg-[var(--color-surface)] px-5 font-medium text-[var(--color-text)] transition-transform focus-visible:outline-2 active:scale-[0.98]"
+      >
+        <svg
+          aria-hidden="true"
+          viewBox="0 0 24 24"
+          className="size-5"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+        >
+          <rect x="4" y="5" width="16" height="15" rx="2" />
+          <path d="M8 3v4M16 3v4M4 10h16M12 13v5M9.5 15.5h5" />
+        </svg>
         {t("booking.manage.bookAnother")}
       </Link>
     </div>

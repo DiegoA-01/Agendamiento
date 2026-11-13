@@ -1,5 +1,13 @@
 # Changelog
 
+## Sitio público: botones con los colores del negocio y efecto vidrio
+
+- **Cancelar la cita** ("Sí, cancelar"): deja el rojo fijo y usa un rojo apagado mezclado con la superficie del negocio, con el texto del tema encima (`.risk-button`). Se nota como peligro y combina con un tema claro u oscuro.
+- **Reservar otra cita** (página de la cita) pasa de enlace subrayado a botón con ícono de calendario.
+- **Efecto vidrio** al pasar el cursor, enfocar con el teclado o tocar cualquier botón del sitio público (reserva, página de la cita, portada y aviso de cookies): brillo diagonal y filo de luz por encima del color del botón y por debajo del texto. Se respeta "reducir movimiento".
+- La portada ("Reservar cita") y el aviso de cookies usan los colores del negocio en vez del gris fijo.
+- Todo el sitio público toma los tokens de la reserva (`.booking`): por ejemplo, la etiqueta "Motivo" al cancelar ya se lee sobre un tema oscuro (antes salía casi invisible).
+
 ## Super Admin: acciones de riesgo con confirmación, login y condiciones de uso con vidrio
 
 - **Acciones de riesgo** (eliminar plan, quitar dominio, suspender y eliminar empresa): dejan el rojo, que no combinaba con el panel, y pasan a un **grafito oxidado con texto rosado claro** (contraste 10,8:1), de la familia oscura de la barra lateral. Se reconocen como peligro sin chocar.

@@ -55,7 +55,7 @@ export function PublicLayout({ children }: { children?: ReactNode }) {
   return (
     <div
       style={themeStyle(theme)}
-      className="flex min-h-screen flex-col bg-[var(--color-background,#f8fafc)] text-[var(--color-text,#0f172a)]"
+      className="booking flex min-h-screen flex-col bg-[var(--color-background,#f8fafc)] text-[var(--color-text,#0f172a)]"
     >
       <a
         href="#contenido"

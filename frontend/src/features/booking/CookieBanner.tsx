@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
-import { Button } from "../../shared/ui/primitives";
 
 const KEY = "cookie_notice";
 
@@ -25,16 +24,18 @@ export function CookieBanner() {
     <div
       role="region"
       aria-label={t("booking.cookies.label")}
-      className="fixed inset-x-0 bottom-0 z-20 border-t border-black/10 bg-white p-4 shadow-lg"
+      className="fixed inset-x-0 bottom-0 z-20 border-t border-[var(--bk-line)] bg-[var(--color-surface)] p-4 text-[var(--color-text)]"
     >
-      <div className="mx-auto flex max-w-2xl flex-col gap-3 text-sm text-slate-800 sm:flex-row sm:items-center">
+      <div className="mx-auto flex max-w-2xl flex-col gap-3 text-sm sm:flex-row sm:items-center">
         <p className="flex-1">
           {t("booking.cookies.text")}{" "}
           <Link to="/cookies" className="font-medium underline">
             {t("booking.pages.cookies.title")}
           </Link>
         </p>
-        <Button
+        <button
+          type="button"
+          className="min-h-11 rounded-2xl bg-[var(--color-primary)] px-5 font-semibold text-[var(--color-background)] focus-visible:outline-2"
           onClick={() => {
             try {
               globalThis.localStorage?.setItem(KEY, "seen");
@@ -45,7 +46,7 @@ export function CookieBanner() {
           }}
         >
           {t("booking.cookies.ok")}
-        </Button>
+        </button>
       </div>
     </div>
   );

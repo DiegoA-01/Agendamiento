@@ -31,7 +31,7 @@ export default function LandingPage() {
       {company.booking_enabled ? (
         <Link
           to="/reservar"
-          className="inline-flex min-h-12 items-center rounded-xl bg-slate-900 px-8 text-lg font-semibold text-white hover:bg-slate-700"
+          className="inline-flex min-h-14 items-center rounded-2xl bg-[var(--color-primary)] px-8 text-lg font-semibold text-[var(--color-background)] transition-transform focus-visible:outline-2 active:scale-[0.98]"
         >
           {t("booking.cta")}
         </Link>

@@ -85,7 +85,7 @@ export function CancelAppointment({
           type="button"
           disabled={cancel.isPending}
           onClick={() => cancel.mutate()}
-          className={`${BUTTON} bg-red-700 text-white hover:bg-red-800 disabled:opacity-60`}
+          className={`${BUTTON} risk-button disabled:opacity-60`}
         >
           {cancel.isPending ? t("common.saving") : t("booking.manage.confirmCancelButton")}
         </button>
