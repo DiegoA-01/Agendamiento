@@ -56,6 +56,32 @@ body {
   color: var(--pf-ink);
   box-shadow: var(--pf-metal-shadow); /* taste-skill-ignore: vidrio pedido */
 }
+/* Acciones de riesgo (eliminar, quitar, suspender): grafito oxidado con texto rosado, de la misma
+   familia oscura que la barra lateral. Se reconoce como peligro sin un rojo que choque. */
+.platform .bg-red-700,
+.confirm-dialog .bg-red-700 {
+  background: #3b2622;
+  color: #ffd9d2;
+  box-shadow: inset 0 0 0 1px #6b3a32;
+}
+.platform .bg-red-700:hover,
+.confirm-dialog .bg-red-700:hover {
+  background: #2a1a17;
+}
+.platform .disabled\:bg-red-300:disabled {
+  background: #3b2622;
+  opacity: 0.4;
+}
+.platform-main .border-red-200 {
+  border-color: rgba(107, 58, 50, 0.25);
+}
+.platform-main .text-red-900 {
+  color: #7a2e25;
+}
+.confirm-icon {
+  background: #f6e3df;
+  color: #8a3b30;
+}
 .platform .metal:hover,
 .platform-main .bg-slate-900:hover {
   filter: brightness(1.05) saturate(1.1);

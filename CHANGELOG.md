@@ -1,5 +1,14 @@
 # Changelog
 
+## Super Admin: acciones de riesgo con confirmación, login y condiciones de uso con vidrio
+
+- **Acciones de riesgo** (eliminar plan, quitar dominio, suspender y eliminar empresa): dejan el rojo, que no combinaba con el panel, y pasan a un **grafito oxidado con texto rosado claro** (contraste 10,8:1), de la familia oscura de la barra lateral. Se reconocen como peligro sin chocar.
+- **Siempre piden confirmación** en una ventana propia (`ConfirmAction`): ícono de advertencia, qué va a pasar y dos botones; el foco empieza en **Cancelar** y Escape también cancela. Reemplaza la alerta del navegador al eliminar un plan y se agrega donde no había ninguna (quitar dominio, suspender). Eliminar una empresa sigue pidiendo además escribir su subdominio.
+- **Login del Super Admin** (y recuperar o cambiar la contraseña en `admin.`): mismo vidrio que el panel. A la izquierda la tarjeta oscura con la marca y lo que se administra; a la derecha el formulario en vidrio claro con el botón metálico. El login de los negocios no cambia.
+- **Condiciones de uso**: se arman como el panel, con el índice de secciones en la tarjeta oscura (enlaces a cada sección), el texto en vidrio claro y el aviso de borrador.
+- La marca ("A" metalizada) y el vidrio oscuro quedan como piezas compartidas (`shared/ui/brand.tsx`, `brandStyles.ts`).
+- Probado en el navegador con un Super Admin de prueba (ya borrado): la confirmación al eliminar un plan y al suspender, cancelando ambas, y el login y las condiciones a 1440 px.
+
 ## Panel del Super Admin con vidrio, en blanco, negro y verde metalizado
 
 - Nuevo marco del panel siguiendo la referencia de diseño:

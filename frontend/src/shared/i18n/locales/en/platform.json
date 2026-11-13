@@ -82,7 +82,12 @@
       "deleteConfirm": "Confirm deletion",
       "dangerZone": "Danger zone",
       "usage": "Usage",
-      "integrations": "Integrations"
+      "integrations": "Integrations",
+      "suspendConfirm": "Suspend {{name}}?",
+      "suspendYes": "Yes, suspend",
+      "deleteTitle": "Delete {{name}}?",
+      "deleteMessage": "The business stops being available to all its users and customers. The data is not erased.",
+      "deleteYes": "Yes, delete the business"
     },
     "ownerPhone": "Owner's mobile",
     "ownerDocumentType": "ID type",
@@ -194,7 +199,10 @@
     "verifyDone": "Domain verified. It now opens the business.",
     "verifyTxtMissing": "We have not found the TXT record yet. DNS changes can take a few minutes.",
     "cnameMissing": "The CNAME does not point to the business yet; without it the domain will not open the site.",
-    "cnameFound": "The CNAME already points to the business."
+    "cnameFound": "The CNAME already points to the business.",
+    "removeConfirm": "Remove the domain {{host}}?",
+    "removeMessage": "The business will stop opening at that address. You can add it again, but it will need to be verified again.",
+    "removeYes": "Yes, remove the domain"
   },
   "plans": {
     "title": "Plans",
@@ -212,7 +220,9 @@
     "professionalsShort_one": "{{count}} professional",
     "professionalsShort_other": "{{count}} professionals",
     "locationsShort_one": "{{count}} location",
-    "locationsShort_other": "{{count}} locations"
+    "locationsShort_other": "{{count}} locations",
+    "deleteMessage": "Businesses using it must be on another plan. This cannot be undone.",
+    "deleteYes": "Yes, delete the plan"
   },
   "audit": {
     "title": "Audit log",

@@ -3,6 +3,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
+import { ConfirmAction } from "../../shared/ui/ConfirmAction";
 import { api } from "../../shared/api/client";
 import { applyServerErrors, describeError } from "../../shared/api/errors";
 import { MODULE_KEYS, type Plan } from "../../shared/api/types";
@@ -150,15 +151,14 @@ function PlanCard({ plan }: { plan: Plan }) {
           <Button variant="secondary" onClick={() => setEditing(true)}>
             {t("plans.edit")}
           </Button>
-          <Button
-            variant="danger"
-            disabled={remove.isPending}
-            onClick={() => {
-              if (window.confirm(t("plans.deleteConfirm", { name: plan.name }))) remove.mutate();
-            }}
-          >
-            {t("common.delete")}
-          </Button>
+          <ConfirmAction
+            label={t("common.delete")}
+            title={t("plans.deleteConfirm", { name: plan.name })}
+            message={t("plans.deleteMessage")}
+            confirmLabel={t("plans.deleteYes")}
+            pending={remove.isPending}
+            onConfirm={() => remove.mutate()}
+          />
         </div>
       </div>
       <div className="flex flex-wrap gap-2">

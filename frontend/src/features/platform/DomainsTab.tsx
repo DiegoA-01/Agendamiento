@@ -3,6 +3,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
+import { ConfirmAction } from "../../shared/ui/ConfirmAction";
 import { api } from "../../shared/api/client";
 import { applyServerErrors, describeError } from "../../shared/api/errors";
 import type { Domain, DomainVerification, TenantDetail } from "../../shared/api/types";
@@ -89,9 +90,14 @@ function DomainRow({ tenantId, domain }: { tenantId: string; domain: Domain }) {
                 {verify.isPending ? t("domains.verifying") : t("domains.verify")}
               </Button>
             )}
-            <Button variant="danger" onClick={() => remove.mutate()} disabled={remove.isPending}>
-              {t("domains.remove")}
-            </Button>
+            <ConfirmAction
+              label={t("domains.remove")}
+              title={t("domains.removeConfirm", { host: domain.host })}
+              message={t("domains.removeMessage")}
+              confirmLabel={t("domains.removeYes")}
+              pending={remove.isPending}
+              onConfirm={() => remove.mutate()}
+            />
           </div>
         )}
       </div>
