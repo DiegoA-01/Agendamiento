@@ -19,6 +19,73 @@ body {
   color: var(--color-text);
 }
 
+/* Panel del Super Admin: vidrio sobre un fondo plata, en blanco, negro y un verde metalizado.
+   Todo bajo `.platform` para no tocar el panel de los negocios ni la reserva. Las clases de los
+   componentes compartidos (tarjetas blancas, botón principal oscuro, bordes grises) se reasignan
+   aquí a los tokens del vidrio. */
+/* prettier-ignore */
+.platform {
+  --pf-ink: #0b0d0c;
+  --pf-muted: #4a5550;
+  --pf-green: #5f7e6f;
+  --pf-green-ink: #2d4a3d;
+  --pf-green-soft: #dfe8e3;
+  --pf-metal: linear-gradient(160deg, #eef3f0, #b2c7bc 34%, #82a092 62%, #c6d6cd); /* taste-skill-ignore: vidrio pedido */
+  --pf-tint-a: radial-gradient(55% 45% at 88% -5%, #82a0926b, transparent 70%); /* taste-skill-ignore: vidrio pedido */
+  --pf-tint-b: radial-gradient(45% 40% at 30% 110%, #0b0d0c1a, transparent 70%); /* taste-skill-ignore: vidrio pedido */
+  --pf-tint-c: radial-gradient(35% 30% at 0% 30%, #c6d6cdb3, transparent 70%); /* taste-skill-ignore: vidrio pedido */
+  --pf-glass: rgba(255, 255, 255, 0.64);
+  --pf-glass-strong: rgba(255, 255, 255, 0.82);
+  --pf-glass-edge: rgba(255, 255, 255, 0.9);
+  --pf-glass-shadow: 0 1px 0 #ffffffef inset, 0 12px 32px -14px #0b0d0c38; /* taste-skill-ignore: vidrio pedido */
+  --pf-metal-shadow: 0 1px 0 #ffffffcc inset, 0 6px 16px -8px #2d4a3d8c; /* taste-skill-ignore: vidrio pedido */
+  color: var(--pf-ink);
+  background: var(--pf-tint-a), var(--pf-tint-b), var(--pf-tint-c), #eef1ef;
+}
+.platform .glass,
+.platform-main .bg-white {
+  background: var(--pf-glass);
+  backdrop-filter: blur(20px) saturate(150%); /* taste-skill-ignore: vidrio pedido */
+  -webkit-backdrop-filter: blur(20px) saturate(150%); /* taste-skill-ignore: vidrio pedido */
+  border-color: var(--pf-glass-edge);
+  box-shadow: var(--pf-glass-shadow); /* taste-skill-ignore: vidrio pedido */
+}
+.platform .metal,
+.platform-main .bg-slate-900 {
+  background: var(--pf-metal);
+  color: var(--pf-ink);
+  box-shadow: var(--pf-metal-shadow); /* taste-skill-ignore: vidrio pedido */
+}
+.platform .metal:hover,
+.platform-main .bg-slate-900:hover {
+  filter: brightness(1.05) saturate(1.1);
+}
+.platform-main h1 {
+  font-size: 1.875rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.platform-main .rounded-xl {
+  border-radius: 1.25rem;
+}
+.platform-main .border-slate-200,
+.platform-main .border-slate-300 {
+  border-color: rgba(11, 13, 12, 0.1);
+}
+.platform-main .bg-slate-50 {
+  background: rgba(255, 255, 255, 0.45);
+}
+.platform-main .text-slate-600,
+.platform-main .text-slate-500 {
+  color: var(--pf-muted);
+}
+.platform-main input:not([type="checkbox"]):not([type="color"]),
+.platform-main select,
+.platform-main textarea {
+  background: var(--pf-glass-strong);
+  border-color: rgba(11, 13, 12, 0.14);
+}
+
 /* Reserva pública (R9): todo sale de los cinco colores del tema del negocio, así funciona igual con
    un tema claro o uno oscuro. Separación por un paso de tono, nunca por sombras. */
 .booking {

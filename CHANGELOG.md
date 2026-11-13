@@ -1,5 +1,19 @@
 # Changelog
 
+## Panel del Super Admin con vidrio, en blanco, negro y verde metalizado
+
+- Nuevo marco del panel siguiendo la referencia de diseño:
+  - **Barra lateral de vidrio oscuro** con la marca, una tarjeta de la plataforma (negocios y planes) y el menú en dos grupos: **Plataforma** (Resumen, Empresas, Planes) y **Control** (Auditoría, Seguridad). La opción activa va en verde metalizado.
+  - Contadores reales en el menú: empresas suspendidas, y códigos de recuperación cuando quedan 3 o menos.
+  - **Barra superior de vidrio** con buscador de empresas (lleva a Empresas con la búsqueda escrita), iniciales y nombre del usuario, y Cerrar sesión.
+  - En el celular, la barra lateral se abre como menú desde un botón.
+- **Resumen** nuevo:
+  - Saludo según la hora ("Buenas tardes, Laura"), mes y botón **Nueva empresa** en verde metalizado.
+  - Cuatro cifras en tarjetas de vidrio con su explicación: negocios, activos, suspendidos y nuevos en 30 días.
+  - Barras de negocios por plan (el plan con más negocios, en metal), reparto por tipo de negocio y últimos negocios creados. Todo sale de la API del resumen (S6), sin datos inventados.
+- Empresas, detalle, planes, auditoría, seguridad y alta de empresa toman el mismo estilo: tarjetas y tablas de vidrio, botón principal metálico y títulos más grandes. Se hace con tokens bajo `.platform` en `index.css`, así el panel de los negocios y la reserva no cambian.
+- Revisado con `design-taste-frontend`: 0 fallas. El vidrio, los degradados metálicos y las sombras van marcados como pedidos expresamente. Probado en el navegador a 1440 px y a 375 px.
+
 ## Cancelar la cita desde la confirmación, hasta 1 hora antes
 
 - Al confirmar una reserva, la misma ventana trae **Cancelar mi cita** con la hora límite ("Puedes cancelarla en línea hasta el sábado 14 de noviembre, 8:15"). Pide confirmación y un motivo opcional; al cancelar, el título cambia a "Tu cita quedó cancelada" y el horario queda libre. La página de la cita (`/cita/<token>`) usa el mismo componente (`CancelAppointment`).

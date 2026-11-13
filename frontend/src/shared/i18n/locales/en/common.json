@@ -47,7 +47,19 @@
     "security": "Security",
     "signOut": "Sign out",
     "skip": "Skip to content",
-    "main": "Main navigation"
+    "main": "Main navigation",
+    "groupPlatform": "Platform",
+    "groupControl": "Control",
+    "workspace": "Agenda platform",
+    "workspaceLine_one": "{{count}} business · {{plans}}",
+    "workspaceLine_other": "{{count}} businesses · {{plans}}",
+    "searchLabel": "Search businesses",
+    "searchPlaceholder": "Search businesses by name or subdomain…",
+    "roleSuperadmin": "Super Admin",
+    "openMenu": "Open the menu",
+    "closeMenu": "Close the menu",
+    "plansCount_one": "{{count}} plan",
+    "plansCount_other": "{{count}} plans"
   },
   "errors": {
     "unknown": "Something went wrong. Please try again.",
