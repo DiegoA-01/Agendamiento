@@ -1,5 +1,9 @@
 # Changelog
 
+## Panel del negocio sin selector de idioma
+
+- La barra superior del panel del dueño ya no muestra el selector Español / English. El panel del Super Admin ya no lo tenía (S1). El sitio público de cada negocio lo conserva, porque ahí el visitante elige su idioma (S4).
+
 ## Panel del negocio con vidrio, en blanco y rojo metalizado, y nueva página Inicio
 
 - **Marco nuevo del panel del dueño**, como la referencia de diseño y con el mismo sistema de vidrio del Super Admin (clases `.platform` y `.platform-main`) en su propia paleta (`.owner`): blanco y rojo metalizado sobre un fondo rosado tenue.
