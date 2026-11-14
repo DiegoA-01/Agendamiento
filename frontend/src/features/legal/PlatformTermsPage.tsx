@@ -2,7 +2,6 @@ import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { BrandMark } from "../../shared/ui/brand";
 import { DARK_GLASS } from "../../shared/ui/brandStyles";
-import { LanguageSwitcher } from "../../shared/ui/LanguageSwitcher";
 import { termsSections } from "./terms";
 
 export const PLATFORM_TERMS_PATH = "/condiciones-de-uso";
@@ -48,11 +47,10 @@ export function PlatformTermsPage() {
         </aside>
 
         <div className="flex min-w-0 flex-1 flex-col gap-5">
-          <header className="glass flex items-center justify-between gap-3 rounded-[24px] border px-5 py-3">
-            <Link to="/login" className="lg:invisible" aria-label={t("platformTerms.back")}>
+          <header className="glass flex items-center rounded-[24px] border px-5 py-3 lg:hidden">
+            <Link to="/login" aria-label={t("platformTerms.back")}>
               <BrandMark />
             </Link>
-            <LanguageSwitcher />
           </header>
 
           <article className="glass platform-main flex flex-col gap-8 rounded-[28px] border p-6 sm:p-10">

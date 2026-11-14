@@ -3,7 +3,6 @@ import { useTranslation } from "react-i18next";
 import { Link, Outlet } from "react-router-dom";
 import { describeError } from "../../shared/api/errors";
 import type { Theme } from "../../shared/api/types";
-import { LanguageSwitcher } from "../../shared/ui/LanguageSwitcher";
 import { ErrorBox, Loading } from "../../shared/ui/primitives";
 import { usePublicCompany } from "./api";
 import { CookieBanner } from "./CookieBanner";
@@ -18,23 +17,15 @@ function themeStyle(theme: Partial<Theme>): CSSProperties {
   } as CSSProperties;
 }
 
-function hasChosenLanguage(): boolean {
-  try {
-    return Boolean(globalThis.localStorage?.getItem("lang"));
-  } catch {
-    return false;
-  }
-}
-
-/** Marco de las páginas públicas del negocio: tema, logo, idioma del negocio (si el visitante no
- *  eligió otro), enlaces legales y aviso de cookies. Mobile-first. */
+/** Marco de las páginas públicas del negocio: tema, logo, idioma del negocio, enlaces legales y
+ *  aviso de cookies. Mobile-first. No hay selector de idioma: el sitio habla el del negocio. */
 export function PublicLayout({ children }: { children?: ReactNode }) {
   const { t, i18n } = useTranslation();
   const company = usePublicCompany();
   const language = company.data?.language;
 
   useEffect(() => {
-    if (language && !hasChosenLanguage() && i18n.language !== language) {
+    if (language && i18n.language !== language) {
       void i18n.changeLanguage(language);
     }
   }, [language, i18n]);
@@ -71,7 +62,6 @@ export function PublicLayout({ children }: { children?: ReactNode }) {
             )}
             <span className="truncate text-lg font-semibold">{name}</span>
           </Link>
-          <LanguageSwitcher />
         </div>
       </header>
       <main id="contenido" className="mx-auto w-full max-w-2xl flex-1 px-4 py-6 pb-32">

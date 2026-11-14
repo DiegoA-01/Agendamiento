@@ -5,35 +5,15 @@ import { translations } from "./resources";
 export const SUPPORTED_LANGUAGES = ["es", "en"] as const;
 export type Language = (typeof SUPPORTED_LANGUAGES)[number];
 export const DEFAULT_LANGUAGE: Language = "es";
-const STORAGE_KEY = "lang";
-
-function initialLanguage(): Language {
-  try {
-    const stored = globalThis.localStorage?.getItem(STORAGE_KEY);
-    if (stored && (SUPPORTED_LANGUAGES as readonly string[]).includes(stored)) {
-      return stored as Language;
-    }
-  } catch {
-    // localStorage no disponible: usamos el idioma por defecto.
-  }
-  return DEFAULT_LANGUAGE;
-}
-
-export function setLanguage(lang: Language) {
-  try {
-    globalThis.localStorage?.setItem(STORAGE_KEY, lang);
-  } catch {
-    // ignorar
-  }
-  return i18n.changeLanguage(lang);
-}
+// No hay selector de idioma: se arranca en español y cada sitio o panel cambia al idioma
+// configurado del negocio (PublicLayout y DashboardLayout).
 
 void i18n.use(initReactI18next).init({
   resources: {
     es: { translation: translations.es },
     en: { translation: translations.en },
   },
-  lng: initialLanguage(),
+  lng: DEFAULT_LANGUAGE,
   fallbackLng: DEFAULT_LANGUAGE,
   interpolation: { escapeValue: false },
 });

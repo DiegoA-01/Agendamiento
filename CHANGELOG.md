@@ -1,5 +1,12 @@
 # Changelog
 
+## Sin selector de idioma en ninguna pantalla
+
+- Se quita el selector Español / English de todo: login y pantallas de acceso (Super Admin y negocio), sitio público y reserva, y condiciones de uso. El panel del dueño ya no lo tenía.
+- **El idioma lo define el negocio**: el sitio público y el panel del dueño usan el idioma configurado en los datos de la empresa (español por defecto; el inglés sigue disponible). El Super Admin y las pantallas de acceso arrancan en español. Ya no se guarda una elección del visitante en el navegador.
+- El aviso de cookies deja de decir que se recuerda el idioma, porque ya no se guarda.
+- Se borra el componente `LanguageSwitcher` y su prueba. Esto cambia la mejora S4 de la §10, que dejaba elegir el idioma en el sitio del negocio; decisión del equipo del 2026-11-14.
+
 ## Login del negocio con el vidrio púrpura del panel
 
 - El login de cada negocio (y recuperar o cambiar la contraseña) toma el mismo estilo de su panel. A la izquierda va una tarjeta de vidrio líquido con la inicial y el nombre del negocio, una frase y lo que se maneja en el panel. A la derecha va el formulario en vidrio claro con el botón púrpura metalizado. Antes se veía como una tarjeta blanca simple.

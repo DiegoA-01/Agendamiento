@@ -24,7 +24,7 @@
     "legalEmpty": "{{name}} has not published this text yet.",
     "cookies": {
       "label": "Cookie notice",
-      "text": "We only use cookies needed for booking to work securely, and we remember the language you choose. We do not use advertising or analytics cookies.",
+      "text": "We only use the cookies needed for booking to work securely. We do not use advertising or analytics cookies.",
       "ok": "Got it"
     },
     "summary": {

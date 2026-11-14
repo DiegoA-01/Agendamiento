@@ -1,8 +1,4 @@
-import { createElement } from "react";
-import { renderToString } from "react-dom/server";
-import { I18nextProvider } from "react-i18next";
 import { describe, expect, it } from "vitest";
-import { LanguageSwitcher } from "../ui/LanguageSwitcher";
 import i18n, { DEFAULT_LANGUAGE, SUPPORTED_LANGUAGES } from "./index";
 import { localeFiles, mergeLocaleFiles, parseLocalePath, translations } from "./resources";
 
@@ -54,13 +50,5 @@ describe("i18n", () => {
     expect(i18n.t("home.tagline")).toBe("Book your appointment in under a minute.");
     await i18n.changeLanguage("es");
     expect(i18n.t("home.tagline")).toBe("Reserva tu cita en menos de un minuto.");
-  });
-
-  it("renderiza el selector de idioma", () => {
-    const html = renderToString(
-      createElement(I18nextProvider, { i18n }, createElement(LanguageSwitcher)),
-    );
-    expect(html).toContain("Idioma");
-    expect(html).toContain("English");
   });
 });

@@ -4,7 +4,6 @@ import { Link } from "react-router-dom";
 import { isPlatformHost } from "../../shared/host";
 import { BrandMark } from "../../shared/ui/brand";
 import { DARK_GLASS } from "../../shared/ui/brandStyles";
-import { LanguageSwitcher } from "../../shared/ui/LanguageSwitcher";
 import { usePublicCompany } from "../booking/api";
 import { PLATFORM_TERMS_PATH } from "../legal/PlatformTermsPage";
 
@@ -83,11 +82,8 @@ function GlassAuthLayout({
         </aside>
 
         <main className="flex flex-col items-center justify-center gap-6 py-8">
-          <div className="flex w-full max-w-md items-center justify-between gap-3">
-            <span className="min-w-0 lg:invisible">
-              <BrandMark name={businessName} />
-            </span>
-            <LanguageSwitcher />
+          <div className="flex w-full max-w-md items-center lg:hidden">
+            <BrandMark name={businessName} />
           </div>
           <section className="glass platform-main flex w-full max-w-md flex-col gap-5 rounded-[28px] border p-7">
             <h1>{title}</h1>
