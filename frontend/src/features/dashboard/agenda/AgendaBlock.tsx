@@ -3,10 +3,10 @@ import type { Appointment, AppointmentStatus } from "../../../shared/api/types";
 import { formatTime } from "../../booking/wizard";
 import { useServices } from "../shared/api";
 
-/** Fondo suave y borde izquierdo por estado: la agenda se lee de un vistazo sin abrir la cita. */
+/** Fondo suave y borde izquierdo por estado (confirmada en el púrpura del panel): la agenda se lee de un vistazo sin abrir la cita. */
 const STATUS_STYLE: Record<AppointmentStatus, string> = {
   pending: "bg-amber-50 border-amber-200 before:bg-amber-500",
-  confirmed: "bg-[#fbeeec] border-[#efc7c1] before:bg-[#b8352b]",
+  confirmed: "bg-[#f3eefb] border-[#dccff2] before:bg-[#7a5cc0]",
   in_progress: "bg-sky-50 border-sky-200 before:bg-sky-600",
   completed: "bg-emerald-50 border-emerald-200 before:bg-emerald-600",
   cancelled: "bg-slate-100 border-slate-200 before:bg-slate-400",

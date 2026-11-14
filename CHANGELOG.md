@@ -1,5 +1,12 @@
 # Changelog
 
+## Panel del negocio en púrpura metalizado suave con barra lateral de vidrio líquido
+
+- **Paleta del panel del dueño**: el rojo metalizado pasa a un **púrpura metalizado suave** (lavanda). El texto es oscuro sobre el metal (contraste de 6,7:1 en su parte más oscura), en vez de blanco. El fondo lleva manchas lila que se ven a través del vidrio.
+- **Barra lateral de vidrio líquido**, claro y translúcido: deja ver el fondo desenfocado (blur de 26 px, saturación 180 %), con un filo de luz arriba y a la izquierda, un brillo diagonal y una sombra suave de profundidad. Los textos del menú pasan a oscuro para que se lean bien (contraste ≥ 7:1).
+- La agenda toma el mismo púrpura: las citas confirmadas y las líneas de la grilla.
+- Diseño guiado por `ui-ux-pro-max` (reglas de glassmorphism y contraste) y revisado con `design-taste-frontend`: 0 fallas.
+
 ## Agenda más legible
 
 - **Bloques de cita nuevos** (`AgendaBlock`): hora de inicio y fin, cliente (y para quién, si es otra persona), servicios y estado. Cada uno tiene fondo suave y borde izquierdo del color de su estado: confirmada en rojo, completada en verde, pendiente en ámbar, en curso en azul y canceladas en gris. Sin barras de desplazamiento dentro del bloque: muestra lo que cabe según su alto, y el resto va en el título emergente y al abrir el detalle.
