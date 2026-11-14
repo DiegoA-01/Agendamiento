@@ -66,6 +66,7 @@
     "customerFilter": "Appointments of {{name}}",
     "selectedCustomer": "the selected customer",
     "clearCustomer": "Show all",
-    "attendee": "For {{name}}"
+    "attendee": "For {{name}}",
+    "showInactive": "Show cancelled and no-shows"
   }
 }
