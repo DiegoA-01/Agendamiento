@@ -1,5 +1,10 @@
 # Changelog
 
+## Login del negocio con el vidrio púrpura del panel
+
+- El login de cada negocio (y recuperar o cambiar la contraseña) toma el mismo estilo de su panel. A la izquierda va una tarjeta de vidrio líquido con la inicial y el nombre del negocio, una frase y lo que se maneja en el panel. A la derecha va el formulario en vidrio claro con el botón púrpura metalizado. Antes se veía como una tarjeta blanca simple.
+- El login del Super Admin sigue con su verde. Los dos comparten el mismo componente (`GlassAuthLayout`).
+
 ## Panel del negocio en púrpura metalizado suave con barra lateral de vidrio líquido
 
 - **Paleta del panel del dueño**: el rojo metalizado pasa a un **púrpura metalizado suave** (lavanda). El texto es oscuro sobre el metal (contraste de 6,7:1 en su parte más oscura), en vez de blanco. El fondo lleva manchas lila que se ven a través del vidrio.
