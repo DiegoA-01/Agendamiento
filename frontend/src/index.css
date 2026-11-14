@@ -57,28 +57,54 @@ body {
   box-shadow: var(--pf-metal-shadow); /* taste-skill-ignore: vidrio pedido */
 }
 /* Panel del dueño de cada negocio: el mismo vidrio del Super Admin (clases `.platform` y
-   `.platform-main`) con su propia paleta, blanco y rojo metalizado, sobre un fondo rosado tenue.
-   También fija los cinco colores del tema dentro del panel: el tema de cada negocio es para su
-   sitio público, y así el panel siempre se lee bien. */
+   `.platform-main`) con su propia paleta, blanco y púrpura metalizado suave (lavanda), sobre un
+   fondo con manchas lila que se ven a través del vidrio. También fija los cinco colores del tema
+   dentro del panel: el tema de cada negocio es para su sitio público. */
 /* prettier-ignore */
 .owner {
-  --pf-ink: #171111;
-  --pf-muted: #5c4f4d;
-  --pf-green: #b8352b;
-  --pf-green-ink: #8f241c;
-  --pf-green-soft: #f8e1de;
-  --pf-metal: linear-gradient(160deg, #e88a7e, #c5382c 36%, #9e2219 64%, #d8665a); /* taste-skill-ignore: vidrio pedido */
-  --pf-metal-ink: #ffffff;
-  --pf-tint-a: radial-gradient(55% 45% at 85% -5%, #efb4a6a6, transparent 70%); /* taste-skill-ignore: vidrio pedido */
-  --pf-tint-b: radial-gradient(45% 40% at 30% 110%, #9e22191a, transparent 70%); /* taste-skill-ignore: vidrio pedido */
-  --pf-tint-c: radial-gradient(35% 30% at 0% 30%, #f6d6cdcc, transparent 70%); /* taste-skill-ignore: vidrio pedido */
-  --pf-metal-shadow: 0 1px 0 #ffffff80 inset, 0 8px 18px -8px #9e2219a6; /* taste-skill-ignore: vidrio pedido */
-  --color-primary: #b8352b;
-  --color-secondary: #b8352b;
-  --color-background: #f6f1f0;
+  --pf-ink: #1c1530;
+  --pf-muted: #574d66;
+  --pf-green: #7a5cc0;
+  --pf-green-ink: #5b3f94;
+  --pf-green-soft: #ece5f8;
+  --pf-metal: linear-gradient(160deg, #f1ecfb, #cbbdeb 34%, #a995d9 62%, #ddd3f3); /* taste-skill-ignore: vidrio pedido */
+  --pf-metal-ink: #1c1530;
+  --pf-tint-a: radial-gradient(50% 45% at 88% -5%, #c9b6efb3, transparent 70%); /* taste-skill-ignore: vidrio pedido */
+  --pf-tint-b: radial-gradient(45% 45% at 25% 105%, #b6a2e866, transparent 70%); /* taste-skill-ignore: vidrio pedido */
+  --pf-tint-c: radial-gradient(30% 40% at 4% 22%, #a98fe08c, transparent 70%); /* taste-skill-ignore: vidrio pedido */
+  --pf-tint-d: radial-gradient(28% 32% at 10% 85%, #e7c9f0b3, transparent 70%); /* taste-skill-ignore: vidrio pedido */
+  --pf-metal-shadow: 0 1px 0 #ffffffb3 inset, 0 8px 18px -8px #5b3f9480; /* taste-skill-ignore: vidrio pedido */
+  --color-primary: #7a5cc0;
+  --color-secondary: #7a5cc0;
+  --color-background: #f4f1f8;
   --color-surface: #ffffff;
-  --color-text: #171111;
-  background: var(--pf-tint-a), var(--pf-tint-b), var(--pf-tint-c), #f6f1f0;
+  --color-text: #1c1530;
+  background: var(--pf-tint-a), var(--pf-tint-b), var(--pf-tint-c), var(--pf-tint-d), #f4f1f8;
+  background-attachment: fixed;
+}
+/* Vidrio líquido de la barra lateral: claro y translúcido, deja ver borroso el fondo lila;
+   un filo de luz arriba y a la izquierda, un brillo diagonal y una sombra suave de profundidad. */
+/* prettier-ignore */
+.liquid-glass {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-radius: 28px;
+  border: 1px solid rgb(255 255 255 / 0.7);
+  background: rgb(255 255 255 / 0.34);
+  backdrop-filter: blur(26px) saturate(180%); /* taste-skill-ignore: vidrio pedido */
+  -webkit-backdrop-filter: blur(26px) saturate(180%); /* taste-skill-ignore: vidrio pedido */
+  box-shadow: inset 0 1px 0 #ffffffe6, inset 1px 0 0 #ffffff99, inset 0 -1px 0 #ffffff59, 0 24px 48px -24px #3c2a6e59; /* taste-skill-ignore: vidrio pedido */
+  color: var(--pf-ink);
+}
+/* prettier-ignore */
+.liquid-glass::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(125deg, #ffffff8c 0%, #ffffff1a 28%, transparent 46%, #ffffff14 78%, #ffffff40 100%); /* taste-skill-ignore: vidrio pedido */
 }
 /* Acciones de riesgo (eliminar, quitar, suspender): grafito oxidado con texto rosado, de la misma
    familia oscura que la barra lateral. Se reconoce como peligro sin un rojo que choque. */

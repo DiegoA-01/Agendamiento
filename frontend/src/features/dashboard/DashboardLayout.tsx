@@ -2,7 +2,6 @@ import { Suspense, useState, type FormEvent, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
 import { BrandMark } from "../../shared/ui/brand";
-import { WARM_GLASS } from "../../shared/ui/brandStyles";
 import { Loading } from "../../shared/ui/primitives";
 import { useMe } from "../auth/useMe";
 import { useSignOut } from "../auth/useSignOut";
@@ -118,15 +117,15 @@ export default function DashboardLayout() {
     <nav
       id="menu-panel"
       aria-label={t("nav.main")}
-      className={`flex h-full flex-col gap-5 overflow-y-auto p-4 [scrollbar-width:none] ${WARM_GLASS}`}
+      className="liquid-glass flex h-full flex-col gap-5 overflow-y-auto p-4 [scrollbar-width:none]"
     >
       <Link to="/panel" className="px-1 pt-1">
         <BrandMark name={businessName} />
       </Link>
 
-      <div className="rounded-2xl border border-white/12 bg-white/8 px-4 py-3">
+      <div className="rounded-2xl border border-white/80 bg-white/50 px-4 py-3">
         <p className="truncate font-semibold">{user.full_name || user.email}</p>
-        <p className="text-sm text-white/70">{t(`dashboard.roles.${me.data.role}`)}</p>
+        <p className="text-sm text-[var(--pf-muted)]">{t(`dashboard.roles.${me.data.role}`)}</p>
       </div>
 
       {GROUPS.map((group) => {
@@ -134,7 +133,7 @@ export default function DashboardLayout() {
         if (sections.length === 0) return null;
         return (
           <div key={group.label} className="flex flex-col gap-1">
-            <p className="px-3 text-sm text-white/55">{t(group.label)}</p>
+            <p className="px-3 text-sm text-[var(--pf-muted)]">{t(group.label)}</p>
             {sections.map((section) => (
               <NavLink
                 key={section}
@@ -142,7 +141,7 @@ export default function DashboardLayout() {
                 onClick={() => setMenuOpen(false)}
                 className={({ isActive }) =>
                   `flex min-h-10 items-center gap-3 rounded-2xl px-3 font-medium transition-colors focus-visible:outline-2 ${
-                    isActive ? "metal" : "text-white/85 hover:bg-white/10 hover:text-white"
+                    isActive ? "metal" : "text-[var(--pf-ink)] hover:bg-white/55"
                   }`
                 }
               >
@@ -156,7 +155,7 @@ export default function DashboardLayout() {
 
       <Link
         to={PLATFORM_TERMS_PATH}
-        className="mt-auto px-1 text-sm text-white/60 underline hover:text-white"
+        className="mt-auto px-1 text-sm text-[var(--pf-muted)] underline hover:text-[var(--pf-ink)]"
       >
         {t("platformTerms.link")}
       </Link>
