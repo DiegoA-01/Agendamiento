@@ -24,7 +24,7 @@
     "legalEmpty": "{{name}} aún no ha publicado este texto.",
     "cookies": {
       "label": "Aviso de cookies",
-      "text": "Usamos solo cookies necesarias para que la reserva funcione de forma segura y recordamos el idioma que elijas. No usamos cookies de publicidad ni de analítica.",
+      "text": "Usamos solo cookies necesarias para que la reserva funcione de forma segura. No usamos cookies de publicidad ni de analítica.",
       "ok": "Entendido"
     },
     "summary": {

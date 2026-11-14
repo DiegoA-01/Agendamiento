@@ -1,4 +1,4 @@
-import { Suspense, useState, type FormEvent, type ReactNode } from "react";
+import { Suspense, useEffect, useState, type FormEvent, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
 import { BrandMark } from "../../shared/ui/brand";
@@ -92,9 +92,14 @@ function initials(name: string, email: string) {
 /** Marco del panel del negocio: vidrio blanco y rojo metalizado, menú según rol y módulos, y el
  *  contenido de cada sección en el `Outlet`. Solo se usa dentro de `AuthGate`. */
 export default function DashboardLayout() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const me = useMe();
   const signOut = useSignOut();
+  // Sin selector de idioma: el panel usa el idioma configurado del negocio.
+  const language = me.data?.tenant?.language;
+  useEffect(() => {
+    if (language && i18n.language !== language) void i18n.changeLanguage(language);
+  }, [language, i18n]);
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const [query, setQuery] = useState("");
