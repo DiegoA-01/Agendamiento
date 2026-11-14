@@ -1,5 +1,11 @@
 # Changelog
 
+## Agenda más legible
+
+- **Bloques de cita nuevos** (`AgendaBlock`): hora de inicio y fin, cliente (y para quién, si es otra persona), servicios y estado. Cada uno tiene fondo suave y borde izquierdo del color de su estado: confirmada en rojo, completada en verde, pendiente en ámbar, en curso en azul y canceladas en gris. Sin barras de desplazamiento dentro del bloque: muestra lo que cabe según su alto, y el resto va en el título emergente y al abrir el detalle.
+- **Grilla más alta y más clara**: 96 px por hora (antes 60), la hora centrada sobre su línea, una línea tenue en cada media hora y aire entre citas seguidas. Cada cita queda exactamente en su horario.
+- Las canceladas, las inasistencias y las reprogramadas se ocultan por defecto, porque angostaban las demás. La casilla **Mostrar canceladas e inasistencias** las trae de vuelta.
+
 ## Panel del negocio sin selector de idioma
 
 - La barra superior del panel del dueño ya no muestra el selector Español / English. El panel del Super Admin ya no lo tenía (S1). El sitio público de cada negocio lo conserva, porque ahí el visitante elige su idioma (S4).

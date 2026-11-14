@@ -5,6 +5,7 @@ import {
   Badge,
   Button,
   Card,
+  CheckboxField,
   EmptyState,
   ErrorBox,
   Loading,
@@ -19,10 +20,15 @@ import { useCan } from "../shared/useCan";
 import { useAgendaAppointments } from "../appointments/api";
 import { AppointmentForm } from "../appointments/AppointmentForm";
 import { AppointmentDetail, AppointmentSummary } from "../appointments/AppointmentDetail";
+import { AgendaBlock } from "./AgendaBlock";
 import { addDays, layoutBlocks, dateFilters, groupAppointments, weekDays } from "./calendar";
 import { useAppointmentEvents } from "./useAppointmentEvents";
 
 const FIRST_VISIBLE_HOUR = 7;
+// Píxeles por minuto de la grilla: 96 px por hora, así una cita de 30 min se lee completa.
+const SCALE = 1.6;
+const HOUR_PX = 60 * SCALE;
+const HIDDEN_STATUSES = ["cancelled", "no_show", "rescheduled"];
 
 export default function AgendaPage() {
   const { t, i18n } = useTranslation();
@@ -31,6 +37,9 @@ export default function AgendaPage() {
   const [view, setView] = useState<"day" | "week">("day");
   const scrolled = useRef(false);
   const [professional, setProfessional] = useState("");
+  // Las canceladas, inasistencias y reprogramadas ocupan carriles y angostan las demás: se
+  // ocultan por defecto y se pueden mostrar.
+  const [showInactive, setShowInactive] = useState(false);
   const [selected, setSelected] = useState<string | null>(null);
   // "Nueva cita" del Inicio llega con `?nueva=1` y abre el formulario de una vez.
   const [params] = useSearchParams();
@@ -44,7 +53,9 @@ export default function AgendaPage() {
     ...dateFilters(dates[0], dates[dates.length - 1]),
     professional_id: professional,
   });
-  const list = appointments.data ?? [];
+  const list = (appointments.data ?? []).filter(
+    (a) => showInactive || !HIDDEN_STATUSES.includes(a.status),
+  );
   const ids = Array.from(
     new Set([
       ...(professionals.data ?? []).map((p) => p.id),
@@ -140,6 +151,11 @@ export default function AgendaPage() {
             </option>
           ))}
         </SelectField>
+        <CheckboxField
+          label={t("agenda.showInactive")}
+          checked={showInactive}
+          onChange={(e) => setShowInactive(e.target.checked)}
+        />
       </Card>
       {creating && (
         <Card>
@@ -174,7 +190,7 @@ export default function AgendaPage() {
           // La grilla mide 24 h (1 px por minuto): abre a primera hora del día laboral.
           ref={(element) => {
             if (element && !scrolled.current) {
-              element.scrollTop = FIRST_VISIBLE_HOUR * 60;
+              element.scrollTop = FIRST_VISIBLE_HOUR * HOUR_PX;
               scrolled.current = true;
             }
           }}
@@ -198,9 +214,13 @@ export default function AgendaPage() {
                 {column.title}
               </h2>
             ))}
-            <div className="relative h-[1440px] text-xs text-slate-600">
+            <div className="relative text-xs text-slate-600" style={{ height: 24 * HOUR_PX }}>
               {Array.from({ length: 24 }, (_, hour) => (
-                <span key={hour} className="absolute right-2" style={{ top: hour * 60 }}>
+                <span
+                  key={hour}
+                  className="absolute right-2 -translate-y-1/2 tabular-nums"
+                  style={{ top: hour * HOUR_PX }}
+                >
                   {String(hour).padStart(2, "0")}:00
                 </span>
               ))}
@@ -208,22 +228,35 @@ export default function AgendaPage() {
             {columns.map((column) => (
               <div
                 key={column.key}
-                className="relative h-[1440px] border-l border-slate-200"
+                className="relative border-l border-slate-200"
                 style={{
-                  backgroundImage:
-                    "repeating-linear-gradient(to bottom, transparent 0, transparent 59px, #e2e8f0 59px, #e2e8f0 60px)",
+                  height: 24 * HOUR_PX,
+                  // Línea de cada hora y una más tenue en la media hora, para ubicar bien cada cita.
+                  backgroundImage: `repeating-linear-gradient(to bottom, #e7dedc 0, #e7dedc 1px, transparent 1px, transparent ${HOUR_PX / 2}px, #f1ebea ${HOUR_PX / 2}px, #f1ebea ${HOUR_PX / 2 + 1}px, transparent ${HOUR_PX / 2 + 1}px, transparent ${HOUR_PX}px)`, // taste-skill-ignore: son las líneas de la grilla, no un degradado
                 }}
               >
                 {layoutBlocks(column.appointments, column.date, zone).map(
                   ({ appointment, top, height, left, width }) => (
-                    <button
+                    <AgendaBlock
                       key={appointment.id}
-                      className="absolute overflow-auto rounded-md border border-sky-300 bg-sky-50 p-1 text-xs text-slate-900 hover:bg-sky-100 focus-visible:z-50 focus-visible:outline-2 focus-visible:outline-sky-700"
-                      style={{ top, height, left: `${left}%`, width: `${width}%` }}
-                      onClick={() => setSelected(appointment.id)}
-                    >
-                      <AppointmentSummary appointment={appointment} />
-                    </button>
+                      appointment={appointment}
+                      height={height * SCALE - 4}
+                      timeZone={zone}
+                      professional={
+                        view === "week"
+                          ? professionals.data?.find((p) => p.id === appointment.professional_id)
+                              ?.display_name
+                          : undefined
+                      }
+                      onOpen={() => setSelected(appointment.id)}
+                      // 2 px de aire entre bloques vecinos, para que no se peguen.
+                      style={{
+                        top: top * SCALE + 2,
+                        height: height * SCALE - 4,
+                        left: `calc(${left}% + 2px)`,
+                        width: `calc(${width}% - 4px)`,
+                      }}
+                    />
                   ),
                 )}
               </div>
