@@ -4,6 +4,7 @@
     "comingSoon": "This section arrives in an upcoming milestone.",
     "noSections": "Your role has no sections available in this business. Ask the owner for access.",
     "nav": {
+      "home": "Home",
       "agenda": "Schedule",
       "appointments": "Appointments",
       "customers": "Customers",
@@ -13,6 +14,45 @@
       "hours": "Working hours",
       "reports": "Reports",
       "company": "Business"
+    },
+    "groups": {
+      "daily": "Day to day",
+      "business": "Business",
+      "management": "Management"
+    },
+    "roles": {
+      "owner": "Owner",
+      "admin": "Administrator",
+      "receptionist": "Front desk",
+      "professional": "Professional",
+      "superadmin": "Super Admin"
+    },
+    "searchLabel": "Search customers",
+    "searchPlaceholder": "Search customers by name or phone…",
+    "home": {
+      "greetingMorning": "Good morning",
+      "greetingMorningName": "Good morning, {{name}}",
+      "greetingAfternoon": "Good afternoon",
+      "greetingAfternoonName": "Good afternoon, {{name}}",
+      "greetingEvening": "Good evening",
+      "greetingEveningName": "Good evening, {{name}}",
+      "subtitle": "{{month}} overview · {{business}}",
+      "salesMonth": "Sales this month",
+      "vsPrevious": "{{change}} vs {{month}}",
+      "noPrevious": "No sales last month to compare",
+      "today": "Appointments today",
+      "todayNote": "{{completed}} completed · {{cancelled}} cancelled",
+      "averageTicket": "Average ticket",
+      "completedCount_one": "{{count}} appointment completed this month",
+      "completedCount_other": "{{count}} appointments completed this month",
+      "webBookings": "Online bookings",
+      "webShare": "{{percent}}% of the month's {{total}} appointments",
+      "salesByMonth": "Sales by month",
+      "salesByMonthNote": "Completed appointments",
+      "seeReports": "See reports",
+      "currencyNote": "Figures in {{currency}}.",
+      "byService": "Sales by service",
+      "noSales": "No sales yet this month."
     }
   }
 }

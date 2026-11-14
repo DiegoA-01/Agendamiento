@@ -1,5 +1,18 @@
 # Changelog
 
+## Panel del negocio con vidrio, en blanco y rojo metalizado, y nueva página Inicio
+
+- **Marco nuevo del panel del dueño**, como la referencia de diseño y con el mismo sistema de vidrio del Super Admin (clases `.platform` y `.platform-main`) en su propia paleta (`.owner`): blanco y rojo metalizado sobre un fondo rosado tenue.
+  - Barra lateral de vidrio oscuro cálido con la inicial y el nombre del negocio, una tarjeta con la persona y su rol, y el menú en tres grupos (Día a día, Negocio, Gestión) con íconos. La opción activa va en rojo metalizado.
+  - Barra superior de vidrio con buscador de clientes (lleva a Clientes con la búsqueda escrita), idioma, iniciales, nombre y rol, y Cerrar sesión. En el celular, el menú se abre desde un botón.
+- **Inicio** (`/inicio`), la nueva primera página para el dueño y el administrador. Recepción y profesionales siguen entrando a la agenda.
+  - Saludo según la hora, mes y negocio, y botón **Nueva cita** que abre el formulario en la agenda (`/agenda?nueva=1`).
+  - Cuatro cifras: ventas del mes con el cambio frente al mes anterior, citas de hoy, ticket promedio y reservas web del mes.
+  - Barras de ventas de los últimos 6 meses (el mes actual en rojo metalizado; los meses sin ventas en cero) y ventas por servicio del mes.
+  - Todo sale de los reportes (M9), sin datos inventados. Plata en formato "$ 160.000".
+- Dentro del panel, los cinco colores del tema quedan fijos en la paleta del panel. El tema de cada negocio sigue mandando en su sitio público. Esto arregla textos que casi no se veían con un tema oscuro (el título "Agenda" y el detalle de la cita).
+- 4 pruebas nuevas en el frontend (136 en total). Revisado con `design-taste-frontend`: 0 fallas.
+
 ## Sitio público: botones con los colores del negocio y efecto vidrio
 
 - **Cancelar la cita** ("Sí, cancelar"): deja el rojo fijo y usa un rojo apagado mezclado con la superficie del negocio, con el texto del tema encima (`.risk-button`). Se nota como peligro y combina con un tema claro u oscuro.

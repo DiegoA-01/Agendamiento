@@ -1,19 +1,22 @@
 import { useTranslation } from "react-i18next";
 
 /** Marca de la plataforma: la "A" en verde metalizado y el nombre. Va dentro de `.platform`. */
-export function BrandMark({ size = "md" }: { size?: "md" | "lg" }) {
+export function BrandMark({ size = "md", name }: { size?: "md" | "lg"; name?: string }) {
   const { t } = useTranslation();
+  const label = name?.trim() || t("app.name");
   const box = size === "lg" ? "size-12 text-xl" : "size-10 text-lg";
   return (
-    <span className="flex items-center gap-3">
+    <span className="flex min-w-0 items-center gap-3">
       <span
         aria-hidden="true"
-        className={`metal flex ${box} items-center justify-center rounded-xl font-bold`}
+        className={`metal flex ${box} shrink-0 items-center justify-center rounded-xl font-bold`}
       >
-        A
+        {label.charAt(0).toUpperCase()}
       </span>
-      <span className={`${size === "lg" ? "text-2xl" : "text-xl"} font-bold tracking-tight`}>
-        {t("app.name")}
+      <span
+        className={`${size === "lg" ? "text-2xl" : "text-xl"} truncate font-bold tracking-tight`}
+      >
+        {label}
       </span>
     </span>
   );
