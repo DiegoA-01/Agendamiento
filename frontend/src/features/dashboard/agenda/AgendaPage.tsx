@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useSearchParams } from "react-router-dom";
 import {
   Badge,
   Button,
@@ -31,7 +32,9 @@ export default function AgendaPage() {
   const scrolled = useRef(false);
   const [professional, setProfessional] = useState("");
   const [selected, setSelected] = useState<string | null>(null);
-  const [creating, setCreating] = useState(false);
+  // "Nueva cita" del Inicio llega con `?nueva=1` y abre el formulario de una vez.
+  const [params] = useSearchParams();
+  const [creating, setCreating] = useState(() => params.get("nueva") === "1");
   const live = useAppointmentEvents();
   const canCreate = useCan("appointments", "create");
   const professionals = useProfessionals();

@@ -55,6 +55,7 @@ describe("menú del panel según rol (spec §5)", () => {
     [
       "owner",
       [
+        "/inicio",
         "/agenda",
         "/citas",
         "/clientes",
@@ -69,6 +70,7 @@ describe("menú del panel según rol (spec §5)", () => {
     [
       "admin",
       [
+        "/inicio",
         "/agenda",
         "/citas",
         "/clientes",
@@ -94,6 +96,7 @@ describe("menú del panel según rol (spec §5)", () => {
 describe("menú del panel según módulos", () => {
   it("sin el módulo de reservas no muestra agenda, citas ni clientes", () => {
     expect(paths("owner", ["reports"])).toEqual([
+      "/inicio",
       "/servicios",
       "/equipo",
       "/puestos",
@@ -101,6 +104,13 @@ describe("menú del panel según módulos", () => {
       "/reportes",
       "/empresa",
     ]);
+  });
+
+  it("el Inicio es solo para quien ve todo el negocio y tiene reportes o comisiones", () => {
+    expect(paths("owner")).toContain("/inicio");
+    expect(paths("owner", ["booking"])).not.toContain("/inicio");
+    expect(paths("professional")).not.toContain("/inicio");
+    expect(paths("receptionist")).not.toContain("/inicio");
   });
 
   it("reportes aparece con el módulo de reportes o con el de comisiones", () => {

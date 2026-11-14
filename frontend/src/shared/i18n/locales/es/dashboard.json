@@ -4,6 +4,7 @@
     "comingSoon": "Esta sección llega en un próximo hito.",
     "noSections": "Tu rol no tiene secciones disponibles en este negocio. Pide acceso al propietario.",
     "nav": {
+      "home": "Inicio",
       "agenda": "Agenda",
       "appointments": "Citas",
       "customers": "Clientes",
@@ -13,6 +14,45 @@
       "hours": "Horarios",
       "reports": "Reportes",
       "company": "Empresa"
+    },
+    "groups": {
+      "daily": "Día a día",
+      "business": "Negocio",
+      "management": "Gestión"
+    },
+    "roles": {
+      "owner": "Propietario",
+      "admin": "Administrador",
+      "receptionist": "Recepción",
+      "professional": "Profesional",
+      "superadmin": "Super Admin"
+    },
+    "searchLabel": "Buscar clientes",
+    "searchPlaceholder": "Buscar clientes por nombre o celular…",
+    "home": {
+      "greetingMorning": "Buen día",
+      "greetingMorningName": "Buen día, {{name}}",
+      "greetingAfternoon": "Buenas tardes",
+      "greetingAfternoonName": "Buenas tardes, {{name}}",
+      "greetingEvening": "Buenas noches",
+      "greetingEveningName": "Buenas noches, {{name}}",
+      "subtitle": "Resumen de {{month}} · {{business}}",
+      "salesMonth": "Ventas del mes",
+      "vsPrevious": "{{change}} frente a {{month}}",
+      "noPrevious": "Sin ventas el mes pasado para comparar",
+      "today": "Citas hoy",
+      "todayNote": "{{completed}} completadas · {{cancelled}} canceladas",
+      "averageTicket": "Ticket promedio",
+      "completedCount_one": "{{count}} cita completada este mes",
+      "completedCount_other": "{{count}} citas completadas este mes",
+      "webBookings": "Reservas web",
+      "webShare": "{{percent}} % de las {{total}} citas del mes",
+      "salesByMonth": "Ventas por mes",
+      "salesByMonthNote": "Citas completadas",
+      "seeReports": "Ver reportes",
+      "currencyNote": "Cifras en {{currency}}.",
+      "byService": "Ventas por servicio",
+      "noSales": "Todavía no hay ventas este mes."
     }
   }
 }

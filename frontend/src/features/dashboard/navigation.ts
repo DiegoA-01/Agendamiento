@@ -1,6 +1,7 @@
 import type { Me, ModuleKey, PermissionResource } from "../../shared/api/types";
 
 export type DashboardSection =
+  | "home"
   | "agenda"
   | "appointments"
   | "customers"
@@ -27,6 +28,14 @@ export interface DashboardLink {
  *  `/me/` (la misma matriz con la que el backend valida); esto solo evita mostrar enlaces que
  *  darían 403. */
 export const DASHBOARD_LINKS: readonly DashboardLink[] = [
+  // Resumen del negocio: ventas y citas de todo el negocio, así que solo para quien lo ve todo.
+  {
+    section: "home",
+    path: "/inicio",
+    resource: "commissions",
+    allRecords: true,
+    modules: ["reports", "commissions"],
+  },
   { section: "agenda", path: "/agenda", resource: "appointments", modules: ["booking"] },
   { section: "appointments", path: "/citas", resource: "appointments", modules: ["booking"] },
   {

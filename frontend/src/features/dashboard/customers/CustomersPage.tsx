@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { api } from "../../../shared/api/client";
 import { describeError } from "../../../shared/api/errors";
@@ -20,12 +20,20 @@ import { KEYS } from "../shared/api";
 import { useCustomers, useDebounced } from "../appointments/api";
 import { CustomerForm } from "./CustomerForm";
 
+/** El buscador de la barra superior llega como `?q=`: una búsqueda nueva vuelve a montar la
+ *  lista con ese texto ya escrito. */
 export default function CustomersPage() {
+  const [params] = useSearchParams();
+  const q = params.get("q") ?? "";
+  return <CustomersList key={q} initialSearch={q} />;
+}
+
+function CustomersList({ initialSearch }: { initialSearch: string }) {
   const { t } = useTranslation();
   const role = useMe().data?.role;
   const permitted = role === "owner" || role === "admin" || role === "receptionist";
   const client = useQueryClient();
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState(initialSearch);
   const customers = useCustomers(useDebounced(search), permitted);
   const [editor, setEditor] = useState<CustomerRecord | "new" | null>(null);
   const remove = useMutation({

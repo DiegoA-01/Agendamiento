@@ -11,6 +11,7 @@ const DashboardLayout = lazy(() => import("./DashboardLayout"));
 
 /** Una pantalla por sección, cada una en su carpeta (cada frente es dueño de las suyas). */
 const PAGES: Record<DashboardSection, ComponentType> = {
+  home: lazy(() => import("./home/HomePage")),
   agenda: lazy(() => import("./agenda/AgendaPage")),
   appointments: lazy(() => import("./appointments/AppointmentsPage")),
   customers: lazy(() => import("./customers/CustomersPage")),
