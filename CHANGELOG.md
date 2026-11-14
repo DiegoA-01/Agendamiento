@@ -1,5 +1,13 @@
 # Changelog
 
+## Portada del negocio con un celular que enseña a reservar
+
+- La portada pública ocupa toda la pantalla. A un lado van el nombre del negocio, una frase corta, el botón **Reservar cita** (y el teléfono, si lo hay) y los pasos de la reserva en texto. Al otro lado va un celular dibujado que muestra cada pantalla: elegir el servicio, elegir con quién y cuándo, dejar los datos y la cita confirmada.
+- El celular avanza solo cada cuatro segundos y se puede pausar. Al tocar un paso se muestra esa pantalla. Si el visitante pidió menos movimiento en su sistema, no avanza solo. Usa los colores del tema del negocio y sus primeros servicios reales.
+- El último paso dice hasta cuántas horas antes se puede cancelar, con el valor que tenga el negocio.
+- Debajo hay una lista de servicios con duración y precio. En celular, los pasos van primero y el celular debajo.
+- El sitio público usa más ancho en la portada y en la reserva; las páginas legales y la de la cita siguen en una columna.
+
 ## Sin selector de idioma en ninguna pantalla
 
 - Se quita el selector Español / English de todo: login y pantallas de acceso (Super Admin y negocio), sitio público y reserva, y condiciones de uso. El panel del dueño ya no lo tenía.

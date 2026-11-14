@@ -131,6 +131,49 @@
       "whoLabel": "Name of the person going",
       "whoHint": "Your contact details stay the same; the appointment is in this person's name.",
       "forMe": "It's for me"
+    },
+    "home": {
+      "tagline": "Book your appointment in under a minute, no calls and no waiting. Pick the service, the time, and you're done.",
+      "call": "or call {{phone}}",
+      "howTitle": "How booking works",
+      "pause": "Pause",
+      "play": "Play",
+      "servicesTitle": "Services",
+      "seeAll": "See all and book",
+      "steps": {
+        "services": {
+          "title": "Choose what you want",
+          "text": "Haircut, beard, brows… you can add several to the same appointment."
+        },
+        "schedule": {
+          "title": "Choose who and when",
+          "text": "You only see free times; if anyone is fine, you get the first one available."
+        },
+        "details": {
+          "title": "Leave your name and phone",
+          "text": "No account or password needed."
+        },
+        "done": {
+          "title": "Done, appointment confirmed",
+          "text_one": "You keep a link to your appointment. You can cancel up to {{count}} hour before.",
+          "text_other": "You keep a link to your appointment. You can cancel up to {{count}} hours before."
+        }
+      },
+      "demo": {
+        "minutes_one": "{{count}} min",
+        "minutes_other": "{{count}} min",
+        "service1": "Classic haircut",
+        "service2": "Beard",
+        "service3": "Brows",
+        "anyPro": "Anyone",
+        "pro": "Choose a professional",
+        "nameLabel": "Name",
+        "nameValue": "Alex Smith",
+        "phoneLabel": "Phone",
+        "phoneValue": "300 123 4567",
+        "doneTitle": "Appointment confirmed!",
+        "doneText": "See you soon. Keep the link to view or cancel your appointment."
+      }
     }
   }
 }
