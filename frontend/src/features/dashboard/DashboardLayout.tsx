@@ -3,7 +3,6 @@ import { useTranslation } from "react-i18next";
 import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
 import { BrandMark } from "../../shared/ui/brand";
 import { WARM_GLASS } from "../../shared/ui/brandStyles";
-import { LanguageSwitcher } from "../../shared/ui/LanguageSwitcher";
 import { Loading } from "../../shared/ui/primitives";
 import { useMe } from "../auth/useMe";
 import { useSignOut } from "../auth/useSignOut";
@@ -239,9 +238,6 @@ export default function DashboardLayout() {
             ) : (
               <p className="min-w-0 flex-1 truncate font-semibold">{businessName}</p>
             )}
-            <div className="hidden sm:block">
-              <LanguageSwitcher />
-            </div>
             <div className="hidden items-center gap-3 md:flex">
               <span
                 aria-hidden="true"

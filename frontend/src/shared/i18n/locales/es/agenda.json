@@ -66,6 +66,7 @@
     "customerFilter": "Citas de {{name}}",
     "selectedCustomer": "el cliente seleccionado",
     "clearCustomer": "Ver todas",
-    "attendee": "Para {{name}}"
+    "attendee": "Para {{name}}",
+    "showInactive": "Mostrar canceladas e inasistencias"
   }
 }
