@@ -59,7 +59,8 @@
     "openMenu": "Open the menu",
     "closeMenu": "Close the menu",
     "plansCount_one": "{{count}} plan",
-    "plansCount_other": "{{count}} plans"
+    "plansCount_other": "{{count}} plans",
+    "more": "Show more"
   },
   "errors": {
     "unknown": "Something went wrong. Please try again.",

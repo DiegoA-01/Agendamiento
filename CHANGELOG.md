@@ -1,5 +1,10 @@
 # Changelog
 
+## Barras laterales sin barra de desplazamiento y con más vidrio líquido
+
+- Las barras laterales del Super Admin y del dueño ya no muestran la barra gris del navegador. Cuando el menú no cabe, el borde de abajo (o el de arriba, si ya se bajó) se desvanece. Abajo aparece una flecha redonda de vidrio que se mueve suave y, al tocarla, baja el menú. Con el teclado no hace falta, porque el foco desplaza solo. Si el visitante pidió menos movimiento, la flecha queda quieta.
+- La barra oscura del Super Admin, su login y las condiciones de uso tienen más vidrio líquido: brillo diagonal, filos de luz arriba y a la izquierda, y más desenfoque del fondo.
+
 ## La barra lateral del panel del negocio se puede desplazar
 
 - Con la página ampliada (zoom) o en una pantalla baja, el menú de la izquierda del panel del dueño no cabía y no bajaba. El vidrio líquido tenía `overflow: hidden`, que anulaba el desplazamiento. Ahora el menú baja con la rueda del mouse o el dedo y muestra una barra de desplazamiento delgada. El brillo del vidrio pasa al fondo de la misma barra, así que se ve igual.
