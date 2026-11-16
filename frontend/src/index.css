@@ -83,28 +83,19 @@ body {
   background-attachment: fixed;
 }
 /* Vidrio líquido de la barra lateral: claro y translúcido, deja ver borroso el fondo lila;
-   un filo de luz arriba y a la izquierda, un brillo diagonal y una sombra suave de profundidad. */
+   un filo de luz arriba y a la izquierda, un brillo diagonal y una sombra suave de profundidad.
+   Sin `overflow: hidden`: la barra lateral necesita poder desplazarse cuando no cabe. */
 /* prettier-ignore */
 .liquid-glass {
   position: relative;
   isolation: isolate;
-  overflow: hidden;
   border-radius: 28px;
   border: 1px solid rgb(255 255 255 / 0.7);
-  background: rgb(255 255 255 / 0.34);
+  background: linear-gradient(125deg, #ffffff8c 0%, #ffffff1a 28%, transparent 46%, #ffffff14 78%, #ffffff40 100%), rgb(255 255 255 / 0.34); /* taste-skill-ignore: vidrio pedido */
   backdrop-filter: blur(26px) saturate(180%); /* taste-skill-ignore: vidrio pedido */
   -webkit-backdrop-filter: blur(26px) saturate(180%); /* taste-skill-ignore: vidrio pedido */
   box-shadow: inset 0 1px 0 #ffffffe6, inset 1px 0 0 #ffffff99, inset 0 -1px 0 #ffffff59, 0 24px 48px -24px #3c2a6e59; /* taste-skill-ignore: vidrio pedido */
   color: var(--pf-ink);
-}
-/* prettier-ignore */
-.liquid-glass::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  background: linear-gradient(125deg, #ffffff8c 0%, #ffffff1a 28%, transparent 46%, #ffffff14 78%, #ffffff40 100%); /* taste-skill-ignore: vidrio pedido */
 }
 /* Acciones de riesgo (eliminar, quitar, suspender): grafito oxidado con texto rosado, de la misma
    familia oscura que la barra lateral. Se reconoce como peligro sin un rojo que choque. */

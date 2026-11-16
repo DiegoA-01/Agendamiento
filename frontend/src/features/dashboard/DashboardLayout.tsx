@@ -122,7 +122,7 @@ export default function DashboardLayout() {
     <nav
       id="menu-panel"
       aria-label={t("nav.main")}
-      className="liquid-glass flex h-full flex-col gap-5 overflow-y-auto p-4 [scrollbar-width:none]"
+      className="liquid-glass flex h-full flex-col gap-5 overflow-y-auto overscroll-contain p-4 [scrollbar-width:thin]"
     >
       <Link to="/panel" className="px-1 pt-1">
         <BrandMark name={businessName} />
@@ -177,7 +177,7 @@ export default function DashboardLayout() {
       </a>
 
       <div className="mx-auto flex max-w-[1500px] gap-5 p-3 sm:p-4">
-        <aside className="sticky top-4 hidden h-[calc(100vh-2rem)] w-[272px] shrink-0 lg:block">
+        <aside className="sticky top-4 hidden h-[calc(100dvh-2rem)] w-[272px] shrink-0 lg:block">
           {sidebar}
         </aside>
 

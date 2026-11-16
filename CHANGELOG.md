@@ -1,5 +1,10 @@
 # Changelog
 
+## La barra lateral del panel del negocio se puede desplazar
+
+- Con la página ampliada (zoom) o en una pantalla baja, el menú de la izquierda del panel del dueño no cabía y no bajaba. El vidrio líquido tenía `overflow: hidden`, que anulaba el desplazamiento. Ahora el menú baja con la rueda del mouse o el dedo y muestra una barra de desplazamiento delgada. El brillo del vidrio pasa al fondo de la misma barra, así que se ve igual.
+- La barra lateral usa el alto real de la ventana (`dvh`), así no se corta en celulares y tabletas.
+
 ## Sitio público en blanco con vidrio y verde metalizado, igual para todos los negocios
 
 - La portada, la reserva, la página de la cita, las páginas legales y el aviso de cookies usan un mismo estilo fijo. El fondo es blanco plata con manchas verdes suaves. La barra de arriba, la caja de pasos, las tarjetas de servicios y el celular de la portada van en vidrio blanco.
