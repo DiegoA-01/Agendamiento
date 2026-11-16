@@ -101,7 +101,7 @@ function CustomersList({ initialSearch }: { initialSearch: string }) {
                 {t("agenda.editCustomer")}
               </Button>
               <Button
-                variant="ghost"
+                variant="dangerGhost"
                 disabled={remove.isPending}
                 onClick={() => {
                   if (window.confirm(t("agenda.deleteCustomer", { name: customer.full_name })))

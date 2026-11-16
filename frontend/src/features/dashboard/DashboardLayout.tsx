@@ -1,4 +1,11 @@
-import { Suspense, useEffect, useState, type FormEvent, type ReactNode } from "react";
+import {
+  Suspense,
+  useEffect,
+  useState,
+  type CSSProperties,
+  type FormEvent,
+  type ReactNode,
+} from "react";
 import { useTranslation } from "react-i18next";
 import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
 import { BrandMark } from "../../shared/ui/brand";
@@ -141,13 +148,14 @@ export default function DashboardLayout() {
           return (
             <div key={group.label} className="flex flex-col gap-1">
               <p className="px-3 text-sm text-[var(--pf-muted)]">{t(group.label)}</p>
-              {sections.map((section) => (
+              {sections.map((section, index) => (
                 <NavLink
+                  style={{ "--i": index } as CSSProperties}
                   key={section}
                   to={links.get(section)!.path}
                   onClick={() => setMenuOpen(false)}
                   className={({ isActive }) =>
-                    `flex min-h-10 items-center gap-3 rounded-2xl px-3 font-medium transition-colors focus-visible:outline-2 ${
+                    `nav-item flex min-h-10 items-center gap-3 rounded-2xl px-3 font-medium focus-visible:outline-2 ${
                       isActive ? "metal" : "text-[var(--pf-ink)] hover:bg-white/55"
                     }`
                   }

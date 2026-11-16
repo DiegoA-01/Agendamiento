@@ -116,20 +116,17 @@ body {
 .scroll-fade::-webkit-scrollbar {
   display: none;
 }
+/* prettier-ignore */
 .scroll-fade[data-fade-top] {
-  mask-image: linear-gradient(to bottom, transparent, #000 40px);
+  mask-image: linear-gradient(to bottom, transparent, #000 40px); /* taste-skill-ignore: máscara del desvanecido, no es un relleno */
 }
+/* prettier-ignore */
 .scroll-fade[data-fade-bottom] {
-  mask-image: linear-gradient(to bottom, #000 calc(100% - 72px), transparent);
+  mask-image: linear-gradient(to bottom, #000 calc(100% - 72px), transparent); /* taste-skill-ignore: máscara del desvanecido, no es un relleno */
 }
+/* prettier-ignore */
 .scroll-fade[data-fade-top][data-fade-bottom] {
-  mask-image: linear-gradient(
-    to bottom,
-    transparent,
-    #000 40px,
-    #000 calc(100% - 72px),
-    transparent
-  );
+  mask-image: linear-gradient(to bottom, transparent, #000 40px, #000 calc(100% - 72px), transparent); /* taste-skill-ignore: máscara del desvanecido, no es un relleno */
 }
 /* prettier-ignore */
 .scroll-more {
@@ -368,6 +365,219 @@ body {
 }
 .booking input[type="checkbox"] {
   accent-color: var(--color-primary);
+}
+
+/* Movimiento de los paneles (Super Admin y dueño). Todo bajo `.platform`, así la reserva pública
+   no cambia. Con "reducir movimiento" en el sistema se apaga (bloque al final). */
+
+/* Vidrio líquido vivo: el brillo diagonal de las barras laterales se desplaza muy despacio. */
+.liquid-glass,
+.dark-glass {
+  background-size:
+    220% 220%,
+    auto;
+  animation: glass-drift 16s ease-in-out infinite alternate;
+}
+@keyframes glass-drift {
+  to {
+    background-position:
+      100% 100%,
+      0 0;
+  }
+}
+
+/* Barra superior (búsqueda, usuario, cerrar sesión) con el mismo vidrio líquido. */
+/* prettier-ignore */
+.platform header.glass {
+  background: linear-gradient(120deg, #ffffff99 0%, #ffffff33 30%, transparent 50%, #ffffff26 80%, #ffffff66 100%), rgb(255 255 255 / 0.5); /* taste-skill-ignore: vidrio líquido pedido */
+  background-size: 220% 220%, auto;
+  backdrop-filter: blur(26px) saturate(180%); /* taste-skill-ignore: vidrio líquido pedido */
+  -webkit-backdrop-filter: blur(26px) saturate(180%); /* taste-skill-ignore: vidrio líquido pedido */
+  box-shadow: inset 0 1px 0 #ffffffee, inset 1px 0 0 #ffffff99, inset 0 -1px 0 #ffffff55, 0 18px 40px -22px #0b0d0c40; /* taste-skill-ignore: vidrio líquido pedido */
+  animation: glass-drift 18s ease-in-out infinite alternate;
+}
+.platform header label,
+.platform header button {
+  transition:
+    transform 220ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    box-shadow 220ms ease,
+    background-color 220ms ease;
+}
+/* prettier-ignore */
+.platform header label:hover,
+.platform header label:focus-within {
+  background: rgb(255 255 255 / 0.9);
+  box-shadow: 0 8px 22px -12px var(--pf-green), inset 0 1px 0 #ffffff; /* taste-skill-ignore: vidrio líquido pedido */
+}
+/* prettier-ignore */
+.platform header button:hover {
+  transform: translateY(-2px);
+  background: var(--pf-green-soft);
+  box-shadow: 0 10px 22px -12px var(--pf-green-ink), inset 0 1px 0 #ffffff; /* taste-skill-ignore: vidrio líquido pedido */
+}
+.platform header button:active {
+  transform: translateY(0) scale(0.97);
+}
+
+/* Menú lateral: cada opción entra escalonada al cargar, se corre a la derecha al pasar el cursor
+   y su ícono se inclina. La opción activa tiene un destello que la cruza al pasar el cursor. */
+.nav-item {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  transition:
+    translate 260ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    background-color 200ms ease,
+    color 200ms ease,
+    box-shadow 260ms ease;
+  animation: nav-in 480ms cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+  animation-delay: calc(var(--i, 0) * 60ms + 80ms);
+}
+.nav-item svg {
+  transition: transform 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.nav-item:hover {
+  translate: 5px 0;
+}
+.nav-item:hover svg {
+  transform: scale(1.15) rotate(-8deg);
+}
+/* prettier-ignore */
+.nav-item::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(105deg, transparent 30%, #ffffff8c 50%, transparent 70%); /* taste-skill-ignore: vidrio líquido pedido */
+  translate: -120% 0;
+}
+.nav-item.metal:hover::after {
+  transition: translate 700ms ease;
+  translate: 120% 0;
+}
+@keyframes nav-in {
+  from {
+    opacity: 0;
+    translate: -14px 0;
+  }
+}
+/* Al desplazar el menú, las opciones que entran por abajo crecen hasta su tamaño. */
+@supports (animation-timeline: view()) {
+  .scroll-fade .nav-item {
+    animation:
+      nav-rise linear both,
+      nav-in 480ms cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+    animation-delay: 0s, calc(var(--i, 0) * 60ms + 80ms);
+    animation-timeline: view(), auto;
+    animation-range:
+      entry 0% entry 100%,
+      normal;
+  }
+}
+@keyframes nav-rise {
+  from {
+    scale: 0.86;
+  }
+}
+
+/* Botones de los paneles: suben un poco y cambian de color al pasar el cursor; al tocarlos se
+   hunden. Todos reciben un destello de vidrio; el de riesgo se enciende en un óxido más vivo
+   para que se note el peligro antes de tocarlo. */
+.platform .btn,
+.confirm-dialog .btn {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  transition:
+    transform 220ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    box-shadow 220ms ease,
+    background-color 220ms ease,
+    border-color 220ms ease,
+    color 220ms ease,
+    filter 220ms ease;
+}
+.platform .btn:not(:disabled):hover,
+.confirm-dialog .btn:not(:disabled):hover {
+  transform: translateY(-2px);
+}
+.platform .btn:not(:disabled):active,
+.confirm-dialog .btn:not(:disabled):active {
+  transform: translateY(0) scale(0.97);
+}
+/* prettier-ignore */
+.platform .btn::after,
+.confirm-dialog .btn::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(105deg, transparent 30%, #ffffff73 50%, transparent 70%); /* taste-skill-ignore: vidrio líquido pedido */
+  translate: -120% 0;
+}
+.platform .btn:not(:disabled):hover::after,
+.confirm-dialog .btn:not(:disabled):hover::after {
+  transition: translate 650ms ease;
+  translate: 120% 0;
+}
+/* prettier-ignore */
+.platform-main .btn[data-variant="primary"]:not(:disabled):hover {
+  filter: brightness(1.06) saturate(1.2);
+  box-shadow: inset 0 1px 0 #ffffffcc, 0 14px 26px -12px var(--pf-green-ink); /* taste-skill-ignore: vidrio líquido pedido */
+}
+/* prettier-ignore */
+.platform-main .btn[data-variant="secondary"]:not(:disabled):hover,
+.platform-main .btn[data-variant="ghost"]:not(:disabled):hover {
+  background: var(--pf-green-soft);
+  border-color: var(--pf-green);
+  color: var(--pf-green-ink);
+  box-shadow: 0 10px 22px -14px var(--pf-green-ink); /* taste-skill-ignore: vidrio líquido pedido */
+}
+/* prettier-ignore */
+.platform .btn[data-variant="danger"]:not(:disabled):hover,
+.confirm-dialog .btn[data-variant="danger"]:not(:disabled):hover {
+  background: #7a2e25;
+  color: #ffffff;
+  box-shadow: inset 0 0 0 1px #c25a4a, 0 12px 26px -10px #b4231a99; /* taste-skill-ignore: brillo de riesgo */
+}
+
+/* prettier-ignore */
+.platform .btn[data-variant="dangerGhost"]:not(:disabled):hover {
+  background: #f6e3df;
+  color: #8a3b30;
+  box-shadow: inset 0 0 0 1px #e2b3aa, 0 10px 22px -12px #b4231a80; /* taste-skill-ignore: brillo de riesgo */
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .liquid-glass,
+  .dark-glass,
+  .platform header.glass,
+  .nav-item,
+  .scroll-fade .nav-item {
+    animation: none;
+  }
+  .nav-item,
+  .nav-item svg,
+  .platform .btn,
+  .confirm-dialog .btn,
+  .platform header label,
+  .platform header button {
+    transition: none;
+  }
+  .nav-item:hover,
+  .nav-item:hover svg,
+  .platform .btn:hover,
+  .confirm-dialog .btn:hover,
+  .platform header button:hover {
+    translate: none;
+    transform: none;
+  }
+  .nav-item::after,
+  .platform .btn::after,
+  .confirm-dialog .btn::after {
+    display: none;
+  }
 }
 
 :focus-visible {

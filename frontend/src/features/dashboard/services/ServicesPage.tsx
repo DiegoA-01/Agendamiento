@@ -122,7 +122,7 @@ function CategoryHeader({ category, editable }: { category: Category; editable: 
               {t("catalog.categories.rename")}
             </Button>
             <Button
-              variant="ghost"
+              variant="dangerGhost"
               disabled={remove.isPending}
               onClick={() => {
                 if (window.confirm(t("catalog.categories.deleteConfirm", { name: category.name })))
@@ -331,7 +331,7 @@ function ServiceRow({
             {t("catalog.edit")}
           </Button>
           <Button
-            variant="ghost"
+            variant="dangerGhost"
             disabled={remove.isPending}
             onClick={() => {
               if (window.confirm(t("catalog.services.deleteConfirm", { name: service.name })))

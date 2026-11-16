@@ -389,7 +389,7 @@ function BlocksSection({
               </div>
               {editable && (
                 <Button
-                  variant="ghost"
+                  variant="dangerGhost"
                   disabled={remove.isPending}
                   onClick={() => {
                     if (window.confirm(t("catalog.hours.deleteBlockConfirm"))) {

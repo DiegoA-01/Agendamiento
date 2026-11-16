@@ -426,7 +426,7 @@ function ProfessionalCard({
               {t("catalog.edit")}
             </Button>
             <Button
-              variant="ghost"
+              variant="dangerGhost"
               disabled={remove.isPending}
               onClick={() => {
                 if (
