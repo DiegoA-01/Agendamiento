@@ -131,6 +131,49 @@
       "whoLabel": "Nombre de quien va",
       "whoHint": "Tus datos de contacto se mantienen; la cita queda a nombre de esta persona.",
       "forMe": "Es para mí"
+    },
+    "home": {
+      "tagline": "Reserva tu cita en menos de un minuto, sin llamar ni esperar respuesta. Eliges el servicio, la hora y listo.",
+      "call": "o llama al {{phone}}",
+      "howTitle": "Así se reserva",
+      "pause": "Pausar",
+      "play": "Reproducir",
+      "servicesTitle": "Servicios",
+      "seeAll": "Ver todos y reservar",
+      "steps": {
+        "services": {
+          "title": "Elige qué te quieres hacer",
+          "text": "Corte, barba, cejas… puedes sumar varios en la misma cita."
+        },
+        "schedule": {
+          "title": "Elige con quién y a qué hora",
+          "text": "Ves solo los horarios libres; si te da igual quién te atienda, te damos el primero disponible."
+        },
+        "details": {
+          "title": "Deja tu nombre y teléfono",
+          "text": "No necesitas crear una cuenta ni contraseña."
+        },
+        "done": {
+          "title": "Listo, cita confirmada",
+          "text_one": "Te queda el enlace de tu cita. Puedes cancelar hasta {{count}} hora antes.",
+          "text_other": "Te queda el enlace de tu cita. Puedes cancelar hasta {{count}} horas antes."
+        }
+      },
+      "demo": {
+        "minutes_one": "{{count}} min",
+        "minutes_other": "{{count}} min",
+        "service1": "Corte clásico",
+        "service2": "Barba",
+        "service3": "Cejas",
+        "anyPro": "Cualquiera",
+        "pro": "Elegir profesional",
+        "nameLabel": "Nombre",
+        "nameValue": "Andrés Gómez",
+        "phoneLabel": "Teléfono",
+        "phoneValue": "300 123 4567",
+        "doneTitle": "¡Cita confirmada!",
+        "doneText": "Te esperamos. Guarda el enlace para ver o cancelar tu cita."
+      }
     }
   }
 }
