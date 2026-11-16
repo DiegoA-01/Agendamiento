@@ -6,6 +6,7 @@ import { useSignOut } from "../auth/useSignOut";
 import { PLATFORM_TERMS_PATH } from "../legal/PlatformTermsPage";
 import { BrandMark } from "../../shared/ui/brand";
 import { DARK_GLASS } from "../../shared/ui/brandStyles";
+import { ScrollArea } from "../../shared/ui/ScrollArea";
 import { usePlatformSummary } from "./api";
 
 // Íconos de línea del menú, dibujados con el color del texto.
@@ -45,7 +46,7 @@ function Icon({ name }: { name: string }) {
 }
 
 // Vidrio oscuro de la barra lateral, como la referencia.
-const SIDEBAR_SURFACE = `flex h-full flex-col gap-6 overflow-y-auto p-4 ${DARK_GLASS}`;
+const SIDEBAR_SURFACE = `flex h-full flex-col overflow-hidden ${DARK_GLASS}`;
 
 const GROUPS = [
   {
@@ -101,53 +102,55 @@ export function PlatformLayout() {
 
   const sidebar = (
     <nav aria-label={t("nav.main")} className={SIDEBAR_SURFACE}>
-      <Link to="/resumen" className="px-1 pt-1">
-        <BrandMark />
-      </Link>
-
-      <div className="rounded-2xl border border-white/12 bg-white/8 px-4 py-3">
-        <p className="font-semibold">{t("nav.workspace")}</p>
-        <p className="text-sm text-white/70">
-          {summary.data
-            ? t("nav.workspaceLine", {
-                count: summary.data.total,
-                plans: t("nav.plansCount", { count: summary.data.by_plan.length }),
-              })
-            : "—"}
-        </p>
-      </div>
-
-      {GROUPS.map((group) => (
-        <div key={group.label} className="flex flex-col gap-1">
-          <p className="px-3 text-sm text-white/55">{t(group.label)}</p>
-          {group.links.map((link) => (
-            <NavLink
-              key={link.to}
-              to={link.to}
-              onClick={() => setMenuOpen(false)}
-              className={({ isActive }) =>
-                `flex min-h-11 items-center gap-3 rounded-2xl px-3 font-medium transition-colors focus-visible:outline-2 ${
-                  isActive ? "metal" : "text-white/85 hover:bg-white/10 hover:text-white"
-                }`
-              }
-            >
-              <Icon name={link.key} />
-              <span className="flex-1">{t(`nav.${link.key}`)}</span>
-              {badges[link.key] !== undefined && (
-                <span className="rounded-full bg-white/90 px-2 text-xs font-semibold text-[var(--pf-ink)] tabular-nums">
-                  {badges[link.key]}
-                </span>
-              )}
-            </NavLink>
-          ))}
-        </div>
-      ))}
-
-      <div className="mt-auto flex flex-col gap-2 px-1 text-sm">
-        <Link to={PLATFORM_TERMS_PATH} className="text-white/60 underline hover:text-white">
-          {t("platformTerms.link")}
+      <ScrollArea tone="dark" className="flex flex-col gap-6 p-4">
+        <Link to="/resumen" className="px-1 pt-1">
+          <BrandMark />
         </Link>
-      </div>
+
+        <div className="rounded-2xl border border-white/12 bg-white/8 px-4 py-3">
+          <p className="font-semibold">{t("nav.workspace")}</p>
+          <p className="text-sm text-white/70">
+            {summary.data
+              ? t("nav.workspaceLine", {
+                  count: summary.data.total,
+                  plans: t("nav.plansCount", { count: summary.data.by_plan.length }),
+                })
+              : "—"}
+          </p>
+        </div>
+
+        {GROUPS.map((group) => (
+          <div key={group.label} className="flex flex-col gap-1">
+            <p className="px-3 text-sm text-white/55">{t(group.label)}</p>
+            {group.links.map((link) => (
+              <NavLink
+                key={link.to}
+                to={link.to}
+                onClick={() => setMenuOpen(false)}
+                className={({ isActive }) =>
+                  `flex min-h-11 items-center gap-3 rounded-2xl px-3 font-medium transition-colors focus-visible:outline-2 ${
+                    isActive ? "metal" : "text-white/85 hover:bg-white/10 hover:text-white"
+                  }`
+                }
+              >
+                <Icon name={link.key} />
+                <span className="flex-1">{t(`nav.${link.key}`)}</span>
+                {badges[link.key] !== undefined && (
+                  <span className="rounded-full bg-white/90 px-2 text-xs font-semibold text-[var(--pf-ink)] tabular-nums">
+                    {badges[link.key]}
+                  </span>
+                )}
+              </NavLink>
+            ))}
+          </div>
+        ))}
+
+        <div className="mt-auto flex flex-col gap-2 px-1 text-sm">
+          <Link to={PLATFORM_TERMS_PATH} className="text-white/60 underline hover:text-white">
+            {t("platformTerms.link")}
+          </Link>
+        </div>
+      </ScrollArea>
     </nav>
   );
 

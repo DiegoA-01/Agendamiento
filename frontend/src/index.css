@@ -83,28 +83,99 @@ body {
   background-attachment: fixed;
 }
 /* Vidrio líquido de la barra lateral: claro y translúcido, deja ver borroso el fondo lila;
-   un filo de luz arriba y a la izquierda, un brillo diagonal y una sombra suave de profundidad. */
+   un filo de luz arriba y a la izquierda, un brillo diagonal y una sombra suave de profundidad.
+   Sin `overflow: hidden`: la barra lateral necesita poder desplazarse cuando no cabe. */
 /* prettier-ignore */
 .liquid-glass {
   position: relative;
   isolation: isolate;
-  overflow: hidden;
   border-radius: 28px;
   border: 1px solid rgb(255 255 255 / 0.7);
-  background: rgb(255 255 255 / 0.34);
+  background: linear-gradient(125deg, #ffffff8c 0%, #ffffff1a 28%, transparent 46%, #ffffff14 78%, #ffffff40 100%), rgb(255 255 255 / 0.34); /* taste-skill-ignore: vidrio pedido */
   backdrop-filter: blur(26px) saturate(180%); /* taste-skill-ignore: vidrio pedido */
   -webkit-backdrop-filter: blur(26px) saturate(180%); /* taste-skill-ignore: vidrio pedido */
   box-shadow: inset 0 1px 0 #ffffffe6, inset 1px 0 0 #ffffff99, inset 0 -1px 0 #ffffff59, 0 24px 48px -24px #3c2a6e59; /* taste-skill-ignore: vidrio pedido */
   color: var(--pf-ink);
 }
+/* Vidrio líquido oscuro del Super Admin (barra lateral, login y condiciones de uso): grafito
+   translúcido que deja ver borroso el fondo, un brillo diagonal, filos de luz arriba y a la
+   izquierda, y una sombra de profundidad. */
 /* prettier-ignore */
-.liquid-glass::before {
-  content: "";
+.dark-glass {
+  border-color: rgb(255 255 255 / 0.14);
+  background: linear-gradient(125deg, #ffffff24 0%, #ffffff08 26%, transparent 45%, #ffffff06 75%, #ffffff1a 100%), linear-gradient(180deg, rgb(18 22 20 / 0.86), rgb(40 46 43 / 0.78)); /* taste-skill-ignore: vidrio líquido pedido */
+  backdrop-filter: blur(28px) saturate(170%); /* taste-skill-ignore: vidrio líquido pedido */
+  -webkit-backdrop-filter: blur(28px) saturate(170%); /* taste-skill-ignore: vidrio líquido pedido */
+  box-shadow: inset 0 1px 0 #ffffff33, inset 1px 0 0 #ffffff1a, inset 0 -1px 0 #ffffff0f, 0 24px 48px -20px #0b0d0c99; /* taste-skill-ignore: vidrio líquido pedido */
+}
+/* Barras laterales sin barra de desplazamiento: los bordes se desvanecen donde hay más menú y una
+   flecha de vidrio abajo invita a bajar. */
+.scroll-fade {
+  scrollbar-width: none;
+}
+.scroll-fade::-webkit-scrollbar {
+  display: none;
+}
+.scroll-fade[data-fade-top] {
+  mask-image: linear-gradient(to bottom, transparent, #000 40px);
+}
+.scroll-fade[data-fade-bottom] {
+  mask-image: linear-gradient(to bottom, #000 calc(100% - 72px), transparent);
+}
+.scroll-fade[data-fade-top][data-fade-bottom] {
+  mask-image: linear-gradient(
+    to bottom,
+    transparent,
+    #000 40px,
+    #000 calc(100% - 72px),
+    transparent
+  );
+}
+/* prettier-ignore */
+.scroll-more {
   position: absolute;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  background: linear-gradient(125deg, #ffffff8c 0%, #ffffff1a 28%, transparent 46%, #ffffff14 78%, #ffffff40 100%); /* taste-skill-ignore: vidrio pedido */
+  bottom: 12px;
+  left: 50%;
+  translate: -50% 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 9999px;
+  backdrop-filter: blur(16px) saturate(170%); /* taste-skill-ignore: vidrio líquido pedido */
+  -webkit-backdrop-filter: blur(16px) saturate(170%); /* taste-skill-ignore: vidrio líquido pedido */
+  transition: opacity 200ms ease, translate 200ms ease;
+  animation: scroll-more-hint 2.4s ease-in-out infinite;
+}
+.scroll-more:hover {
+  animation: none;
+  translate: -50% 2px;
+}
+/* prettier-ignore */
+.scroll-more-dark {
+  color: #ffffff;
+  background: rgb(255 255 255 / 0.14);
+  border: 1px solid rgb(255 255 255 / 0.22);
+  box-shadow: inset 0 1px 0 #ffffff40, 0 8px 18px -8px #000000b3; /* taste-skill-ignore: vidrio líquido pedido */
+}
+/* prettier-ignore */
+.scroll-more-light {
+  color: var(--pf-ink);
+  background: rgb(255 255 255 / 0.62);
+  border: 1px solid rgb(255 255 255 / 0.9);
+  box-shadow: inset 0 1px 0 #ffffff, 0 8px 18px -8px #3c2a6e66; /* taste-skill-ignore: vidrio líquido pedido */
+}
+@keyframes scroll-more-hint {
+  50% {
+    translate: -50% 4px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .scroll-more {
+    animation: none;
+    transition: none;
+  }
 }
 /* Acciones de riesgo (eliminar, quitar, suspender): grafito oxidado con texto rosado, de la misma
    familia oscura que la barra lateral. Se reconoce como peligro sin un rojo que choque. */
