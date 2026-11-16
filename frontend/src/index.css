@@ -174,6 +174,52 @@ body {
   --bk-risk: color-mix(in srgb, #b4231a 38%, var(--color-surface));
   --bk-risk-edge: color-mix(in srgb, #e5484d 55%, transparent);
 }
+/* Estilo fijo del sitio público, igual para todos los negocios: blanco con vidrio y un verde
+   metalizado. Los cinco colores del tema quedan fijos aquí (ya no se toman del negocio) y todo lo
+   que la reserva pinta con el color principal se vuelve verde metalizado con texto oscuro. */
+/* prettier-ignore */
+.booking {
+  --color-primary: #3d6e55;
+  --color-secondary: #5f8c74;
+  --color-background: #f3f7f4;
+  --color-surface: #ffffff;
+  --color-text: #0e1d16;
+  --pk-metal: linear-gradient(160deg, #eef6f1 0%, #a8c8b6 32%, #5f8c74 62%, #b9d4c5 100%); /* taste-skill-ignore: verde metalizado pedido */
+  --pk-metal-ink: #0b1a12;
+  --pk-metal-shadow: inset 0 1px 0 #ffffffcc, 0 8px 18px -8px #2c5a429c; /* taste-skill-ignore: verde metalizado pedido */
+  --pk-glass-shadow: inset 0 1px 0 #ffffff, 0 14px 34px -16px #0e1d1640; /* taste-skill-ignore: vidrio pedido */
+}
+/* prettier-ignore */
+.public-backdrop {
+  background: radial-gradient(45% 50% at 88% 0%, #8fb8a2aa, transparent 70%), radial-gradient(40% 45% at 0% 35%, #cfe3d7, transparent 70%), radial-gradient(40% 40% at 40% 110%, #7fa98f55, transparent 70%), #eef3f0; /* taste-skill-ignore: vidrio pedido */
+  background-attachment: fixed;
+}
+/* prettier-ignore */
+.booking .glass {
+  background: rgb(255 255 255 / 0.58);
+  backdrop-filter: blur(22px) saturate(160%); /* taste-skill-ignore: vidrio pedido */
+  -webkit-backdrop-filter: blur(22px) saturate(160%); /* taste-skill-ignore: vidrio pedido */
+  border-color: rgb(255 255 255 / 0.9);
+  box-shadow: var(--pk-glass-shadow); /* taste-skill-ignore: vidrio pedido */
+}
+.booking .metal,
+.booking .bg-\[var\(--color-primary\)\] {
+  background: var(--pk-metal);
+  color: var(--pk-metal-ink);
+  box-shadow: var(--pk-metal-shadow); /* taste-skill-ignore: verde metalizado pedido */
+}
+.booking .bg-\[var\(--color-primary\)\] .text-\[var\(--color-background\)\] {
+  color: inherit;
+}
+/* prettier-ignore */
+.booking .step-active {
+  background: rgb(255 255 255 / 0.8);
+  box-shadow: inset 0 1px 0 #ffffff, 0 6px 16px -10px #0e1d1655; /* taste-skill-ignore: vidrio pedido */
+}
+/* prettier-ignore */
+.booking .phone-screen-bg {
+  background: radial-gradient(70% 40% at 100% 0%, #b4d2c1, transparent 70%), radial-gradient(60% 40% at 0% 100%, #d4e6db, transparent 70%), #f3f7f4; /* taste-skill-ignore: vidrio pedido */
+}
 .booking .risk-button {
   background-color: var(--bk-risk);
   color: var(--color-text);

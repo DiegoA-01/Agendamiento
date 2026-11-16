@@ -60,7 +60,7 @@ export default function LandingPage() {
             <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
               <Link
                 to="/reservar"
-                className="inline-flex min-h-14 items-center rounded-2xl bg-[var(--color-primary)] px-8 text-lg font-semibold text-[var(--color-background)] transition-transform focus-visible:outline-2 active:scale-[0.98]"
+                className="metal inline-flex min-h-14 items-center rounded-2xl px-8 text-lg font-semibold transition-transform focus-visible:outline-2 active:scale-[0.98]"
               >
                 {t("booking.cta")}
               </Link>
@@ -74,7 +74,7 @@ export default function LandingPage() {
             <Notice tone="warning">{t("booking.disabled")}</Notice>
           )}
 
-          <div className="flex flex-col gap-3">
+          <div className="glass flex flex-col gap-3 rounded-[26px] border p-4 sm:p-5">
             <div className="flex items-center justify-between gap-3">
               <h2 className="text-sm font-semibold tracking-wide uppercase">
                 {t("booking.home.howTitle")}
@@ -82,7 +82,7 @@ export default function LandingPage() {
               <button
                 type="button"
                 onClick={() => setPlaying((value) => !value)}
-                className="rounded-full border border-[var(--bk-line)] px-3 py-1 text-xs focus-visible:outline-2"
+                className="rounded-full border border-[var(--bk-line)] bg-white/70 px-3 py-1 text-xs focus-visible:outline-2"
               >
                 {t(playing ? "booking.home.pause" : "booking.home.play")}
               </button>
@@ -97,16 +97,12 @@ export default function LandingPage() {
                       aria-current={active ? "step" : undefined}
                       onClick={() => show(index)}
                       className={`flex w-full items-start gap-4 rounded-2xl border px-4 py-3 text-left transition-colors focus-visible:outline-2 ${
-                        active
-                          ? "border-[var(--color-primary)] bg-[var(--bk-raised)]"
-                          : "border-transparent hover:bg-[var(--bk-raised)]"
+                        active ? "step-active border-white" : "border-transparent hover:bg-white/50"
                       }`}
                     >
                       <span
                         className={`flex size-8 shrink-0 items-center justify-center rounded-full text-sm font-semibold ${
-                          active
-                            ? "bg-[var(--color-primary)] text-[var(--color-background)]"
-                            : "border border-[var(--bk-line)]"
+                          active ? "metal" : "border border-[var(--bk-line)] bg-white/60"
                         }`}
                       >
                         {index + 1}
@@ -154,7 +150,7 @@ export default function LandingPage() {
             {services.map((service) => (
               <li
                 key={service.id}
-                className="flex flex-col gap-1 rounded-2xl bg-[var(--bk-raised)] px-5 py-4"
+                className="glass flex flex-col gap-1 rounded-[20px] border px-5 py-4"
               >
                 <span className="font-semibold">{service.name}</span>
                 <span className="text-sm text-[var(--bk-muted)]">

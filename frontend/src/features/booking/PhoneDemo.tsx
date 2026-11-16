@@ -28,7 +28,7 @@ export function PhoneDemo({
   return (
     <div aria-hidden="true" className="phone-demo relative mx-auto w-[300px] shrink-0 sm:w-[320px]">
       <div className="phone-frame rounded-[52px] p-3">
-        <div className="relative flex h-[560px] flex-col overflow-hidden rounded-[42px] bg-[var(--color-background)] text-[var(--color-text)] sm:h-[580px]">
+        <div className="relative flex h-[560px] flex-col overflow-hidden phone-screen-bg rounded-[42px] text-[var(--color-text)] sm:h-[580px]">
           <div className="absolute top-2.5 left-1/2 h-6 w-24 -translate-x-1/2 rounded-full bg-black" />
           <div className="flex items-center justify-between px-7 pt-3 text-[11px] font-semibold opacity-80">
             <span>9:41</span>
@@ -36,7 +36,7 @@ export function PhoneDemo({
           </div>
 
           <div className="flex items-center gap-2 px-5 pt-6 pb-3">
-            <span className="flex size-8 items-center justify-center rounded-xl bg-[var(--color-primary)] text-sm font-bold text-[var(--color-background)]">
+            <span className="metal flex size-8 items-center justify-center rounded-xl text-sm font-bold">
               {businessName.trim().charAt(0).toUpperCase()}
             </span>
             <span className="truncate text-sm font-semibold">{businessName}</span>

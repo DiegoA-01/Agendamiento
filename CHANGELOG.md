@@ -1,5 +1,12 @@
 # Changelog
 
+## Sitio público en blanco con vidrio y verde metalizado, igual para todos los negocios
+
+- La portada, la reserva, la página de la cita, las páginas legales y el aviso de cookies usan un mismo estilo fijo. El fondo es blanco plata con manchas verdes suaves. La barra de arriba, la caja de pasos, las tarjetas de servicios y el celular de la portada van en vidrio blanco.
+- Los botones principales, las selecciones y la barra de progreso de la reserva van en verde metalizado con texto oscuro.
+- Si el negocio no tiene logo, la barra de arriba muestra su inicial en verde metalizado.
+- **El tema de colores del negocio ya no cambia el sitio público**: todos los negocios se ven igual. Es decisión del equipo del 2026-11-16 y cambia lo que hacía el tema por negocio de la spec (M3). Los colores guardados en Empresa siguen ahí, pero hoy no se usan en el sitio.
+
 ## Portada del negocio con un celular que enseña a reservar
 
 - La portada pública ocupa toda la pantalla. A un lado van el nombre del negocio, una frase corta, el botón **Reservar cita** (y el teléfono, si lo hay) y los pasos de la reserva en texto. Al otro lado va un celular dibujado que muestra cada pantalla: elegir el servicio, elegir con quién y cuándo, dejar los datos y la cita confirmada.
