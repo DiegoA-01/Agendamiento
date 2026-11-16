@@ -123,7 +123,13 @@ body {
   mask-image: linear-gradient(to bottom, #000 calc(100% - 72px), transparent);
 }
 .scroll-fade[data-fade-top][data-fade-bottom] {
-  mask-image: linear-gradient(to bottom, transparent, #000 40px, #000 calc(100% - 72px), transparent);
+  mask-image: linear-gradient(
+    to bottom,
+    transparent,
+    #000 40px,
+    #000 calc(100% - 72px),
+    transparent
+  );
 }
 /* prettier-ignore */
 .scroll-more {
