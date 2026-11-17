@@ -1,5 +1,12 @@
 # Changelog
 
+## Ojo para ver la contraseña
+
+- Todos los campos de contraseña tienen un botón con un ojo a la derecha. Al tocarlo se ve lo que se escribió y el ojo se tacha; al tocarlo otra vez se oculta.
+- Aparece en el login del Super Admin y en el de cada negocio, al recuperar la contraseña y al cambiarla.
+- El botón dice «Mostrar contraseña» u «Ocultar contraseña» para lectores de pantalla e indica si está activo.
+- La contraseña siempre empieza oculta.
+
 ## Panel del dueño en café metalizado, cuero y blanco
 
 - El panel de cada negocio y su login cambian el púrpura por un café metalizado que tira a cuero, de crema a canela y bronce, combinado con blanco.
