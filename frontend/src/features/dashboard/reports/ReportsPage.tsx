@@ -1,4 +1,4 @@
-import { type FormEvent, type ReactNode, useState } from "react";
+import { Fragment, type FormEvent, type ReactNode, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ApiError } from "../../../shared/api/client";
 import { describeError } from "../../../shared/api/errors";
@@ -18,6 +18,7 @@ import {
 import { useMe } from "../../auth/useMe";
 import { useProfessionals } from "../shared/api";
 import { useCan } from "../shared/useCan";
+import { commissionRows } from "./commissionRows";
 import {
   type BookingRow,
   type CommissionEntry,
@@ -448,6 +449,9 @@ function CommissionsTab({ filters, enabled }: { filters: ReportFilters; enabled:
   const entries = useCommissions(filters, enabled);
   const [adjusting, setAdjusting] = useState<CommissionEntry | null>(null);
   const list = entries.data?.pages.flatMap((page) => page.results) ?? [];
+  // Una fila por cita: sus servicios y ajustes sumados; el detalle por servicio se abre aparte.
+  const rows = commissionRows(list);
+  const [expanded, setExpanded] = useState<string | null>(null);
   const when = (iso: string) =>
     new Intl.DateTimeFormat(i18n.language, {
       dateStyle: "medium",
@@ -457,56 +461,103 @@ function CommissionsTab({ filters, enabled }: { filters: ReportFilters; enabled:
   return (
     <section className="space-y-4" aria-label={t("reports.tabs.commissions")}>
       <div className="flex justify-end">
-        {enabled && <DownloadLink href={exportUrl("commissions/", filters)} />}
+        {enabled && (
+          <DownloadLink href={exportUrl("commissions/", filters, { group: "appointment" })} />
+        )}
       </div>
       {adjusting && <AdjustForm entry={adjusting} onDone={() => setAdjusting(null)} />}
       {enabled && <QueryState query={entries} />}
       {entries.isSuccess && list.length === 0 && (
         <EmptyState>{t("reports.noCommissions")}</EmptyState>
       )}
-      {list.length > 0 && (
+      {rows.length > 0 && (
         <Table
           hideCaption
           caption={t("reports.tabs.commissions")}
           head={[
             t("reports.appointmentDate"),
             t("reports.groups.professional"),
-            t("reports.groups.service"),
+            t("reports.services"),
             t("reports.base"),
             t("reports.pct"),
             t("reports.commission"),
             t("reports.business"),
-            ...(canAdjust ? [t("reports.actions")] : []),
+            t("reports.detail"),
           ]}
         >
-          {list.map((entry) => (
-            <tr key={entry.id} className={entry.kind === "adjustment" ? "bg-amber-50/60" : ""}>
-              <Cell first>
-                <span className="block">{when(entry.appointment_start_at)}</span>
-                {entry.kind === "adjustment" && (
-                  <span className="mt-1 flex flex-wrap items-center gap-1 text-xs font-normal">
-                    <Badge tone="warning">{t("reports.adjustment")}</Badge>
-                    {entry.reason}
-                  </span>
-                )}
-              </Cell>
-              <Cell>{entry.professional_name}</Cell>
-              <Cell>{entry.service_name}</Cell>
-              <Cell>{format.money(entry.base_amount)}</Cell>
-              <Cell>{format.percent(entry.pct)}</Cell>
-              <Cell>{format.money(entry.commission_amount)}</Cell>
-              <Cell>{format.money(entry.business_amount)}</Cell>
-              {canAdjust && (
-                <Cell>
-                  {entry.kind === "entry" && (
-                    <Button variant="ghost" onClick={() => setAdjusting(entry)}>
-                      {t("reports.adjust")}
+          {rows.map((row) => {
+            const open = expanded === row.key;
+            return (
+              <Fragment key={row.key}>
+                <tr className={open ? "bg-slate-50" : ""}>
+                  <Cell first>
+                    <span className="block">{when(row.appointmentStartAt)}</span>
+                    {row.adjustment !== "0.00" && (
+                      <span className="mt-1 flex flex-wrap items-center gap-1 text-xs font-normal">
+                        <Badge tone="warning">
+                          {t("reports.includesAdjustment", {
+                            amount: `${Number(row.adjustment) > 0 ? "+" : ""}${format.money(row.adjustment)}`,
+                          })}
+                        </Badge>
+                        {row.reasons.join(" · ")}
+                      </span>
+                    )}
+                  </Cell>
+                  <Cell>{row.professionalName}</Cell>
+                  <td className="max-w-72 px-4 py-2 text-right">{row.services.join(" + ")}</td>
+                  <Cell>{format.money(row.base)}</Cell>
+                  <Cell>{format.percent(row.pct)}</Cell>
+                  <Cell>
+                    <span className="font-semibold">{format.money(row.commission)}</span>
+                  </Cell>
+                  <Cell>{format.money(row.business)}</Cell>
+                  <Cell>
+                    <Button
+                      variant="ghost"
+                      aria-expanded={open}
+                      onClick={() => setExpanded(open ? null : row.key)}
+                    >
+                      {t(open ? "reports.hideDetail" : "reports.showDetail")}
                     </Button>
-                  )}
-                </Cell>
-              )}
-            </tr>
-          ))}
+                  </Cell>
+                </tr>
+                {open && (
+                  <tr className="bg-slate-50">
+                    <td colSpan={8} className="px-4 pb-4">
+                      <ul className="flex flex-col gap-2">
+                        {row.entries.map((entry) => (
+                          <li
+                            key={entry.id}
+                            className="flex flex-wrap items-center gap-x-6 gap-y-1 rounded-xl bg-white px-4 py-2"
+                          >
+                            <span className="min-w-40 flex-1 font-medium">
+                              {entry.service_name}
+                              {entry.kind === "adjustment" && (
+                                <span className="ml-2 inline-flex items-center gap-1 text-xs font-normal">
+                                  <Badge tone="warning">{t("reports.adjustment")}</Badge>
+                                  {entry.reason}
+                                </span>
+                              )}
+                            </span>
+                            <span>{format.money(entry.base_amount)}</span>
+                            <span>{format.percent(entry.pct)}</span>
+                            <span className="font-semibold">
+                              {format.money(entry.commission_amount)}
+                            </span>
+                            {canAdjust && entry.kind === "entry" && (
+                              <Button variant="ghost" onClick={() => setAdjusting(entry)}>
+                                {t("reports.adjust")}
+                              </Button>
+                            )}
+                          </li>
+                        ))}
+                      </ul>
+                    </td>
+                  </tr>
+                )}
+              </Fragment>
+            );
+          })}
         </Table>
       )}
       {entries.hasNextPage && (

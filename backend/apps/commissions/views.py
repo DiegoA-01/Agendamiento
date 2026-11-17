@@ -103,9 +103,23 @@ class CommissionListView(ModuleView):
 
 
 class CommissionExportView(ModuleView):
-    @extend_schema(parameters=COMMISSION_PARAMETERS, responses={200: CSV_RESPONSE})
+    @extend_schema(
+        parameters=[
+            *COMMISSION_PARAMETERS,
+            OpenApiParameter(
+                "group",
+                str,
+                enum=["appointment"],
+                description="`appointment`: una fila por cita (sus servicios y ajustes sumados).",
+            ),
+        ],
+        responses={200: CSV_RESPONSE},
+    )
     def get(self, request):
         entries = filtered_entries(request).order_by("appointment_start_at", "created_at")
+        if request.query_params.get("group") == "appointment":
+            header, rows = commissions.rows_by_appointment(entries)
+            return csv_response("comisiones-por-cita.csv", header, rows)
         rows = (
             [
                 timezone.localtime(entry.appointment_start_at).strftime("%Y-%m-%d %H:%M"),

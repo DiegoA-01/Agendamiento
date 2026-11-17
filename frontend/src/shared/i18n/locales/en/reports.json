@@ -64,6 +64,11 @@
     "reason": "Reason",
     "adjustNote": "The original commission is kept: the difference is saved as an adjustment with your reason.",
     "saveAdjustment": "Save adjustment",
-    "salesBy": "Sales by {{group}}"
+    "salesBy": "Sales by {{group}}",
+    "services": "Services",
+    "detail": "Detail",
+    "showDetail": "Show detail",
+    "hideDetail": "Hide",
+    "includesAdjustment": "Includes adjustment {{amount}}"
   }
 }
