@@ -157,7 +157,9 @@
       "breakTo": "Break to",
       "breakRange": "Break from {{start}} to {{end}}",
       "addBreakSlot": "Add a break",
-      "removeBreak": "Remove this break"
+      "removeBreak": "Remove this break",
+      "unsaved": "You have unsaved changes. Save them so bookings use them.",
+      "allSaved": "All changes saved."
     }
   }
 }

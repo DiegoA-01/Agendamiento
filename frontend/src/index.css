@@ -666,6 +666,29 @@ body {
   background: repeating-linear-gradient(135deg, #f6c453 0 6px, #fbe2a1 6px 12px); /* taste-skill-ignore: franjas del descanso */
   box-shadow: inset 0 0 0 1px #e0a92c; /* taste-skill-ignore: borde del descanso */
 }
+/* prettier-ignore */
+.hours-savebar {
+  background: rgb(255 255 255 / 0.75);
+  backdrop-filter: blur(16px); /* taste-skill-ignore: barra de guardar flotante */
+  box-shadow: inset 0 0 0 1px #0000000f; /* taste-skill-ignore: borde de la barra */
+}
+/* prettier-ignore */
+.hours-savebar-dirty {
+  background: #fff6df;
+  box-shadow: inset 0 0 0 1px #f1d18a, 0 14px 30px -18px #6b410099; /* taste-skill-ignore: barra con cambios pendientes */
+  animation: savebar-in 380ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes savebar-in {
+  from {
+    transform: translateY(8px);
+    opacity: 0.6;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hours-savebar-dirty {
+    animation: none;
+  }
+}
 .hours-break-box {
   background: #fff6df;
   box-shadow: inset 0 0 0 1px #f1d18a; /* taste-skill-ignore: caja del descanso */

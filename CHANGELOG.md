@@ -12,6 +12,11 @@
 - **Servicios:** van en verde oscuro, como una lista grande con duración y precio en dorado. Al pasar el cursor, la fila se llena de esmeralda metalizado. Cada servicio lleva a la reserva.
 - La ventana de la reserva sigue igual y se abre encima. Las páginas legales y la de la cita siguen en su estilo claro.
 - Con «reducir movimiento» en el sistema no hay animaciones. En el celular el diseño se reacomoda en una columna, sin desplazamiento horizontal.
+## Horarios avisa los cambios sin guardar
+
+- Si se agrega o cambia un descanso y no se guarda, las reservas no lo ven. Pasó con un descanso del miércoles que se quedó solo en la pantalla.
+- Ahora la barra de «Guardar horario» queda pegada abajo. Con cambios pendientes se pone ámbar y dice «Tienes cambios sin guardar. Guarda para que se apliquen en las reservas». Sin cambios dice «Todo guardado» y el botón queda inactivo.
+- Si hay cambios sin guardar, el navegador pregunta antes de salir o recargar la página.
 
 ## Horarios con jornada y descansos, y el descanso visible al reservar
 
