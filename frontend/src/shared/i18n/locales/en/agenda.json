@@ -67,6 +67,10 @@
     "selectedCustomer": "the selected customer",
     "clearCustomer": "Show all",
     "attendee": "For {{name}}",
-    "showInactive": "Show cancelled and no-shows"
+    "showInactive": "Show cancelled and no-shows",
+    "byProfessional": "Appointments by professional",
+    "unknownProfessional": "Other professional",
+    "appointmentsCount_one": "{{count}} appointment",
+    "appointmentsCount_other": "{{count}} appointments"
   }
 }

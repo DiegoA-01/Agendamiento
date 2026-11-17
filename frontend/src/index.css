@@ -652,6 +652,61 @@ body {
   }
 }
 
+/* Citas: pestañas por profesional con su inicial; la elegida va en el metal del panel. Cada
+   grupo de citas entra subiendo. */
+.pro-tab {
+  background: rgb(255 255 255 / 0.6);
+  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.06); /* taste-skill-ignore: borde de la pestaña */
+  transition:
+    transform 220ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    background-color 200ms;
+}
+.pro-tab:hover {
+  transform: translateY(-2px);
+  background: rgb(255 255 255 / 0.9);
+}
+.pro-tab-on,
+.pro-tab-on:hover {
+  background: var(--pf-metal);
+  color: var(--pf-metal-ink, var(--pf-ink));
+  box-shadow: var(--pf-metal-shadow); /* taste-skill-ignore: pestaña metalizada */
+}
+.pro-avatar {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 9999px;
+  background: var(--pf-green-soft, #e2e8f0);
+  color: var(--pf-green-ink, #0f172a);
+  font-weight: 700;
+}
+.pro-avatar-lg {
+  width: 40px;
+  height: 40px;
+  background: var(--pf-metal);
+  color: var(--pf-metal-ink, var(--pf-ink));
+}
+.pro-group {
+  animation: pro-in 420ms cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+}
+@keyframes pro-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pro-group {
+    animation: none;
+  }
+  .pro-tab,
+  .pro-tab:hover {
+    transition: none;
+    transform: none;
+  }
+}
+
 /* Horarios: barra del día con la jornada en el color del panel y los descansos en franjas ámbar
    diagonales, para que se vean de un vistazo. Las cajas de cada descanso usan el mismo ámbar. */
 .hours-track {
