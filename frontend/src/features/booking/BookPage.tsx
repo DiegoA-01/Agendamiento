@@ -27,7 +27,7 @@ import {
   useSlots,
 } from "./api";
 import { CancelAppointment } from "./CancelAppointment";
-import { AppointmentSummary } from "./ManagePage";
+import { WalletCard } from "./WalletCard";
 import { ServiceDetail } from "./ServiceDetail";
 import {
   MAX_SERVICES,
@@ -798,9 +798,11 @@ export default function BookPage() {
           {cancelled ? t("booking.manage.cancelled") : t("booking.wizard.done")}
         </h1>
         {!cancelled && <p className={MUTED}>{t("booking.wizard.doneHint")}</p>}
-        <div className={`rounded-2xl ${PANEL} p-5 ${cancelled ? "opacity-60" : ""}`}>
-          <AppointmentSummary appointment={book.data} />
-        </div>
+        <WalletCard
+          appointment={book.data}
+          status={t(cancelled ? "booking.status.cancelled" : "booking.status.confirmed")}
+          dimmed={cancelled}
+        />
         {!cancelled && (
           <>
             <Link

@@ -1,5 +1,13 @@
 # Changelog
 
+## La cita como tarjeta de billetera en verde metalizado
+
+- La página «Tu cita» y la confirmación de la reserva muestran la cita como una tarjeta de billetera, tipo tarjeta de crédito. Es verde esmeralda metalizado y brillante, con líneas de metal cepillado, un chip dorado y el nombre del negocio arriba. Lleva el estado de la cita, la fecha y hora en relieve, con quién, dónde, los servicios, el nombre del cliente y el total.
+- **Movimiento:** la tarjeta entra girando un poco y cada tanto la cruza un destello holográfico. Con el mouse se inclina en 3D y un brillo sigue al cursor. En el celular queda quieta.
+- Si la cita está cancelada, la tarjeta se ve apagada, en gris. El estado ya no se repite junto al título de la página.
+- **«Cancelar mi cita»:** al pasar el cursor pasa de blanco a un óxido rojo metalizado que combina con la tarjeta, sube y brilla.
+- Con «reducir movimiento» en el sistema no hay animaciones.
+
 ## Ventana de reserva con animaciones y sin barra de desplazamiento
 
 - La ventana de la reserva ya no muestra la barra gris de desplazamiento. Se sigue bajando con la rueda o con el dedo.

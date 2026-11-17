@@ -51,7 +51,7 @@ export function CancelAppointment({
         <button
           type="button"
           onClick={() => setConfirming(true)}
-          className={`${BUTTON} bg-[var(--color-surface)] text-[var(--color-text)] ring-1 ring-[color-mix(in_srgb,var(--color-text)_25%,transparent)] ring-inset`}
+          className={`${BUTTON} cancel-trigger bg-[var(--color-surface)] text-[var(--color-text)] ring-1 ring-[color-mix(in_srgb,var(--color-text)_25%,transparent)] ring-inset`}
         >
           {t("booking.manage.cancel")}
         </button>
