@@ -1,5 +1,16 @@
 # Changelog
 
+## Ventana de reserva con animaciones y sin barra de desplazamiento
+
+- La ventana de la reserva ya no muestra la barra gris de desplazamiento. Se sigue bajando con la rueda o con el dedo.
+- **Apertura:** entra flotando, con un rebote suave, y el fondo se desenfoca.
+- **Pasos:** cada paso entra subiendo por bloques (título, secciones y avisos). El resumen de arriba y los botones de abajo se quedan quietos. La barra de pasos se llena de izquierda a derecha.
+- **Opciones:** servicios, profesionales, días y horas suben al pasar el cursor y rebotan al elegirlas.
+- **Botón principal:** da un pulso cuando ya se puede seguir.
+- **Confirmación:** un sello con un círculo y un check que se dibujan y una onda alrededor. Luego entran escalonados el resumen y los botones.
+- Con «reducir movimiento» en el sistema no hay animaciones.
+- La prueba e2e busca el campo «Contraseña» por su nombre exacto, porque el botón del ojo («Mostrar contraseña») también contiene esa palabra.
+
 ## Mano al pasar el cursor por los botones
 
 - En toda la app (reserva pública, paneles y login), al pasar el cursor por un botón aparece la mano, así se sabe que se puede tocar. Por ejemplo, en «Cancelar mi cita» o «Reservar otra cita para alguien más».

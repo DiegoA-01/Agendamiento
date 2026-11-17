@@ -324,6 +324,213 @@ body {
   border: 1px solid var(--bk-risk-edge);
 }
 
+/* Ventana de la reserva con movimiento: entra flotando, sin barra de desplazamiento a la vista,
+   cada paso entra escalonado, lo que se elige rebota, la barra de pasos se llena, el botón
+   principal avisa cuando ya se puede seguir y la confirmación sella con un check que se dibuja.
+   Con "reducir movimiento" en el sistema se apaga (bloque al final). */
+.booking-dialog {
+  scrollbar-width: none;
+}
+.booking-dialog::-webkit-scrollbar {
+  display: none;
+}
+.booking-dialog[open] {
+  animation: dialog-in 420ms cubic-bezier(0.2, 0.9, 0.25, 1.15);
+}
+.booking-dialog[open]::backdrop {
+  backdrop-filter: blur(6px); /* taste-skill-ignore: fondo borroso de la ventana */
+  animation: backdrop-in 320ms ease;
+}
+@keyframes dialog-in {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.96);
+  }
+}
+@keyframes backdrop-in {
+  from {
+    opacity: 0;
+  }
+}
+
+/* Cada bloque del paso (título, secciones, avisos) entra subiendo, uno tras otro. El resumen de
+   arriba y la barra de botones de abajo se quedan quietos. */
+.booking-flow > :not(:first-child):not(:last-child) {
+  animation: step-in 460ms cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+}
+.booking-flow > :nth-child(3) {
+  animation-delay: 70ms;
+}
+.booking-flow > :nth-child(4) {
+  animation-delay: 140ms;
+}
+.booking-flow > :nth-child(n + 5) {
+  animation-delay: 210ms;
+}
+@keyframes step-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+}
+
+/* Barra de pasos: los hechos quedan llenos y el actual se llena de izquierda a derecha. */
+.step-bar {
+  position: relative;
+}
+.step-bar::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--pk-metal, var(--color-primary));
+  transform: scaleX(0);
+  transform-origin: left;
+}
+.step-bar-done::after {
+  transform: scaleX(1);
+}
+.step-bar-now::after {
+  animation: bar-fill 700ms cubic-bezier(0.2, 0.8, 0.2, 1) 120ms forwards;
+}
+@keyframes bar-fill {
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* Opciones (servicios, profesionales, días, horas): suben al pasar el cursor y rebotan al
+   elegirlas. */
+/* prettier-ignore */
+.booking-dialog button[aria-pressed] {
+  transition: transform 220ms cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 220ms ease, background-color 220ms ease;
+}
+/* prettier-ignore */
+.booking-dialog button[aria-pressed]:not(:disabled):hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px -16px #0e1d1680; /* taste-skill-ignore: elevación al pasar el cursor */
+}
+.booking-dialog button[aria-pressed="true"] {
+  animation: pick-pop 380ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes pick-pop {
+  40% {
+    transform: scale(1.04);
+  }
+}
+
+/* El botón principal da un pulso cuando pasa de deshabilitado a listo, y un destello suave
+   mientras espera. */
+.booking-cta:not(:disabled) {
+  animation: cta-ready 600ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.booking-cta:not(:disabled):hover {
+  transform: translateY(-2px);
+}
+@keyframes cta-ready {
+  40% {
+    transform: scale(1.03);
+  }
+}
+
+/* Confirmación: un sello verde que se dibuja, con una onda, y lo demás entra escalonado. */
+.done-badge {
+  position: relative;
+  display: inline-flex;
+  width: fit-content;
+  color: var(--color-primary);
+  animation: badge-pop 520ms cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+}
+.done-badge::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  border: 2px solid currentColor;
+  opacity: 0;
+  animation: badge-ring 1100ms ease-out 300ms;
+}
+.done-circle {
+  fill: color-mix(in srgb, var(--color-primary) 14%, transparent);
+  stroke: currentColor;
+  stroke-width: 2.5;
+  stroke-dasharray: 151;
+  stroke-dashoffset: 151;
+  animation: draw 600ms ease-out 120ms forwards;
+}
+.done-check {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 3.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 36;
+  stroke-dashoffset: 36;
+  animation: draw 380ms ease-out 560ms forwards;
+}
+@keyframes draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes badge-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+}
+@keyframes badge-ring {
+  from {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.8);
+  }
+}
+.booking-done > :not(.done-badge) {
+  animation: step-in 480ms cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+}
+.booking-done > :nth-child(2) {
+  animation-delay: 380ms;
+}
+.booking-done > :nth-child(3) {
+  animation-delay: 460ms;
+}
+.booking-done > :nth-child(4) {
+  animation-delay: 540ms;
+}
+.booking-done > :nth-child(n + 5) {
+  animation-delay: 620ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .booking-dialog[open],
+  .booking-dialog[open]::backdrop,
+  .booking-flow > *,
+  .step-bar-now::after,
+  .booking-dialog button[aria-pressed="true"],
+  .booking-cta:not(:disabled),
+  .done-badge,
+  .done-badge::after,
+  .booking-done > * {
+    animation: none;
+  }
+  .step-bar-now::after {
+    transform: scaleX(1);
+  }
+  .done-circle,
+  .done-check {
+    animation: none;
+    stroke-dashoffset: 0;
+  }
+  .booking-dialog button[aria-pressed]:hover,
+  .booking-cta:not(:disabled):hover {
+    transform: none;
+  }
+}
+
 /* Efecto vidrio al pasar el cursor o tocar cualquier botón con forma (los que llevan `rounded-*`):
    un brillo diagonal y un filo de luz arriba, encima del color del botón. Va en un pseudoelemento
    para que aparezca suave y no tape los anillos de selección. */

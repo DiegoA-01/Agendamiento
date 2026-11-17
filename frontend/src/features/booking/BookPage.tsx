@@ -780,7 +780,15 @@ export default function BookPage() {
   if (book.isSuccess) {
     const manageUrl = new URL(book.data.manage_url, window.location.origin).pathname;
     return (
-      <div className="flex flex-col gap-5 pb-6">
+      <div className="booking-done flex flex-col gap-5 pb-6">
+        {!cancelled && (
+          <span aria-hidden="true" className="done-badge">
+            <svg viewBox="0 0 52 52" className="size-14">
+              <circle cx="26" cy="26" r="24" className="done-circle" />
+              <path d="M15 27l7.5 7.5L37.5 19" className="done-check" />
+            </svg>
+          </span>
+        )}
         <h1
           id={BOOKING_TITLE_ID}
           ref={heading}
@@ -872,7 +880,7 @@ export default function BookPage() {
 
   return (
     // Ocupa toda la altura de la ventana: la barra de botones queda abajo aunque haya poco contenido.
-    <div className="flex flex-1 flex-col gap-6 tabular-nums">
+    <div className="booking-flow flex flex-1 flex-col gap-6 tabular-nums">
       <Ticket
         services={chosen.map((s) => s.name).join(" + ")}
         forName={forOther ? attendee.trim() : ""}
@@ -883,13 +891,13 @@ export default function BookPage() {
         note={step === "details" ? t("booking.summary.priceMayVary") : undefined}
       />
 
-      <div className="flex flex-col gap-3">
+      <div key={step} className="flex flex-col gap-3">
         <div className="flex gap-1.5" aria-hidden="true">
           {STEPS.map((name, index) => (
             <span
               key={name}
-              className={`h-1 flex-1 rounded-full ${
-                index <= stepIndex ? "bg-[var(--color-primary)]" : "bg-[var(--bk-raised)]"
+              className={`step-bar h-1.5 flex-1 overflow-hidden rounded-full bg-[var(--bk-raised)] ${
+                index < stepIndex ? "step-bar-done" : index === stepIndex ? "step-bar-now" : ""
               }`}
             />
           ))}
@@ -1061,7 +1069,7 @@ export default function BookPage() {
           type="button"
           disabled={step === "details" ? book.isPending : !canContinue}
           onClick={step === "details" ? submit : () => go(STEPS[stepIndex + 1])}
-          className={`min-h-14 flex-1 rounded-2xl px-4 font-semibold focus-visible:outline-2 ${PRESS} ${ACCENT} disabled:cursor-not-allowed disabled:bg-[var(--bk-raised)] disabled:text-[var(--bk-muted)]`}
+          className={`booking-cta min-h-14 flex-1 rounded-2xl px-4 font-semibold focus-visible:outline-2 ${PRESS} ${ACCENT} disabled:cursor-not-allowed disabled:bg-[var(--bk-raised)] disabled:text-[var(--bk-muted)]`}
         >
           {ctaLabel} <span aria-hidden="true">→</span>
         </button>
