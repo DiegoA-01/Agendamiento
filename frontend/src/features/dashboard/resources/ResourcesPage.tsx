@@ -124,7 +124,7 @@ function ResourceRow({ resource, editable }: { resource: Workstation; editable: 
             {t("catalog.edit")}
           </Button>
           <Button
-            variant="ghost"
+            variant="dangerGhost"
             disabled={remove.isPending}
             onClick={() => {
               if (window.confirm(t("catalog.resources.deleteConfirm", { name: resource.name })))

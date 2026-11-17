@@ -1,5 +1,19 @@
 # Changelog
 
+## Paneles con más vidrio líquido y movimiento
+
+- Paneles del Super Admin y del dueño. La reserva pública no cambia.
+- **Barras laterales:** el brillo del vidrio líquido se mueve muy despacio.
+  - Al cargar, las opciones del menú entran escalonadas.
+  - Al pasar el cursor, cada opción se corre a la derecha y su ícono se inclina. La opción activa recibe un destello.
+  - Al desplazar el menú, las opciones que entran por abajo crecen hasta su tamaño.
+- **Barra superior** (búsqueda, usuario, cerrar sesión): usa el mismo vidrio líquido. La búsqueda se ilumina al pasar el cursor o escribir. Cerrar sesión sube y cambia de color.
+- **Botones:** suben un poco y cambian de color al pasar el cursor, con un destello de vidrio. Al tocarlos se hunden.
+  - El principal brilla más.
+  - Los secundarios toman el color del panel.
+  - Los de riesgo se encienden en un óxido rojo, incluidos los «Eliminar» discretos de servicios, equipo, puestos, horarios y clientes, que ahora son la variante `dangerGhost`.
+- Con «reducir movimiento» activado en el sistema, no hay animaciones.
+
 ## Barras laterales sin barra de desplazamiento y con más vidrio líquido
 
 - Las barras laterales del Super Admin y del dueño ya no muestran la barra gris del navegador. Cuando el menú no cabe, el borde de abajo (o el de arriba, si ya se bajó) se desvanece. Abajo aparece una flecha redonda de vidrio que se mueve suave y, al tocarla, baja el menú. Con el teclado no hace falta, porque el foco desplaza solo. Si el visitante pidió menos movimiento, la flecha queda quieta.

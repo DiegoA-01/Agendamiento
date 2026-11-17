@@ -2,7 +2,8 @@ import { useId, useState, type ComponentProps, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { fieldMessage } from "../api/errors";
 
-type ButtonVariant = "primary" | "secondary" | "danger" | "ghost";
+// `dangerGhost`: botón discreto de una acción de riesgo (Eliminar); se enciende al pasar el cursor.
+type ButtonVariant = "primary" | "secondary" | "danger" | "ghost" | "dangerGhost";
 
 const BUTTON_STYLES: Record<ButtonVariant, string> = {
   primary: "bg-slate-900 text-white hover:bg-slate-700 disabled:bg-slate-400",
@@ -10,6 +11,7 @@ const BUTTON_STYLES: Record<ButtonVariant, string> = {
     "border border-slate-300 bg-white text-slate-900 hover:bg-slate-50 disabled:opacity-50",
   danger: "bg-red-700 text-white hover:bg-red-800 disabled:bg-red-300",
   ghost: "text-slate-700 hover:bg-slate-100 disabled:opacity-50",
+  dangerGhost: "text-slate-700 hover:bg-red-50 hover:text-red-800 disabled:opacity-50",
 };
 
 export function Button({
@@ -21,7 +23,8 @@ export function Button({
   return (
     <button
       type={type}
-      className={`inline-flex min-h-10 items-center justify-center gap-2 rounded-lg px-4 text-sm font-medium transition-colors disabled:cursor-not-allowed ${BUTTON_STYLES[variant]} ${className}`}
+      data-variant={variant}
+      className={`btn inline-flex min-h-10 items-center justify-center gap-2 rounded-lg px-4 text-sm font-medium transition-colors disabled:cursor-not-allowed ${BUTTON_STYLES[variant]} ${className}`}
       {...props}
     />
   );

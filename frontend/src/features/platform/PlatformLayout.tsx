@@ -1,4 +1,4 @@
-import { useState, type FormEvent, type ReactNode } from "react";
+import { useState, type CSSProperties, type FormEvent, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
 import { useMe } from "../auth/useMe";
@@ -122,13 +122,14 @@ export function PlatformLayout() {
         {GROUPS.map((group) => (
           <div key={group.label} className="flex flex-col gap-1">
             <p className="px-3 text-sm text-white/55">{t(group.label)}</p>
-            {group.links.map((link) => (
+            {group.links.map((link, index) => (
               <NavLink
+                style={{ "--i": index } as CSSProperties}
                 key={link.to}
                 to={link.to}
                 onClick={() => setMenuOpen(false)}
                 className={({ isActive }) =>
-                  `flex min-h-11 items-center gap-3 rounded-2xl px-3 font-medium transition-colors focus-visible:outline-2 ${
+                  `nav-item flex min-h-11 items-center gap-3 rounded-2xl px-3 font-medium focus-visible:outline-2 ${
                     isActive ? "metal" : "text-white/85 hover:bg-white/10 hover:text-white"
                   }`
                 }
