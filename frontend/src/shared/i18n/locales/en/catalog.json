@@ -147,7 +147,17 @@
       "blockReasonPlaceholder": "Vacation",
       "blockSave": "Block time",
       "deleteBlockConfirm": "Delete this time off? Those hours become available again.",
-      "noProfile": "Your account is not linked to a professional profile yet. Ask the owner to link it."
+      "noProfile": "Your account is not linked to a professional profile yet. Ask the owner to link it.",
+      "works": "Works",
+      "workday": "Workday",
+      "legendWork": "Open",
+      "legendBreak": "Break: no bookings",
+      "breakTitle": "Break {{n}}",
+      "breakFrom": "Break from",
+      "breakTo": "Break to",
+      "breakRange": "Break from {{start}} to {{end}}",
+      "addBreakSlot": "Add a break",
+      "removeBreak": "Remove this break"
     }
   }
 }

@@ -147,7 +147,17 @@
       "blockReasonPlaceholder": "Vacaciones",
       "blockSave": "Bloquear",
       "deleteBlockConfirm": "¿Eliminar este bloqueo? Esas horas vuelven a quedar disponibles.",
-      "noProfile": "Tu cuenta aún no está enlazada a una ficha de profesional. Pídele al propietario que la enlace."
+      "noProfile": "Tu cuenta aún no está enlazada a una ficha de profesional. Pídele al propietario que la enlace.",
+      "works": "Trabaja",
+      "workday": "Jornada",
+      "legendWork": "Atiende",
+      "legendBreak": "Descanso: no se puede reservar",
+      "breakTitle": "Descanso {{n}}",
+      "breakFrom": "Descanso desde",
+      "breakTo": "Descanso hasta",
+      "breakRange": "Descanso de {{start}} a {{end}}",
+      "addBreakSlot": "Agregar descanso",
+      "removeBreak": "Quitar este descanso"
     }
   }
 }

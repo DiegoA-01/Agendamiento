@@ -338,6 +338,12 @@ export interface AvailableDays {
 
 export type SlotPeriod = "morning" | "afternoon" | "evening";
 
+/** Descanso del profesional (hueco entre franjas de su horario): a esa hora no se reserva. */
+export interface BreakRange {
+  start: string;
+  end: string;
+}
+
 export interface Slot {
   start: string;
   end: string;

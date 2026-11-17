@@ -276,6 +276,25 @@ def slots_for_day(
     ]
 
 
+def breaks_for_day(tenant, professional, day: dt.date) -> list[Interval]:
+    """Descansos del profesional ese día: los huecos entre sus franjas de trabajo (por ejemplo,
+    9–13 y 14–18 dejan un descanso de 13 a 14). Sirve para mostrarlos al reservar."""
+    intervals = _working_intervals(professional, day, ZoneInfo(tenant.timezone))
+    return [
+        (previous_end, next_start)
+        for (_, previous_end), (next_start, _) in zip(intervals, intervals[1:], strict=False)
+        if next_start > previous_end
+    ]
+
+
+def get_breaks(tenant, service_ids, day: dt.date, professional_id=None, *, public: bool):
+    """Descansos del profesional elegido. Con "cualquiera" no hay uno solo que mostrar: vacío."""
+    if professional_id is None:
+        return []
+    professional = candidates(resolve_services(service_ids), professional_id, public=public)[0]
+    return breaks_for_day(tenant, professional, day)
+
+
 def get_available_slots(tenant, service_ids, day: dt.date, professional_id=None, *, public: bool):
     """Función pública del motor (spec §8)."""
     services = resolve_services(service_ids)

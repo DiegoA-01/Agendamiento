@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { api } from "../../shared/api/client";
 import type {
   AvailableDays,
+  BreakRange,
   PublicAppointment,
   PublicCategory,
   PublicCompany,
@@ -69,4 +70,20 @@ export const usePublicAppointment = (token: string) =>
     queryKey: ["public", "appointment", token],
     queryFn: () =>
       api<PublicAppointment>(`/api/v1/public/appointments/${encodeURIComponent(token)}/`),
+  });
+
+/** Descansos del profesional elegido ese día (con "cualquiera" no se piden). */
+export const usePublicBreaks = (
+  serviceIds: string[],
+  professionalId: string | null,
+  date: string,
+) =>
+  useQuery({
+    queryKey: ["public", "breaks", serviceIds, professionalId, date],
+    queryFn: () => {
+      const params = serviceParams(serviceIds, professionalId);
+      params.set("date", date);
+      return api<BreakRange[]>(`/api/v1/public/availability/breaks/?${params}`);
+    },
+    enabled: serviceIds.length > 0 && Boolean(date) && Boolean(professionalId),
   });

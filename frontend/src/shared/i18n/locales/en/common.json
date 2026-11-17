@@ -130,7 +130,9 @@
     "one_per_category": "You can only choose one service from that category per appointment.",
     "customer_overlap": "You already have an appointment at that time. Choose another time.",
     "invalid_recovery_code": "That recovery code does not work or was already used.",
-    "two_factor_not_enabled": "Two-step verification is not active."
+    "two_factor_not_enabled": "Two-step verification is not active.",
+    "hours_breakOutside": "The break must be inside the workday.",
+    "hours_breakOverlap": "It overlaps another break on the same day."
   },
   "verticals": {
     "barbershop": "Barbershop",

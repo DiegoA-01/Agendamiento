@@ -112,6 +112,17 @@ class SlotSerializer(serializers.Serializer):
     professional_ids = serializers.ListField(child=serializers.UUIDField())
 
 
+class BreakSerializer(serializers.Serializer):
+    """Descanso del profesional: hueco entre dos franjas de su horario."""
+
+    start = serializers.DateTimeField()
+    end = serializers.DateTimeField()
+
+    def to_representation(self, instance):
+        start, end = instance
+        return super().to_representation({"start": start, "end": end})
+
+
 class CalendarDaySerializer(serializers.Serializer):
     date = serializers.DateField()
     status = serializers.ChoiceField(

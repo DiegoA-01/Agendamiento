@@ -151,6 +151,26 @@ class PublicSlotsView(PublicView):
         return Response(data)
 
 
+class PublicBreaksView(PublicView):
+    """Descansos del profesional elegido ese día, para mostrarlos entre los horarios: a esa hora
+    no se puede reservar. Con "cualquiera" responde vacío."""
+
+    @extend_schema(
+        parameters=[*AVAILABILITY_PARAMS, OpenApiParameter("date", str, required=True)],
+        responses=scheduling_serializers.BreakSerializer(many=True),
+    )
+    def get(self, request):
+        query = _availability_query(request, scheduling_serializers.SlotsQuerySerializer)
+        breaks = availability.get_breaks(
+            request.tenant,
+            query["service_ids"],
+            query["date"],
+            query["professional_id"],
+            public=True,
+        )
+        return Response(scheduling_serializers.BreakSerializer(breaks, many=True).data)
+
+
 class PublicDaysView(PublicView):
     @extend_schema(
         parameters=[*AVAILABILITY_PARAMS, OpenApiParameter("month", str, required=True)],

@@ -130,7 +130,9 @@
     "one_per_category": "Solo puedes elegir un servicio de esa categoría por cita.",
     "customer_overlap": "Ya tienes una cita en ese horario. Elige otra hora.",
     "invalid_recovery_code": "Ese código de recuperación no sirve o ya se usó.",
-    "two_factor_not_enabled": "La verificación en dos pasos no está activa."
+    "two_factor_not_enabled": "La verificación en dos pasos no está activa.",
+    "hours_breakOutside": "El descanso debe quedar dentro de la jornada.",
+    "hours_breakOverlap": "Se cruza con otro descanso del mismo día."
   },
   "verticals": {
     "barbershop": "Barbería",

@@ -1,5 +1,18 @@
 # Changelog
 
+## Horarios con jornada y descansos, y el descanso visible al reservar
+
+- **Horarios:** cada día se arma con un «Trabaja», la **jornada** (desde, hasta) y sus **descansos** (desde, hasta).
+  - Cada descanso va en una caja ámbar.
+  - Una barra del día muestra la jornada en el color del panel y los descansos encima en franjas ámbar, con su hora.
+  - «Agregar descanso» sugiere de 13:00 a 14:00 si cabe.
+  - Se valida que el descanso quede dentro de la jornada y no se cruce con otro.
+  - «Copiar el lunes de martes a viernes» copia también los descansos.
+  - Antes había que adivinar que «Agregar franja» servía para un descanso.
+- Por dentro no cambia el modelo: la jornada partida por sus descansos se guarda como franjas, igual que antes. Las franjas viejas que se cruzaban se juntan al abrir la pantalla.
+- **Reserva:** si el cliente elige a un profesional, entre sus horarios aparece una fila ámbar «Descanso 13:00 – 14:00 · no se puede reservar». Con «Cualquiera» no se muestra, porque cada profesional tiene su propio descanso.
+- Nuevo endpoint público `GET /api/v1/public/availability/breaks/`, con los mismos parámetros que `slots`. Devuelve los huecos entre las franjas del profesional ese día.
+
 ## La cita como tarjeta de billetera en verde metalizado
 
 - La página «Tu cita» y la confirmación de la reserva muestran la cita como una tarjeta de billetera, tipo tarjeta de crédito. Es verde esmeralda metalizado y brillante, con líneas de metal cepillado, un chip dorado y el nombre del negocio arriba. Lleva el estado de la cita, la fecha y hora en relieve, con quién, dónde, los servicios, el nombre del cliente y el total.

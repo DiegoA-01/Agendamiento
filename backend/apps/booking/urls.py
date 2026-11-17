@@ -41,6 +41,11 @@ urlpatterns += [
         public_views.PublicSlotsView.as_view(),
         name="public-availability-slots",
     ),
+    path(
+        "public/availability/breaks/",
+        public_views.PublicBreaksView.as_view(),
+        name="public-availability-breaks",
+    ),
     path("public/appointments/", public_views.PublicBookView.as_view(), name="public-book"),
     path(
         "public/appointments/<str:token>/",
