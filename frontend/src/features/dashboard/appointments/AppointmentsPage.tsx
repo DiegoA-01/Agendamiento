@@ -9,7 +9,6 @@ import {
   ErrorBox,
   Loading,
   PageHeader,
-  SelectField,
   TextField,
 } from "../../../shared/ui/primitives";
 import { describeError } from "../../../shared/api/errors";
@@ -20,6 +19,7 @@ import { useCan } from "../shared/useCan";
 import { AppointmentForm } from "./AppointmentForm";
 import { AppointmentDetail, AppointmentSummary } from "./AppointmentDetail";
 import { useAppointments } from "./api";
+import { groupByProfessional } from "./byProfessional";
 import { STATUSES } from "./transitions";
 import type { AppointmentStatus } from "../../../shared/api/types";
 
@@ -84,18 +84,6 @@ export default function AppointmentsPage() {
             if (e.target.value) setRange({ ...range, to: e.target.value });
           }}
         />
-        <SelectField
-          label={t("agenda.professional")}
-          value={professional}
-          onChange={(e) => setProfessional(e.target.value)}
-        >
-          <option value="">{t("common.all")}</option>
-          {professionals.data?.map((p) => (
-            <option key={p.id} value={p.id}>
-              {p.display_name}
-            </option>
-          ))}
-        </SelectField>
         {/* Se llega con `?customer_id=` desde /clientes: se muestra como filtro quitable. */}
         {customer && (
           <div className="flex flex-wrap items-end gap-2">
@@ -136,6 +124,29 @@ export default function AppointmentsPage() {
           ))}
         </fieldset>
       </Card>
+      {/* Una pestaña por profesional: "Todos" muestra las citas agrupadas por quién atiende. */}
+      <div
+        role="group"
+        aria-label={t("agenda.byProfessional")}
+        className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none]"
+      >
+        {[{ id: "", display_name: t("common.all") }, ...(professionals.data ?? [])].map((p) => (
+          <button
+            key={p.id || "all"}
+            type="button"
+            aria-pressed={professional === p.id}
+            onClick={() => setProfessional(p.id)}
+            className={`pro-tab flex min-h-11 shrink-0 items-center gap-2 rounded-full py-1.5 pr-4 pl-1.5 text-sm font-medium ${
+              professional === p.id ? "pro-tab-on" : ""
+            }`}
+          >
+            <span aria-hidden="true" className="pro-avatar">
+              {p.id ? p.display_name.trim().charAt(0).toUpperCase() : "∗"}
+            </span>
+            {p.display_name}
+          </button>
+        ))}
+      </div>
       {selected && <AppointmentDetail id={selected} onClose={() => setSelected(null)} />}
       {(appointments.isPending || professionals.isPending || services.isPending) && <Loading />}
       {failed && (
@@ -144,17 +155,38 @@ export default function AppointmentsPage() {
       {appointments.isSuccess && !list.length && (
         <EmptyState>{t("agenda.emptyAppointments")}</EmptyState>
       )}
-      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-        {list.map((appointment) => (
-          <button
-            className="min-w-0 rounded-xl border border-slate-200 bg-white p-4 text-slate-900 shadow-sm hover:border-sky-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-700"
-            key={appointment.id}
-            onClick={() => setSelected(appointment.id)}
+      {groupByProfessional(list, professionals.data ?? [], t("agenda.unknownProfessional")).map(
+        (group) => (
+          <section
+            key={group.id}
+            aria-labelledby={`pro-${group.id}`}
+            className="pro-group space-y-3"
           >
-            <AppointmentSummary appointment={appointment} />
-          </button>
-        ))}
-      </div>
+            <div className="flex items-center gap-3">
+              <span aria-hidden="true" className="pro-avatar pro-avatar-lg">
+                {group.name.trim().charAt(0).toUpperCase()}
+              </span>
+              <h2 id={`pro-${group.id}`} className="text-lg font-semibold">
+                {group.name}
+              </h2>
+              <span className="text-sm text-slate-600">
+                {t("agenda.appointmentsCount", { count: group.appointments.length })}
+              </span>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+              {group.appointments.map((appointment) => (
+                <button
+                  className="min-w-0 rounded-xl border border-slate-200 bg-white p-4 text-left text-slate-900 shadow-sm hover:border-sky-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-700"
+                  key={appointment.id}
+                  onClick={() => setSelected(appointment.id)}
+                >
+                  <AppointmentSummary appointment={appointment} />
+                </button>
+              ))}
+            </div>
+          </section>
+        ),
+      )}
       {appointments.hasNextPage && (
         <Button
           variant="secondary"

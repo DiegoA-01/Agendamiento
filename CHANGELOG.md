@@ -1,5 +1,12 @@
 # Changelog
 
+## Citas separadas por profesional
+
+- En «Citas», arriba de la lista, hay una pestaña por cada persona del equipo, con su inicial, más «Todos». El selector de profesional del filtro se cambia por estas pestañas.
+- **Con «Todos»:** las citas salen agrupadas por profesional, en el orden del equipo. Cada grupo lleva un encabezado con su inicial, su nombre y cuántas citas tiene. Dentro de cada grupo las citas van ordenadas por hora.
+- **Al tocar a una persona:** solo salen sus citas.
+- Las pestañas suben al pasar el cursor, la elegida va en el metal del panel y cada grupo entra con una animación suave. Con «reducir movimiento» en el sistema no hay animaciones.
+
 ## Portada del negocio en esmeralda metalizado, con la tarjeta de cita que sale del celular
 
 - La portada pública usa el verde esmeralda metalizado de la tarjeta de la cita: fondo verde muy oscuro con luces que se mueven despacio, texto crema y detalles dorados.

@@ -67,6 +67,10 @@
     "selectedCustomer": "el cliente seleccionado",
     "clearCustomer": "Ver todas",
     "attendee": "Para {{name}}",
-    "showInactive": "Mostrar canceladas e inasistencias"
+    "showInactive": "Mostrar canceladas e inasistencias",
+    "byProfessional": "Citas por profesional",
+    "unknownProfessional": "Otro profesional",
+    "appointmentsCount_one": "{{count}} cita",
+    "appointmentsCount_other": "{{count}} citas"
   }
 }
