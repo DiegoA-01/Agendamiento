@@ -76,6 +76,7 @@ def tenant_snapshot(tenant) -> dict[str, Any]:
         "language": tenant.language,
         "status": tenant.status,
         "plan": str(tenant.plan_id),
+        "public_style": tenant.public_style,
     }
 
 

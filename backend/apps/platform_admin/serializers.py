@@ -2,7 +2,7 @@ from rest_framework import serializers
 
 from apps.accounts.models import User
 from apps.tenancy import services as tenancy
-from apps.tenancy.constants import LANGUAGES, MODULE_KEYS, VERTICALS
+from apps.tenancy.constants import LANGUAGES, MODULE_KEYS, PUBLIC_STYLES, VERTICALS
 from apps.tenancy.theme import THEME_KEYS
 
 
@@ -46,6 +46,9 @@ class TenantSerializer(serializers.Serializer):
     language = serializers.CharField()
     status = serializers.CharField()
     theme = serializers.DictField()
+    public_style = serializers.CharField(
+        help_text="Estilo de la reserva elegido; vacío = según el tipo de negocio."
+    )
     created_at = serializers.DateTimeField()
     plan = PlanBriefSerializer()
 
@@ -116,6 +119,10 @@ class TenantUpdateSerializer(serializers.Serializer):
     timezone = serializers.CharField()
     currency = serializers.CharField(max_length=3)
     language = serializers.ChoiceField(choices=LANGUAGES)
+    public_style = serializers.ChoiceField(
+        choices=("", *PUBLIC_STYLES),
+        help_text="Estilo de la página pública de reservas; vacío = según el tipo de negocio.",
+    )
 
 
 class ThemeSerializer(serializers.Serializer):

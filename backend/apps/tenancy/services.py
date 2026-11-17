@@ -55,7 +55,24 @@ __all__ = [
 ]
 
 _HOST_RE = re.compile(r"^(?=.{4,253}$)([a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,63}$")
-TENANT_EDITABLE_FIELDS = ("name", "vertical", "timezone", "currency", "language", "plan")
+TENANT_EDITABLE_FIELDS = (
+    "name",
+    "vertical",
+    "timezone",
+    "currency",
+    "language",
+    "plan",
+    "public_style",
+)
+# Estilo por defecto de la página pública según el tipo de negocio.
+STYLE_BY_VERTICAL = {"barbershop": "barbershop", "salon": "salon", "nails": "salon", "spa": "salon"}
+
+
+def public_style_for(tenant: Tenant) -> str:
+    """El estilo de la página pública: el que eligió el Super Admin o el del tipo de negocio."""
+    return tenant.public_style or STYLE_BY_VERTICAL.get(tenant.vertical, "emerald")
+
+
 CHALLENGE_PREFIX = "_agenda-challenge"
 
 

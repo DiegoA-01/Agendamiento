@@ -5,6 +5,7 @@ from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
 from apps.media import services as media
+from apps.tenancy.constants import PUBLIC_STYLES
 
 from .models import Appointment
 
@@ -33,6 +34,9 @@ class PublicCompanySerializer(serializers.Serializer):
     cookies_html = serializers.CharField(allow_blank=True)
     cancel_min_hours = serializers.IntegerField()
     booking_enabled = serializers.BooleanField()
+    public_style = serializers.ChoiceField(
+        choices=PUBLIC_STYLES, help_text="Estilo visual de la página de reservas."
+    )
 
 
 class PublicServiceSerializer(serializers.Serializer):

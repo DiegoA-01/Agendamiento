@@ -280,5 +280,18 @@
     "regenerateTitle": "Generar códigos nuevos",
     "regenerateIntro": "Los códigos anteriores dejarán de servir. Confirma con tu contraseña y el código de tu app.",
     "regenerateSubmit": "Generar códigos nuevos"
+  },
+  "styles": {
+    "title": "Estilo de la reserva",
+    "intro": "Cómo se ve la página donde los clientes reservan: portada, ventana de reserva y tarjeta de la cita.",
+    "auto": "Automático",
+    "autoHint": "Según el tipo de negocio: barbería usa Barbería clásica; salón, uñas y spa usan Salón.",
+    "emerald": "Esmeralda",
+    "emeraldHint": "Verde esmeralda metalizado con detalles dorados.",
+    "barbershop": "Barbería clásica",
+    "barbershopHint": "Carbón, rojo vino y latón, con el poste de barbero girando.",
+    "salon": "Salón de belleza",
+    "salonHint": "Rosa piel, perla y oro rosa, con brillos suaves.",
+    "save": "Guardar estilo"
   }
 }

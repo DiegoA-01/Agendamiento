@@ -107,3 +107,18 @@ def test_a_plan_used_only_by_deleted_tenants_can_be_deleted_logically(api):
 def test_unknown_plan_is_404(api):
     response = call(api, "get", "/api/v1/plans/00000000-0000-0000-0000-000000000000/")
     assert response.status_code == 404
+
+
+def test_superadmin_sets_the_public_style_and_it_is_audited(api):
+    tenant = TenantFactory()
+
+    response = call(api, "patch", f"/api/v1/tenants/{tenant.pk}/", {"public_style": "salon"})
+
+    assert response.status_code == 200, response.json()
+    assert response.json()["public_style"] == "salon"
+    tenant.refresh_from_db()
+    assert tenant.public_style == "salon"
+    log = AuditLog.objects.filter(action="tenant.update").latest("created_at")
+    assert log.after["public_style"] == "salon"
+    bad = call(api, "patch", f"/api/v1/tenants/{tenant.pk}/", {"public_style": "neon"})
+    assert bad.status_code == 400

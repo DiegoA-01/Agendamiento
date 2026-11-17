@@ -1,5 +1,7 @@
 export type Role = "superadmin" | "owner" | "admin" | "receptionist" | "professional";
 export type Vertical = "barbershop" | "salon" | "nails" | "spa";
+/** Estilo de la página pública de reservas (lo elige el Super Admin). */
+export type PublicStyle = "emerald" | "barbershop" | "salon";
 export type Language = "es" | "en";
 export type TenantStatus = "active" | "suspended";
 export type ModuleKey = "booking" | "commissions" | "reports" | "notifications_whatsapp";
@@ -78,6 +80,8 @@ export interface Tenant {
   language: Language;
   status: TenantStatus;
   theme: Partial<Theme>;
+  /** Vacío = según el tipo de negocio. */
+  public_style: PublicStyle | "";
   created_at: string;
   plan: { id: string; name: string };
 }
@@ -144,6 +148,7 @@ export const MODULE_KEYS: ModuleKey[] = [
 ];
 export const VERTICALS: Vertical[] = ["barbershop", "salon", "nails", "spa"];
 export const LANGUAGES: Language[] = ["es", "en"];
+export const PUBLIC_STYLES: PublicStyle[] = ["emerald", "barbershop", "salon"];
 export const THEME_KEYS: (keyof Theme)[] = [
   "primary",
   "secondary",
@@ -294,6 +299,7 @@ export interface PublicCompany {
   cookies_html: string;
   cancel_min_hours: number;
   booking_enabled: boolean;
+  public_style: PublicStyle;
 }
 
 export interface PublicService {

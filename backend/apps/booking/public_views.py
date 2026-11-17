@@ -68,6 +68,7 @@ class PublicCompanyView(PublicView):
             "logo": media.media_urls(info.logo) if info else None,
             "booking_enabled": tenancy.is_module_enabled(tenant, MODULE_BOOKING),
             "cancel_min_hours": tenant.cancel_min_hours,
+            "public_style": tenancy.public_style_for(tenant),
         }
         for field in ("address", "city", "phone", "email", "terms_html", "privacy_html"):
             data[field] = getattr(info, field, "") if info else ""

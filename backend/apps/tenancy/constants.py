@@ -10,6 +10,8 @@ MODULE_KEYS = (MODULE_BOOKING, MODULE_COMMISSIONS, MODULE_REPORTS, MODULE_WHATSA
 
 VERTICALS = ("barbershop", "salon", "nails", "spa")
 LANGUAGES = ("es", "en")
+# Estilos de la página pública de reservas. Vacío = según el tipo de negocio.
+PUBLIC_STYLES = ("emerald", "barbershop", "salon")
 
 # Nombres de los parámetros de sesión que leen las políticas RLS.
 DB_SETTING_TENANT = "app.current_tenant"

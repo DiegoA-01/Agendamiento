@@ -9,6 +9,7 @@ import { THEME_KEYS, type Theme, type TenantDetail } from "../../shared/api/type
 import { Badge, Button, Card, Notice, TextField } from "../../shared/ui/primitives";
 import { MIN_TEXT_CONTRAST, contrastRatio, isHexColor } from "./contrast";
 import { themeSchema, type ThemeValues } from "./schemas";
+import { StylePicker } from "./StylePicker";
 
 const DEFAULT_THEME: Theme = {
   primary: "#1f2937",
@@ -60,6 +61,9 @@ export function ThemeTab({ tenant }: { tenant: TenantDetail }) {
 
   return (
     <div className="grid gap-5 lg:grid-cols-[1fr_20rem]">
+      <div className="lg:col-span-2">
+        <StylePicker tenant={tenant} />
+      </div>
       <Card>
         <p className="mb-4 text-sm text-slate-600">{t("theme.intro")}</p>
         {message && (

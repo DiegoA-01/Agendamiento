@@ -111,6 +111,31 @@ export default function LandingPage() {
         </div>
 
         <div className="ld-stage ld-in" style={delay(300)}>
+          {company.public_style === "barbershop" && (
+            <div aria-hidden="true" className="ld-motif-pole barber-pole">
+              <span className="barber-pole-cap" />
+              <span className="barber-pole-tube" />
+              <span className="barber-pole-cap" />
+            </div>
+          )}
+          {company.public_style === "salon" && (
+            <div aria-hidden="true">
+              <span className="salon-orb" style={{ width: 120, height: 120, left: 20, top: 60 }} />
+              <span
+                className="salon-orb"
+                style={{ width: 60, height: 60, right: 0, bottom: 60, animationDelay: "-3s" }}
+              />
+              <span className="salon-sparkle" style={{ left: 90, top: 210 }} />
+              <span
+                className="salon-sparkle"
+                style={{ right: 30, top: 40, animationDelay: "-1s" }}
+              />
+              <span
+                className="salon-sparkle"
+                style={{ left: 40, bottom: 120, animationDelay: "-2s" }}
+              />
+            </div>
+          )}
           <div aria-hidden="true" className={`ld-card ${done ? "ld-card-out" : ""}`}>
             <div className="flex items-start justify-between gap-3 text-xs font-semibold tracking-[0.14em] uppercase">
               <span className="truncate">{company.name}</span>
