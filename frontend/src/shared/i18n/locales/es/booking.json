@@ -175,6 +175,18 @@
         "phoneValue": "300 123 4567",
         "doneTitle": "¡Cita confirmada!",
         "doneText": "Te esperamos. Guarda el enlace para ver o cancelar tu cita."
+      },
+      "lead": "Tu corte, a la hora que quieras. Eliges el servicio, quién te atiende y la hora, y en menos de un minuto tienes tu cita en el bolsillo.",
+      "seeServices": "Ver servicios y precios",
+      "howSub": "Cuatro toques, sin llamar ni esperar respuesta. El celular de arriba lo hace en vivo.",
+      "toast": "Cita confirmada · {{time}}",
+      "facts": {
+        "minute": "1 min",
+        "minuteLabel": "para reservar",
+        "cancel_one": "{{count}} hora",
+        "cancel_other": "{{count}} horas",
+        "cancelLabel": "antes, cancelas gratis",
+        "accountLabel": "cuentas ni contraseñas"
       }
     },
     "wallet": {

@@ -749,6 +749,669 @@ body {
   box-shadow: inset 0 0 0 1px #f1d18a; /* taste-skill-ignore: caja del descanso */
 }
 
+/* Portada del negocio en verde esmeralda metalizado (como la tarjeta de la cita): fondo verde muy
+   oscuro con luces que se mueven despacio, nombre en serif crema con un brillo, celular que flota y
+   hace la reserva, y la tarjeta que sale de él al confirmar. Los pasos van en una franja crema y los
+   servicios otra vez en verde. La reserva se abre encima en su ventana clara de siempre. */
+/* prettier-ignore */
+.public-dark {
+  --ld-ground: #071a14;
+  --ld-ground-2: #0b241c;
+  --ld-cream: #f2efe6;
+  --ld-muted: #a9bfb3;
+  --ld-gold: #d9b664;
+  --ld-metal: linear-gradient(135deg, #0c3a2a 0%, #1d6a4c 32%, #6fb894 50%, #1f6247 66%, #0b3123 100%); /* taste-skill-ignore: esmeralda metalizado pedido */
+  --ld-metal-light: linear-gradient(135deg, #e9f6ef 0%, #9fd1b6 30%, #3f8f69 55%, #bfe3cf 100%); /* taste-skill-ignore: esmeralda metalizado pedido */
+  position: relative;
+  isolation: isolate;
+  background: var(--ld-ground);
+  color: var(--ld-cream);
+}
+/* prettier-ignore */
+.public-dark::before {
+  content: "";
+  position: fixed;
+  inset: -20%;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(35% 30% at 20% 20%, #1d6a4c66, transparent 70%), radial-gradient(30% 35% at 80% 10%, #6fb89433, transparent 70%), radial-gradient(40% 35% at 60% 90%, #0f4a3555, transparent 70%); /* taste-skill-ignore: luces del fondo */
+  filter: blur(30px); /* taste-skill-ignore: luces del fondo */
+  animation: ld-drift 18s ease-in-out infinite alternate;
+}
+@keyframes ld-drift {
+  to {
+    transform: translate(4%, 3%) rotate(6deg) scale(1.08);
+  }
+}
+/* prettier-ignore */
+.public-dark > header .glass {
+  background: rgb(255 255 255 / 0.06);
+  border-color: rgb(255 255 255 / 0.12);
+  box-shadow: inset 0 1px 0 #ffffff1f; /* taste-skill-ignore: barra de vidrio oscuro */
+}
+.public-dark > footer {
+  color: var(--ld-muted);
+}
+.public-dark .metal {
+  background: var(--ld-metal-light);
+  color: #06231a;
+}
+
+/* El celular inclinado y la tarjeta no deben abrir desplazamiento horizontal en el celular. */
+.landing {
+  overflow-x: clip;
+}
+.ld-wrap {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+.ld-hero {
+  display: grid;
+  gap: 48px;
+  align-items: center;
+  padding-top: 48px;
+  padding-bottom: 96px;
+}
+@media (min-width: 1024px) {
+  .ld-hero {
+    grid-template-columns: 1.05fr 0.95fr;
+    min-height: calc(100dvh - 110px);
+    padding-top: 0;
+  }
+}
+/* prettier-ignore */
+.ld-title {
+  font-size: clamp(52px, 7.4vw, 108px);
+  line-height: 0.95;
+  letter-spacing: -0.03em;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+  background: linear-gradient(100deg, #f2efe6 0%, #f2efe6 40%, #bfe3cf 50%, #f2efe6 60%, #f2efe6 100%); /* taste-skill-ignore: brillo del nombre */
+  background-size: 250% 100%;
+  -webkit-background-clip: text; /* taste-skill-ignore: brillo del nombre pedido */
+  background-clip: text; /* taste-skill-ignore: brillo del nombre pedido */
+  color: transparent;
+  animation: ld-in 900ms cubic-bezier(0.2, 0.8, 0.2, 1) backwards, ld-shine 6s ease-in-out 1.2s infinite;
+}
+@keyframes ld-shine {
+  0%,
+  60% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: -50% 0;
+  }
+}
+.ld-lead {
+  margin-top: 22px;
+  max-width: 34ch;
+  font-size: 20px;
+  line-height: 1.55;
+  color: var(--ld-muted);
+}
+.ld-in {
+  animation: ld-in 900ms cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+}
+@keyframes ld-in {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+}
+/* prettier-ignore */
+.ld-cta {
+  position: relative;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 60px;
+  padding: 0 34px;
+  border-radius: 9999px;
+  font-size: 18px;
+  font-weight: 600;
+  color: #effff6;
+  background: var(--ld-metal);
+  box-shadow: inset 0 1px 0 #ffffff40, 0 18px 40px -16px #1d6a4ccc; /* taste-skill-ignore: botón metalizado */
+  transition: transform 250ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+/* prettier-ignore */
+.ld-cta::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 35%, #ffffff55 50%, transparent 65%); /* taste-skill-ignore: destello del botón */
+  transform: translateX(-100%);
+  animation: ld-sweep 3.5s ease-in-out infinite;
+}
+@keyframes ld-sweep {
+  0%,
+  55% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+.ld-cta:hover {
+  transform: translateY(-3px);
+}
+.ld-link {
+  color: var(--ld-cream);
+  font-size: 16px;
+  text-decoration: underline;
+  text-decoration-color: rgb(242 239 230 / 0.4);
+  text-underline-offset: 5px;
+  transition: text-decoration-color 200ms;
+}
+.ld-link:hover {
+  text-decoration-color: var(--ld-cream);
+}
+.ld-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px 32px;
+  margin-top: 44px;
+}
+.ld-facts div {
+  display: flex;
+  flex-direction: column-reverse;
+}
+.ld-facts dt {
+  color: var(--ld-muted);
+  font-size: 15px;
+}
+.ld-facts dd {
+  color: var(--ld-gold);
+  font-size: 28px;
+  font-weight: 600;
+  font-family: var(--font-display);
+}
+
+/* El escenario: celular inclinado que flota, la tarjeta detrás y el aviso de confirmación. */
+.ld-stage {
+  position: relative;
+  height: 640px;
+}
+/* prettier-ignore */
+.ld-phone {
+  position: absolute;
+  right: 8%;
+  top: 10px;
+  width: 300px;
+  height: 610px;
+  padding: 11px;
+  border-radius: 52px;
+  background: #0a0c0b;
+  box-shadow: inset 0 0 0 1px #ffffff26, 0 50px 90px -30px #000; /* taste-skill-ignore: profundidad del celular */
+  rotate: -4deg;
+  animation: ld-float 7s ease-in-out infinite;
+}
+@keyframes ld-float {
+  50% {
+    translate: 0 -12px;
+  }
+}
+.ld-screen {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  padding: 16px 18px;
+  border-radius: 42px;
+  background: #f3f7f4;
+  color: #0e1d16;
+}
+.ld-island {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  width: 92px;
+  height: 24px;
+  border-radius: 9999px;
+  background: #000;
+  translate: -50% 0;
+}
+/* prettier-ignore */
+.ld-mark {
+  display: grid;
+  place-items: center;
+  border-radius: 9px;
+  font-weight: 700;
+  color: #06231a;
+  background: var(--ld-metal-light);
+  box-shadow: inset 0 1px 0 #ffffff99; /* taste-skill-ignore: marca metalizada */
+}
+.ld-bar {
+  position: relative;
+  flex: 1;
+  height: 4px;
+  overflow: hidden;
+  border-radius: 9px;
+  background: #0e1d161a;
+}
+.ld-bar::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--ld-metal);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 700ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.ld-bar-on::after {
+  transform: scaleX(1);
+}
+.ld-view {
+  position: absolute;
+  inset: 120px 18px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  opacity: 0;
+  transform: translateX(30px);
+  transition:
+    opacity 450ms,
+    transform 450ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.ld-view-on {
+  opacity: 1;
+  transform: none;
+}
+/* prettier-ignore */
+.ld-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 12px;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 1px 0 #0000001a; /* taste-skill-ignore: tarjeta del celular */
+  font-size: 13px;
+}
+.ld-row small {
+  color: #5d6f66;
+  font-size: 11px;
+}
+.ld-tick {
+  width: 20px;
+  height: 20px;
+  flex: none;
+  border-radius: 50%;
+  border: 1.5px solid #0e1d1633;
+}
+.ld-sel {
+  background: var(--ld-metal);
+  color: #effff6;
+}
+.ld-sel small {
+  color: #c6ecd8;
+}
+.ld-sel .ld-tick {
+  border-color: #effff6;
+  background: #effff633;
+}
+.ld-day,
+.ld-time {
+  padding: 9px 0;
+  border-radius: 12px;
+  background: #fff;
+  text-align: center;
+  font-size: 11px;
+}
+.ld-day b {
+  display: block;
+  font-size: 15px;
+}
+.ld-time {
+  font-size: 12px;
+}
+/* prettier-ignore */
+.ld-break {
+  padding: 7px;
+  border-radius: 12px;
+  text-align: center;
+  font-size: 11px;
+  font-weight: 600;
+  color: #6b4100;
+  background: repeating-linear-gradient(135deg, #f6c453 0 6px, #fbe2a1 6px 12px); /* taste-skill-ignore: franjas del descanso */
+}
+.ld-input {
+  display: block;
+  margin-top: 3px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: #fff;
+  color: #0e1d16;
+  font-size: 13px;
+}
+.ld-btn {
+  margin-top: auto;
+  padding: 13px;
+  border-radius: 9999px;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 600;
+  color: #effff6;
+  background: var(--ld-metal);
+}
+.ld-seal circle {
+  fill: #1d6a4c22;
+  stroke: #1d6a4c;
+  stroke-width: 2.5;
+  stroke-dasharray: 151;
+  stroke-dashoffset: 151;
+}
+.ld-seal path {
+  fill: none;
+  stroke: #1d6a4c;
+  stroke-width: 3.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 36;
+  stroke-dashoffset: 36;
+}
+.ld-view-on .ld-seal circle {
+  animation: ld-draw 600ms ease-out 100ms forwards;
+}
+.ld-view-on .ld-seal path {
+  animation: ld-draw 400ms ease-out 600ms forwards;
+}
+@keyframes ld-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+/* prettier-ignore */
+.ld-card {
+  position: absolute;
+  left: 0;
+  top: 250px;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  width: min(390px, 90%);
+  height: 240px;
+  padding: 22px 24px;
+  overflow: hidden;
+  border-radius: 24px;
+  color: #effff6;
+  background: repeating-linear-gradient(100deg, #ffffff08 0 2px, transparent 2px 5px), var(--ld-metal); /* taste-skill-ignore: tarjeta metalizada */
+  box-shadow: inset 0 1px 0 #ffffff40, 0 40px 70px -30px #000; /* taste-skill-ignore: profundidad de la tarjeta */
+  opacity: 0;
+  transform: rotate(-12deg) translate(60px, 40px) scale(0.9);
+  transition: transform 1s cubic-bezier(0.2, 0.9, 0.25, 1.1), opacity 600ms;
+  pointer-events: none;
+}
+.ld-card-out {
+  opacity: 1;
+  transform: rotate(-8deg) translate(-10px, 0) scale(1);
+}
+/* prettier-ignore */
+.ld-card::after {
+  content: "";
+  position: absolute;
+  inset: -40% -60%;
+  background: linear-gradient(105deg, transparent 40%, #ffffff40 49%, #d6ffe966 50%, #ffffff40 51%, transparent 60%); /* taste-skill-ignore: destello holográfico */
+  transform: translateX(-60%);
+  animation: ld-holo 4s ease-in-out infinite;
+}
+@keyframes ld-holo {
+  0%,
+  40% {
+    transform: translateX(-60%);
+  }
+  100% {
+    transform: translateX(60%);
+  }
+}
+/* prettier-ignore */
+.ld-chip {
+  display: block;
+  width: 44px;
+  height: 32px;
+  margin: 16px 0 14px;
+  border-radius: 7px;
+  background: linear-gradient(135deg, #f7e6a6, #c9a24a 45%, #f3d98a 60%, #a8822f); /* taste-skill-ignore: chip dorado */
+}
+.ld-pill {
+  flex: none;
+  padding: 3px 10px;
+  border-radius: 9999px;
+  background: #effff6;
+  color: #0b3123;
+  font-size: 11px;
+  letter-spacing: 0;
+  text-transform: none;
+}
+.ld-when {
+  font-size: 21px;
+  font-weight: 600;
+  text-shadow: 0 1px 0 #0006; /* taste-skill-ignore: letras en relieve */
+}
+.ld-total {
+  font-size: 22px;
+  font-weight: 700;
+  text-shadow: 0 1px 0 #0006; /* taste-skill-ignore: letras en relieve */
+}
+/* prettier-ignore */
+.ld-toast {
+  position: absolute;
+  right: 0;
+  top: 120px;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  border-radius: 18px;
+  background: var(--ld-cream);
+  color: #0b3123;
+  font-size: 14px;
+  font-weight: 600;
+  box-shadow: 0 20px 40px -18px #000; /* taste-skill-ignore: aviso flotante */
+  opacity: 0;
+  transform: translateY(10px) scale(0.9);
+  transition: opacity 500ms ease, transform 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.ld-toast-on {
+  opacity: 1;
+  transform: none;
+}
+.ld-toast-dot {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--ld-metal);
+  color: #fff;
+  font-size: 13px;
+}
+@media (max-width: 640px) {
+  .ld-stage {
+    height: 600px;
+  }
+  .ld-phone {
+    right: 50%;
+    translate: 50% 0;
+    animation: none;
+  }
+  .ld-card {
+    top: 330px;
+  }
+}
+
+/* Pasos: franja crema con una línea que se llena y el paso del celular resaltado. */
+.ld-steps {
+  padding: 110px 0 120px;
+  border-radius: 40px 40px 0 0;
+  background: var(--ld-cream);
+  color: #0b1a12;
+}
+.ld-h2 {
+  font-size: clamp(40px, 4.6vw, 64px);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  font-weight: 600;
+}
+.ld-sub {
+  max-width: 46ch;
+  margin-top: 14px;
+  font-size: 19px;
+  color: #4b5c53;
+}
+.ld-ghost {
+  padding: 8px 16px;
+  border-radius: 9999px;
+  background: #0b1a120d;
+  font-size: 14px;
+  transition: background-color 200ms;
+}
+.ld-ghost:hover {
+  background: #0b1a121a;
+}
+.ld-track {
+  position: relative;
+  display: grid;
+  gap: 28px;
+  margin-top: 56px;
+}
+@media (min-width: 768px) {
+  .ld-track {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+  }
+}
+.ld-line {
+  display: none;
+}
+@media (min-width: 768px) {
+  .ld-line {
+    position: absolute;
+    left: 29px;
+    right: 29px;
+    top: 27px;
+    display: block;
+    height: 4px;
+    border-radius: 9px;
+    background: #0b1a1214;
+  }
+}
+.ld-line i {
+  position: absolute;
+  inset: 0;
+  border-radius: 9px;
+  background: var(--ld-metal);
+  transform-origin: left;
+  transition: transform 800ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.ld-step {
+  position: relative;
+  display: block;
+  width: 100%;
+  padding-right: 10px;
+  text-align: left;
+  transition: transform 400ms;
+}
+.ld-step-on {
+  transform: translateY(-6px);
+}
+/* prettier-ignore */
+.ld-dot {
+  display: grid;
+  place-items: center;
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  background: #fff;
+  font-size: 22px;
+  font-weight: 600;
+  box-shadow: 0 10px 24px -14px #0b1a12; /* taste-skill-ignore: círculo del paso */
+  transition: transform 500ms cubic-bezier(0.34, 1.56, 0.64, 1), background-color 300ms, color 300ms;
+}
+.ld-step-on .ld-dot {
+  background: var(--ld-metal);
+  color: #fff;
+  transform: scale(1.12);
+}
+.ld-step:hover .ld-dot {
+  transform: scale(1.08);
+}
+
+/* Servicios: lista grande; al pasar el cursor la fila se llena de esmeralda metalizado. */
+.ld-services {
+  padding: 110px 0 120px;
+  background: var(--ld-ground-2);
+}
+.ld-service {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 24px;
+  align-items: baseline;
+  padding: 24px 8px;
+  border-radius: 18px;
+  color: var(--ld-cream);
+  font-size: clamp(20px, 2.2vw, 28px);
+  transition: padding 350ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.ld-service::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--ld-metal);
+  transform: translateY(101%);
+  transition: transform 450ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.ld-service:hover,
+.ld-service:focus-visible {
+  padding-left: 28px;
+}
+.ld-service:hover::before,
+.ld-service:focus-visible::before {
+  transform: none;
+}
+.ld-service-min {
+  font-size: 15px;
+  color: var(--ld-muted);
+}
+.ld-service-price {
+  font-size: 19px;
+  font-weight: 600;
+  color: var(--ld-gold);
+}
+.ld-service:hover .ld-service-min,
+.ld-service:hover .ld-service-price {
+  color: #effff6;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .public-dark::before,
+  .ld-title,
+  .ld-in,
+  .ld-cta::after,
+  .ld-phone,
+  .ld-card::after {
+    animation: none;
+  }
+  .ld-view,
+  .ld-card,
+  .ld-toast,
+  .ld-step,
+  .ld-dot,
+  .ld-service,
+  .ld-service::before,
+  .ld-line i,
+  .ld-bar::after {
+    transition: none;
+  }
+}
+
 /* Efecto vidrio al pasar el cursor o tocar cualquier botón con forma (los que llevan `rounded-*`):
    un brillo diagonal y un filo de luz arriba, encima del color del botón. Va en un pseudoelemento
    para que aparezca suave y no tape los anillos de selección. */
