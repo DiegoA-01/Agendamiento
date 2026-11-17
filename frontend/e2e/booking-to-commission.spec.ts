@@ -85,7 +85,7 @@ test("un cliente reserva, el dueño completa la cita y ve la comisión", async (
   // --- 2. El dueño completa la cita -----------------------------------------------------------
   await page.goto(businessUrl("/login"));
   await page.getByLabel("Correo").fill(process.env.E2E_OWNER_EMAIL!);
-  await page.getByLabel("Contraseña").fill(process.env.E2E_OWNER_PASSWORD!);
+  await page.getByLabel("Contraseña", { exact: true }).fill(process.env.E2E_OWNER_PASSWORD!);
   await page.getByRole("button", { name: "Entrar" }).click();
   await expect(page).not.toHaveURL(/\/login/);
 

@@ -86,15 +86,52 @@ export function TextField({
   ...props
 }: ComponentProps<"input"> & FieldShellProps) {
   const id = useId();
+  const { t } = useTranslation();
+  const [visible, setVisible] = useState(false);
+  const isPassword = props.type === "password";
+  const input = (
+    <input
+      id={id}
+      aria-invalid={error ? true : undefined}
+      aria-describedby={describedBy(id, error, hint)}
+      className={`${INPUT_STYLES} ${error ? "border-red-600" : "border-slate-300"} ${isPassword ? "pr-12" : ""} ${className}`}
+      {...props}
+      type={isPassword && visible ? "text" : props.type}
+    />
+  );
   return (
     <FieldShell id={id} label={label} error={error} hint={hint} optional={optional}>
-      <input
-        id={id}
-        aria-invalid={error ? true : undefined}
-        aria-describedby={describedBy(id, error, hint)}
-        className={`${INPUT_STYLES} ${error ? "border-red-600" : "border-slate-300"} ${className}`}
-        {...props}
-      />
+      {isPassword ? (
+        // Contraseña con un ojo para verla mientras se escribe; vuelve a ocultarse al tocarlo.
+        <div className="relative">
+          {input}
+          <button
+            type="button"
+            onClick={() => setVisible((value) => !value)}
+            aria-label={t(visible ? "common.hidePassword" : "common.showPassword")}
+            aria-pressed={visible}
+            aria-controls={id}
+            className="password-eye absolute inset-y-0 right-1 my-auto flex size-9 items-center justify-center rounded-lg text-slate-500 hover:text-slate-900 focus-visible:outline-2"
+          >
+            <svg
+              aria-hidden="true"
+              viewBox="0 0 24 24"
+              className="size-5"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Z" />
+              <circle cx="12" cy="12" r="3" />
+              {visible && <path d="M4 4l16 16" />}
+            </svg>
+          </button>
+        </div>
+      ) : (
+        input
+      )}
     </FieldShell>
   );
 }

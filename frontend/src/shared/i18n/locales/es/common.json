@@ -36,7 +36,9 @@
     "hexFormat": "Usa un color de 6 dígitos, por ejemplo #1f2937.",
     "errorTitle": "No se pudo cargar",
     "yes": "Sí",
-    "no": "No"
+    "no": "No",
+    "showPassword": "Mostrar contraseña",
+    "hidePassword": "Ocultar contraseña"
   },
   "nav": {
     "brand": "Administración",
