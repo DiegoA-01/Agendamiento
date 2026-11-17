@@ -1,5 +1,11 @@
 # Changelog
 
+## Horarios avisa los cambios sin guardar
+
+- Si se agrega o cambia un descanso y no se guarda, las reservas no lo ven. Pasó con un descanso del miércoles que se quedó solo en la pantalla.
+- Ahora la barra de «Guardar horario» queda pegada abajo. Con cambios pendientes se pone ámbar y dice «Tienes cambios sin guardar. Guarda para que se apliquen en las reservas». Sin cambios dice «Todo guardado» y el botón queda inactivo.
+- Si hay cambios sin guardar, el navegador pregunta antes de salir o recargar la página.
+
 ## Horarios con jornada y descansos, y el descanso visible al reservar
 
 - **Horarios:** cada día se arma con un «Trabaja», la **jornada** (desde, hasta) y sus **descansos** (desde, hasta).

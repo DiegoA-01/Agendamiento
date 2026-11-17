@@ -157,7 +157,9 @@
       "breakTo": "Descanso hasta",
       "breakRange": "Descanso de {{start}} a {{end}}",
       "addBreakSlot": "Agregar descanso",
-      "removeBreak": "Quitar este descanso"
+      "removeBreak": "Quitar este descanso",
+      "unsaved": "Tienes cambios sin guardar. Guarda para que se apliquen en las reservas.",
+      "allSaved": "Todo guardado."
     }
   }
 }
