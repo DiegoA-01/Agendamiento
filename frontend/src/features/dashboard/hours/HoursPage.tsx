@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { ApiError, api } from "../../../shared/api/client";
@@ -64,6 +64,9 @@ function WeekEditor({
   const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [plan, setPlan] = useState<Plan>(() => planFromWeek(initial));
+  // Lo último guardado, para saber si hay cambios sin guardar.
+  const [savedPlan, setSavedPlan] = useState<Plan>(() => planFromWeek(initial));
+  const dirty = planKey(plan) !== planKey(savedPlan);
   const [message, setMessage] = useState<{ tone: "success" | "danger"; text: string } | null>(null);
   const [showErrors, setShowErrors] = useState(false);
   const errors = validatePlan(plan);
@@ -76,7 +79,9 @@ function WeekEditor({
       }),
     onSuccess: (saved) => {
       queryClient.setQueryData(KEYS.workingHours(professional.id), saved);
-      setPlan(planFromWeek(weekFromHours(saved)));
+      const fresh = planFromWeek(weekFromHours(saved));
+      setPlan(fresh);
+      setSavedPlan(fresh);
       setMessage({ tone: "success", text: t("common.saved") });
     },
     onError: (error) => setMessage({ tone: "danger", text: describeError(t, error) }),
@@ -105,6 +110,14 @@ function WeekEditor({
     change(weekday, (day) => day && { ...day, breaks: day.breaks.filter((_, i) => i !== index) });
   const toggleDay = (weekday: number, open: boolean) =>
     change(weekday, () => (open ? { start: "09:00", end: "18:00", breaks: [] } : null));
+
+  // Con cambios sin guardar, el navegador pregunta antes de salir o recargar.
+  useEffect(() => {
+    if (!dirty) return;
+    const warn = (event: BeforeUnloadEvent) => event.preventDefault();
+    window.addEventListener("beforeunload", warn);
+    return () => window.removeEventListener("beforeunload", warn);
+  }, [dirty]);
 
   const minutes = weeklyMinutes(weekFromPlan(plan));
   return (
@@ -247,9 +260,24 @@ function WeekEditor({
         })}
       </ul>
       {editable && (
-        <div>
+        // Barra de guardar pegada abajo: con cambios pendientes se enciende y lo dice.
+        <div
+          className={`hours-savebar sticky bottom-3 z-20 flex flex-wrap items-center gap-3 rounded-2xl p-3 ${
+            dirty ? "hours-savebar-dirty" : ""
+          }`}
+        >
+          <p role="status" className="flex-1 text-sm font-medium">
+            {dirty ? (
+              <span className="flex items-center gap-2">
+                <span className="hours-break inline-block size-3 rounded-full" />
+                {t("catalog.hours.unsaved")}
+              </span>
+            ) : (
+              <span className="text-slate-600">{t("catalog.hours.allSaved")}</span>
+            )}
+          </p>
           <Button
-            disabled={save.isPending}
+            disabled={save.isPending || !dirty}
             onClick={() => {
               setShowErrors(true);
               if (!planHasErrors(errors)) save.mutate();
@@ -263,6 +291,9 @@ function WeekEditor({
     </Card>
   );
 }
+
+/** Huella del horario para comparar con lo guardado. */
+const planKey = (plan: Plan) => JSON.stringify(hoursFromWeek(weekFromPlan(plan)));
 
 const minutesOf = (time: string) => Number(time.slice(0, 2)) * 60 + Number(time.slice(3, 5));
 
