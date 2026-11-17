@@ -106,6 +106,44 @@ def test_public_slots_hide_who_attends_when_any_professional(shop):
     assert at(9).date().isoformat() in days
 
 
+def test_breaks_are_the_gaps_between_a_professionals_working_hours(shop):
+    from apps.scheduling.models import WorkingHours
+
+    ana = shop.professional("Ana")  # lunes de 9 a 12
+    with tenant_context(shop.tenant):
+        WorkingHours.objects.create(
+            professional=ana, weekday=0, start_time=dt.time(13), end_time=dt.time(18)
+        )
+    params = {
+        "service_ids": [str(shop.service.pk)],
+        "date": at(9).date().isoformat(),
+        "professional_id": str(ana.pk),
+    }
+
+    breaks = visitor(shop).get(f"{PUBLIC}/availability/breaks/", params).json()
+    slots = visitor(shop).get(f"{PUBLIC}/availability/slots/", params).json()
+
+    assert breaks == [{"start": at(12).isoformat(), "end": at(13).isoformat()}]
+    starts = {slot["start"] for slot in slots}
+    assert at(12).isoformat() not in starts  # en el descanso no se reserva
+    assert at(13).isoformat() in starts
+
+
+def test_breaks_are_empty_for_anyone_or_without_a_gap(shop):
+    ana = shop.professional("Ana")
+    base = {"service_ids": [str(shop.service.pk)], "date": at(9).date().isoformat()}
+
+    anyone = visitor(shop).get(f"{PUBLIC}/availability/breaks/", base).json()
+    straight = (
+        visitor(shop)
+        .get(f"{PUBLIC}/availability/breaks/", {**base, "professional_id": str(ana.pk)})
+        .json()
+    )
+
+    assert anyone == []
+    assert straight == []
+
+
 # --- Reservar ----------------------------------------------------------------------------------
 
 

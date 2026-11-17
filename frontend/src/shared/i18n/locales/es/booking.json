@@ -130,7 +130,9 @@
       "whoTitle": "¿Para quién es la cita?",
       "whoLabel": "Nombre de quien va",
       "whoHint": "Tus datos de contacto se mantienen; la cita queda a nombre de esta persona.",
-      "forMe": "Es para mí"
+      "forMe": "Es para mí",
+      "break": "Descanso",
+      "breakRange": "{{start}} – {{end}} · no se puede reservar"
     },
     "home": {
       "tagline": "Reserva tu cita en menos de un minuto, sin llamar ni esperar respuesta. Eliges el servicio, la hora y listo.",

@@ -26,15 +26,16 @@ import { useMe } from "../../auth/useMe";
 import { KEYS, useProfessionals } from "../shared/api";
 import { useCan } from "../shared/useCan";
 import {
-  WEEKDAYS,
-  copyDay,
-  hasErrors,
-  hoursFromWeek,
-  validateWeek,
-  weekFromHours,
-  weeklyMinutes,
-  type Week,
-} from "./week";
+  copyPlanDay,
+  planFromWeek,
+  planHasErrors,
+  suggestBreak,
+  validatePlan,
+  weekFromPlan,
+  type DayPlan,
+  type Plan,
+} from "./plan";
+import { WEEKDAYS, hoursFromWeek, weekFromHours, weeklyMinutes, type Week } from "./week";
 
 const WORKDAYS = [1, 2, 3, 4] as const; // martes a viernes, para "copiar el lunes"
 
@@ -62,53 +63,50 @@ function WeekEditor({
 }) {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
-  const [week, setWeek] = useState<Week>(initial);
+  const [plan, setPlan] = useState<Plan>(() => planFromWeek(initial));
   const [message, setMessage] = useState<{ tone: "success" | "danger"; text: string } | null>(null);
   const [showErrors, setShowErrors] = useState(false);
-  const errors = validateWeek(week);
+  const errors = validatePlan(plan);
 
   const save = useMutation({
     mutationFn: () =>
       api<WorkingHours[]>(`/api/v1/professionals/${professional.id}/working-hours/`, {
         method: "PUT",
-        body: hoursFromWeek(week),
+        body: hoursFromWeek(weekFromPlan(plan)),
       }),
     onSuccess: (saved) => {
       queryClient.setQueryData(KEYS.workingHours(professional.id), saved);
-      setWeek(weekFromHours(saved));
+      setPlan(planFromWeek(weekFromHours(saved)));
       setMessage({ tone: "success", text: t("common.saved") });
     },
     onError: (error) => setMessage({ tone: "danger", text: describeError(t, error) }),
   });
 
-  function update(weekday: number, index: number, field: "start" | "end", value: string) {
+  function change(weekday: number, next: (day: DayPlan | null) => DayPlan | null) {
     setMessage(null);
-    setWeek((current) =>
-      current.map((day, d) =>
-        d === weekday ? day.map((it, i) => (i === index ? { ...it, [field]: value } : it)) : day,
-      ),
-    );
+    setPlan((current) => current.map((day, d) => (d === weekday ? next(day) : day)));
   }
-  function add(weekday: number) {
-    setMessage(null);
-    setWeek((current) =>
-      current.map((day, d) => {
-        if (d !== weekday) return day;
-        const last = day.at(-1);
-        // Sugerencia: la jornada típica, o una franja después de la última (tras un descanso).
-        const next = last ? { start: last.end, end: "" } : { start: "09:00", end: "18:00" };
-        return [...day, next];
-      }),
+  const setDay = (weekday: number, field: "start" | "end", value: string) =>
+    change(weekday, (day) => day && { ...day, [field]: value });
+  const setBreak = (weekday: number, index: number, field: "start" | "end", value: string) =>
+    change(
+      weekday,
+      (day) =>
+        day && {
+          ...day,
+          breaks: day.breaks.map((pause, i) =>
+            i === index ? { ...pause, [field]: value } : pause,
+          ),
+        },
     );
-  }
-  function remove(weekday: number, index: number) {
-    setMessage(null);
-    setWeek((current) =>
-      current.map((day, d) => (d === weekday ? day.filter((_, i) => i !== index) : day)),
-    );
-  }
+  const addBreak = (weekday: number) =>
+    change(weekday, (day) => day && { ...day, breaks: [...day.breaks, suggestBreak(day)] });
+  const removeBreak = (weekday: number, index: number) =>
+    change(weekday, (day) => day && { ...day, breaks: day.breaks.filter((_, i) => i !== index) });
+  const toggleDay = (weekday: number, open: boolean) =>
+    change(weekday, () => (open ? { start: "09:00", end: "18:00", breaks: [] } : null));
 
-  const minutes = weeklyMinutes(week);
+  const minutes = weeklyMinutes(weekFromPlan(plan));
   return (
     <Card className="flex flex-col gap-4">
       <div className="flex flex-wrap items-start justify-between gap-3">
@@ -121,70 +119,132 @@ function WeekEditor({
             })}
           </p>
         </div>
-        {editable && week[0].length > 0 && (
-          <Button variant="secondary" onClick={() => setWeek((w) => copyDay(w, 0, WORKDAYS))}>
+        {editable && plan[0] && (
+          <Button variant="secondary" onClick={() => setPlan((p) => copyPlanDay(p, 0, WORKDAYS))}>
             {t("catalog.hours.copyMonday")}
           </Button>
         )}
       </div>
+      <div className="flex flex-wrap items-center gap-4 text-sm text-slate-600" aria-hidden="true">
+        <span className="flex items-center gap-2">
+          <span className="hours-work inline-block h-3 w-6 rounded-full" />
+          {t("catalog.hours.legendWork")}
+        </span>
+        <span className="flex items-center gap-2">
+          <span className="hours-break inline-block h-3 w-6 rounded-full" />
+          {t("catalog.hours.legendBreak")}
+        </span>
+      </div>
       {message && <Notice tone={message.tone}>{message.text}</Notice>}
-      <ul className="flex flex-col divide-y divide-slate-100">
-        {WEEKDAYS.map((weekday) => (
-          <li key={weekday} className="flex flex-col gap-2 py-3 sm:flex-row sm:items-start">
-            <span className="w-28 shrink-0 pt-2 text-sm font-medium">
-              {t(`catalog.hours.days.${weekday}`)}
-            </span>
-            <div className="flex flex-1 flex-col gap-2">
-              {week[weekday].length === 0 && (
-                <p className="pt-2 text-sm text-slate-500">{t("catalog.hours.closed")}</p>
-              )}
-              {week[weekday].map((interval, index) => {
-                const error = showErrors ? errors[weekday][index] : null;
-                return (
-                  <div key={index} className="flex flex-wrap items-end gap-2">
-                    <div className="w-32">
+      <ul className="flex flex-col gap-2">
+        {WEEKDAYS.map((weekday) => {
+          const day = plan[weekday];
+          const dayErrors = showErrors ? errors[weekday] : null;
+          return (
+            <li key={weekday} className="flex flex-col gap-3 py-4 lg:flex-row lg:items-start">
+              <div className="flex w-36 shrink-0 items-center justify-between gap-2 pt-1 lg:flex-col lg:items-start">
+                <span className="font-medium">{t(`catalog.hours.days.${weekday}`)}</span>
+                {editable ? (
+                  <label className="flex items-center gap-2 text-sm text-slate-600">
+                    <input
+                      type="checkbox"
+                      checked={day !== null}
+                      onChange={(e) => toggleDay(weekday, e.target.checked)}
+                    />
+                    {t("catalog.hours.works")}
+                  </label>
+                ) : (
+                  !day && (
+                    <span className="text-sm text-slate-500">{t("catalog.hours.closed")}</span>
+                  )
+                )}
+              </div>
+
+              {day ? (
+                <div className="flex flex-1 flex-col gap-3">
+                  <DayTrack day={day} />
+                  <div className="flex flex-wrap items-end gap-2">
+                    <span className="w-full text-sm font-medium text-slate-600">
+                      {t("catalog.hours.workday")}
+                    </span>
+                    <div className="w-36">
                       <TextField
                         label={t("catalog.hours.from")}
                         type="time"
-                        value={interval.start}
+                        value={day.start}
                         disabled={!editable}
-                        onChange={(e) => update(weekday, index, "start", e.target.value)}
+                        onChange={(e) => setDay(weekday, "start", e.target.value)}
                       />
                     </div>
-                    <div className="w-32">
+                    <div className="w-36">
                       <TextField
                         label={t("catalog.hours.to")}
                         type="time"
-                        value={interval.end}
+                        value={day.end}
                         disabled={!editable}
-                        error={error ? `hours_${error}` : undefined}
-                        onChange={(e) => update(weekday, index, "end", e.target.value)}
+                        error={dayErrors?.day ? `hours_${dayErrors.day}` : undefined}
+                        onChange={(e) => setDay(weekday, "end", e.target.value)}
                       />
                     </div>
-                    {editable && (
-                      <Button
-                        variant="ghost"
-                        aria-label={t("catalog.hours.removeInterval")}
-                        onClick={() => remove(weekday, index)}
-                      >
-                        {t("catalog.hours.remove")}
-                      </Button>
-                    )}
                   </div>
-                );
-              })}
-              {editable && (
-                <div>
-                  <Button variant="ghost" onClick={() => add(weekday)}>
-                    {week[weekday].length === 0
-                      ? t("catalog.hours.addFirst")
-                      : t("catalog.hours.addBreak")}
-                  </Button>
+
+                  {day.breaks.map((pause, index) => {
+                    const error = dayErrors?.breaks[index];
+                    return (
+                      <div
+                        key={index}
+                        className="hours-break-box flex flex-wrap items-end gap-2 rounded-2xl p-3"
+                      >
+                        <span className="flex w-full items-center gap-2 text-sm font-semibold">
+                          <span className="hours-break inline-block size-3 rounded-full" />
+                          {t("catalog.hours.breakTitle", { n: index + 1 })}
+                        </span>
+                        <div className="w-36">
+                          <TextField
+                            label={t("catalog.hours.breakFrom")}
+                            type="time"
+                            value={pause.start}
+                            disabled={!editable}
+                            onChange={(e) => setBreak(weekday, index, "start", e.target.value)}
+                          />
+                        </div>
+                        <div className="w-36">
+                          <TextField
+                            label={t("catalog.hours.breakTo")}
+                            type="time"
+                            value={pause.end}
+                            disabled={!editable}
+                            error={error ? `hours_${error}` : undefined}
+                            onChange={(e) => setBreak(weekday, index, "end", e.target.value)}
+                          />
+                        </div>
+                        {editable && (
+                          <Button
+                            variant="dangerGhost"
+                            aria-label={t("catalog.hours.removeBreak")}
+                            onClick={() => removeBreak(weekday, index)}
+                          >
+                            {t("catalog.hours.remove")}
+                          </Button>
+                        )}
+                      </div>
+                    );
+                  })}
+
+                  {editable && (
+                    <div>
+                      <Button variant="secondary" onClick={() => addBreak(weekday)}>
+                        + {t("catalog.hours.addBreakSlot")}
+                      </Button>
+                    </div>
+                  )}
                 </div>
+              ) : (
+                <p className="flex-1 pt-1 text-sm text-slate-500">{t("catalog.hours.closed")}</p>
               )}
-            </div>
-          </li>
-        ))}
+            </li>
+          );
+        })}
       </ul>
       {editable && (
         <div>
@@ -192,7 +252,7 @@ function WeekEditor({
             disabled={save.isPending}
             onClick={() => {
               setShowErrors(true);
-              if (!hasErrors(errors)) save.mutate();
+              if (!planHasErrors(errors)) save.mutate();
               else setMessage({ tone: "danger", text: t("errors.validation_error") });
             }}
           >
@@ -201,6 +261,54 @@ function WeekEditor({
         </div>
       )}
     </Card>
+  );
+}
+
+const minutesOf = (time: string) => Number(time.slice(0, 2)) * 60 + Number(time.slice(3, 5));
+
+/** Barra del día de 6:00 a 22:00 (o más si la jornada se sale): la jornada en el color del panel
+ *  y cada descanso en franjas ámbar encima, con su hora. */
+function DayTrack({ day }: { day: DayPlan }) {
+  const { t } = useTranslation();
+  if (!day.start || !day.end || day.start >= day.end) return null;
+  const from = Math.min(6 * 60, minutesOf(day.start));
+  const to = Math.max(22 * 60, minutesOf(day.end));
+  const pct = (time: string) => ((minutesOf(time) - from) / (to - from)) * 100;
+  const segment = (start: string, end: string) => ({
+    left: `${pct(start)}%`,
+    width: `${Math.max(0, pct(end) - pct(start))}%`,
+  });
+  return (
+    <div className="hours-track relative mb-5 h-8 rounded-full" aria-hidden="true">
+      <span
+        className="hours-work absolute inset-y-1 rounded-full"
+        style={segment(day.start, day.end)}
+      />
+      {day.breaks
+        .filter((pause) => pause.start && pause.end && pause.start < pause.end)
+        .map((pause, index) => (
+          <span
+            key={index}
+            className="hours-break absolute inset-y-0 flex items-center justify-center overflow-hidden rounded-full text-[11px] font-semibold"
+            style={segment(pause.start, pause.end)}
+            title={t("catalog.hours.breakRange", { start: pause.start, end: pause.end })}
+          >
+            {pause.start}
+          </span>
+        ))}
+      <span
+        className="absolute -bottom-5 text-[11px] text-slate-500"
+        style={{ left: `${pct(day.start)}%` }}
+      >
+        {day.start}
+      </span>
+      <span
+        className="absolute -bottom-5 -translate-x-full text-[11px] text-slate-500"
+        style={{ left: `${pct(day.end)}%` }}
+      >
+        {day.end}
+      </span>
+    </div>
   );
 }
 

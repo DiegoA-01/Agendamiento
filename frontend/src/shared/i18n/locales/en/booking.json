@@ -130,7 +130,9 @@
       "whoTitle": "Who is the appointment for?",
       "whoLabel": "Name of the person going",
       "whoHint": "Your contact details stay the same; the appointment is in this person's name.",
-      "forMe": "It's for me"
+      "forMe": "It's for me",
+      "break": "Break",
+      "breakRange": "{{start}} – {{end}} · no bookings"
     },
     "home": {
       "tagline": "Book your appointment in under a minute, no calls and no waiting. Pick the service, the time, and you're done.",

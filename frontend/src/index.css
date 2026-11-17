@@ -652,6 +652,25 @@ body {
   }
 }
 
+/* Horarios: barra del día con la jornada en el color del panel y los descansos en franjas ámbar
+   diagonales, para que se vean de un vistazo. Las cajas de cada descanso usan el mismo ámbar. */
+.hours-track {
+  background: rgb(0 0 0 / 0.05);
+}
+.hours-work {
+  background: var(--pf-metal, #94a3b8);
+}
+/* prettier-ignore */
+.hours-break {
+  color: #6b4100;
+  background: repeating-linear-gradient(135deg, #f6c453 0 6px, #fbe2a1 6px 12px); /* taste-skill-ignore: franjas del descanso */
+  box-shadow: inset 0 0 0 1px #e0a92c; /* taste-skill-ignore: borde del descanso */
+}
+.hours-break-box {
+  background: #fff6df;
+  box-shadow: inset 0 0 0 1px #f1d18a; /* taste-skill-ignore: caja del descanso */
+}
+
 /* Efecto vidrio al pasar el cursor o tocar cualquier botón con forma (los que llevan `rounded-*`):
    un brillo diagonal y un filo de luz arriba, encima del color del botón. Va en un pseudoelemento
    para que aparezca suave y no tape los anillos de selección. */

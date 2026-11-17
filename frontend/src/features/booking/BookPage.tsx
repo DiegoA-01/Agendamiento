@@ -1,14 +1,16 @@
 import { useMutation } from "@tanstack/react-query";
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { Fragment, useEffect, useRef, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { ApiError, api } from "../../shared/api/client";
 import { describeError } from "../../shared/api/errors";
 import type {
+  BreakRange,
   PublicBooked,
   PublicCategory,
   PublicProfessional,
   PublicService,
+  Slot,
 } from "../../shared/api/types";
 import { formatMoney } from "../../shared/money";
 import {
@@ -24,6 +26,7 @@ import {
   usePublicCompany,
   usePublicProfessionals,
   usePublicServices,
+  usePublicBreaks,
   useSlots,
 } from "./api";
 import { CancelAppointment } from "./CancelAppointment";
@@ -513,6 +516,7 @@ function TimeStep({
   const { t } = useTranslation();
   const { time } = useCompanyFormat();
   const slots = useSlots(serviceIds, professionalId, date);
+  const breaks = usePublicBreaks(serviceIds, professionalId, date).data ?? [];
   const [period, setPeriod] = useState<(typeof PERIODS)[number] | null>(null);
   if (slots.isPending) return <Loading />;
   if (slots.isError) {
@@ -546,20 +550,65 @@ function TimeStep({
       </div>
       <div role="tabpanel" className="grid grid-cols-3 gap-2 sm:grid-cols-4">
         {groups[active].map((slot) => (
-          <button
-            key={slot.start}
-            type="button"
-            aria-pressed={selected === slot.start}
-            onClick={() => onSelect(slot.start)}
-            className={`min-h-12 rounded-xl text-sm font-medium tabular-nums focus-visible:outline-2 ${PRESS} ${
-              selected === slot.start ? ACCENT : `${PANEL} ${INK}`
-            }`}
-          >
-            {time(slot.start)}
-          </button>
+          <Fragment key={slot.start}>
+            {breaksBefore(breaks, groups[active], slot).map((pause) => (
+              <BreakRow key={pause.start} pause={pause} />
+            ))}
+            <button
+              type="button"
+              aria-pressed={selected === slot.start}
+              onClick={() => onSelect(slot.start)}
+              className={`min-h-12 rounded-xl text-sm font-medium tabular-nums focus-visible:outline-2 ${PRESS} ${
+                selected === slot.start ? ACCENT : `${PANEL} ${INK}`
+              }`}
+            >
+              {time(slot.start)}
+            </button>
+          </Fragment>
+        ))}
+        {breaksAfter(breaks, groups[active]).map((pause) => (
+          <BreakRow key={pause.start} pause={pause} />
         ))}
       </div>
     </div>
+  );
+}
+
+const at = (iso: string) => Date.parse(iso);
+
+/** Descansos que van justo antes de este horario: los que empiezan entre el horario anterior del
+ *  grupo y este, o, si es el primero, el que termina justo cuando este empieza. */
+function breaksBefore(breaks: BreakRange[], group: Slot[], slot: Slot): BreakRange[] {
+  const index = group.indexOf(slot);
+  const previous = index > 0 ? group[index - 1] : null;
+  return breaks.filter((pause) =>
+    previous
+      ? at(previous.start) < at(pause.start) && at(pause.start) < at(slot.start)
+      : at(pause.end) === at(slot.start),
+  );
+}
+
+/** Descansos que empiezan cuando termina el último horario del grupo (por ejemplo, el almuerzo
+ *  al final de la mañana). */
+function breaksAfter(breaks: BreakRange[], group: Slot[]): BreakRange[] {
+  const last = group.at(-1);
+  if (!last) return [];
+  return breaks.filter(
+    (pause) => at(pause.start) >= at(last.start) && at(pause.start) <= at(last.end),
+  );
+}
+
+/** Fila del descanso entre los horarios: franjas ámbar, sin poder tocarla. */
+function BreakRow({ pause }: { pause: BreakRange }) {
+  const { t } = useTranslation();
+  const { time } = useCompanyFormat();
+  return (
+    <p className="hours-break col-span-full flex min-h-12 items-center justify-center gap-2 rounded-xl px-3 text-sm">
+      <span className="font-semibold">{t("booking.wizard.break")}</span>
+      <span>
+        {t("booking.wizard.breakRange", { start: time(pause.start), end: time(pause.end) })}
+      </span>
+    </p>
   );
 }
 
