@@ -292,6 +292,8 @@
     "barbershopHint": "Carbón, rojo vino y latón, con el poste de barbero girando.",
     "salon": "Salón de belleza",
     "salonHint": "Rosa piel, perla y oro rosa, con brillos suaves.",
-    "save": "Guardar estilo"
+    "save": "Guardar estilo",
+    "saved": "Guardado",
+    "viewSite": "Ver la página de reservas ↗"
   }
 }

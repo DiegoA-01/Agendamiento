@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { api } from "../../shared/api/client";
 import { describeError } from "../../shared/api/errors";
 import { PUBLIC_STYLES, type PublicStyle, type TenantDetail } from "../../shared/api/types";
+import { tenantUrl } from "../../shared/format";
 import { Button, Card, Notice } from "../../shared/ui/primitives";
 
 /** Colores de muestra de cada estilo: fondo, metal del botón y acento. Solo para la vista previa. */
@@ -36,6 +37,8 @@ export function StylePicker({ tenant }: { tenant: TenantDetail }) {
   });
 
   const options: (PublicStyle | "")[] = ["", ...PUBLIC_STYLES];
+  // La página pública del negocio, para comprobar el estilo después de guardar.
+  const site = typeof window === "undefined" ? "" : tenantUrl(tenant.slug, window.location);
   return (
     <Card className="space-y-4">
       <div>
@@ -79,22 +82,50 @@ export function StylePicker({ tenant }: { tenant: TenantDetail }) {
                   <span className="text-xs font-semibold text-slate-600">A</span>
                 )}
               </span>
-              <span className="min-w-0">
-                <span className="block font-semibold">{t(`styles.${option || "auto"}`)}</span>
+              <span className="min-w-0 flex-1">
+                <span className="flex flex-wrap items-center gap-2 font-semibold">
+                  {t(`styles.${option || "auto"}`)}
+                  {tenant.public_style === option && (
+                    <span className="style-saved">{t("styles.saved")}</span>
+                  )}
+                </span>
                 <span className="block text-sm text-slate-600">
                   {t(`styles.${option || "auto"}Hint`)}
                 </span>
+              </span>
+              <span aria-hidden="true" className="style-check">
+                <svg
+                  viewBox="0 0 24 24"
+                  className="size-4"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="m5 12.5 4.5 4.5L19 7.5" />
+                </svg>
               </span>
             </button>
           );
         })}
       </div>
-      <Button
-        disabled={save.isPending || value === tenant.public_style}
-        onClick={() => save.mutate()}
-      >
-        {save.isPending ? t("common.saving") : t("styles.save")}
-      </Button>
+      <div className="flex flex-wrap items-center gap-4">
+        <Button
+          disabled={save.isPending || value === tenant.public_style}
+          onClick={() => save.mutate()}
+        >
+          {save.isPending ? t("common.saving") : t("styles.save")}
+        </Button>
+        <a
+          href={site}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-sm font-medium underline underline-offset-4"
+        >
+          {t("styles.viewSite")}
+        </a>
+      </div>
     </Card>
   );
 }

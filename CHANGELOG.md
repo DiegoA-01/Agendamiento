@@ -1,5 +1,11 @@
 # Changelog
 
+## El selector de estilo del Super Admin marca la opción elegida
+
+- En Empresas → Tema → «Estilo de la reserva», al tocar una opción ahora se nota cuál quedó elegida: se pone blanca, con un anillo verde y un check, y sube un poco. Antes no cambiaba nada a la vista, porque faltaban sus estilos.
+- La opción guardada lleva la etiqueta «Guardado». El botón «Guardar estilo» solo se activa cuando hay un cambio.
+- Junto al botón hay un enlace «Ver la página de reservas ↗» que abre el sitio del negocio en otra pestaña, para comprobar el estilo.
+
 ## Tres estilos para la página de reservas, elegidos por el Super Admin
 
 - La página pública de cada negocio (portada, ventana de reserva, «Tu cita» y tarjeta de la cita) tiene tres estilos:
