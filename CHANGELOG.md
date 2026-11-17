@@ -1,5 +1,10 @@
 # Changelog
 
+## Mano al pasar el cursor por los botones
+
+- En toda la app (reserva pública, paneles y login), al pasar el cursor por un botón aparece la mano, así se sabe que se puede tocar. Por ejemplo, en «Cancelar mi cita» o «Reservar otra cita para alguien más».
+- Los botones deshabilitados muestran que no se pueden usar. Tailwind 4 deja la flecha normal por defecto.
+
 ## Ojo para ver la contraseña
 
 - Todos los campos de contraseña tienen un botón con un ojo a la derecha. Al tocarlo se ve lo que se escribió y el ojo se tacha; al tocarlo otra vez se oculta.

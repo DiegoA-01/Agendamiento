@@ -14,6 +14,18 @@
   --font-display: ui-serif, "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
 }
 
+/* Tailwind 4 deja los botones con la flecha normal: la mano avisa que se pueden tocar, en toda la
+   app (reserva, paneles y login). Los deshabilitados muestran que no se puede. */
+button:not(:disabled),
+[role="button"]:not([aria-disabled="true"]),
+summary,
+label:has(> input[type="checkbox"], > input[type="radio"]) {
+  cursor: pointer;
+}
+button:disabled {
+  cursor: not-allowed;
+}
+
 body {
   background: var(--color-background);
   color: var(--color-text);
