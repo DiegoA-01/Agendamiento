@@ -71,6 +71,10 @@
     "byProfessional": "Citas por profesional",
     "unknownProfessional": "Otro profesional",
     "appointmentsCount_one": "{{count}} cita",
-    "appointmentsCount_other": "{{count}} citas"
+    "appointmentsCount_other": "{{count}} citas",
+    "tomorrow": "Mañana",
+    "appointmentsIntroOwn": "Tus citas, separadas por día.",
+    "pendingCount_one": "{{count}} pendiente",
+    "pendingCount_other": "{{count}} pendientes"
   }
 }

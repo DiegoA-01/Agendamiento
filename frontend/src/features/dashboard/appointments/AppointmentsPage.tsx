@@ -19,14 +19,23 @@ import { useCan } from "../shared/useCan";
 import { AppointmentForm } from "./AppointmentForm";
 import { AppointmentDetail, AppointmentSummary } from "./AppointmentDetail";
 import { useAppointments } from "./api";
-import { groupByProfessional } from "./byProfessional";
+import { groupByDay, groupByProfessional } from "./byProfessional";
+import { todayIn } from "../../booking/wizard";
 import { STATUSES } from "./transitions";
 import type { AppointmentStatus } from "../../../shared/api/types";
 
+const INACTIVE: AppointmentStatus[] = ["cancelled", "no_show", "rescheduled"];
+const PENDING: AppointmentStatus[] = ["pending", "confirmed", "in_progress"];
+const pendingCount = (list: { status: AppointmentStatus }[]) =>
+  list.filter((a) => PENDING.includes(a.status)).length;
+
 export default function AppointmentsPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [params, setParams] = useSearchParams();
-  const zone = useMe().data?.tenant?.timezone ?? "America/Bogota";
+  const me = useMe().data;
+  const zone = me?.tenant?.timezone ?? "America/Bogota";
+  // El barbero solo ve sus citas: no necesita las pestañas de profesionales.
+  const ownOnly = me?.role === "professional";
   const [range, setRange] = useState(() => defaultRange(zone));
   const [professional, setProfessional] = useState("");
   const [statuses, setStatuses] = useState<AppointmentStatus[]>([]);
@@ -50,11 +59,25 @@ export default function AppointmentsPage() {
         ? services
         : null;
   const list = appointments.data?.pages.flatMap((p) => p.results) ?? [];
+  const today = todayIn(zone);
+  const [y, m, d] = today.split("-").map(Number);
+  const tomorrow = new Date(Date.UTC(y, m - 1, d + 1)).toISOString().slice(0, 10);
+  const dayLabel = (date: string) => {
+    const long = new Intl.DateTimeFormat(i18n.language, {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+      timeZone: "UTC",
+    }).format(new Date(`${date}T12:00:00Z`));
+    if (date === today) return `${t("agenda.today")} · ${long}`;
+    if (date === tomorrow) return `${t("agenda.tomorrow")} · ${long}`;
+    return long;
+  };
   return (
     <div className="min-w-0 space-y-5">
       <PageHeader
         title={t("dashboard.nav.appointments")}
-        description={t("agenda.appointmentsIntro")}
+        description={t(ownOnly ? "agenda.appointmentsIntroOwn" : "agenda.appointmentsIntro")}
         actions={
           canCreate && (
             <Button onClick={() => setCreating(true)}>{t("agenda.newAppointment")}</Button>
@@ -125,28 +148,30 @@ export default function AppointmentsPage() {
         </fieldset>
       </Card>
       {/* Una pestaña por profesional: "Todos" muestra las citas agrupadas por quién atiende. */}
-      <div
-        role="group"
-        aria-label={t("agenda.byProfessional")}
-        className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none]"
-      >
-        {[{ id: "", display_name: t("common.all") }, ...(professionals.data ?? [])].map((p) => (
-          <button
-            key={p.id || "all"}
-            type="button"
-            aria-pressed={professional === p.id}
-            onClick={() => setProfessional(p.id)}
-            className={`pro-tab flex min-h-11 shrink-0 items-center gap-2 rounded-full py-1.5 pr-4 pl-1.5 text-sm font-medium ${
-              professional === p.id ? "pro-tab-on" : ""
-            }`}
-          >
-            <span aria-hidden="true" className="pro-avatar">
-              {p.id ? p.display_name.trim().charAt(0).toUpperCase() : "∗"}
-            </span>
-            {p.display_name}
-          </button>
-        ))}
-      </div>
+      {!ownOnly && (
+        <div
+          role="group"
+          aria-label={t("agenda.byProfessional")}
+          className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none]"
+        >
+          {[{ id: "", display_name: t("common.all") }, ...(professionals.data ?? [])].map((p) => (
+            <button
+              key={p.id || "all"}
+              type="button"
+              aria-pressed={professional === p.id}
+              onClick={() => setProfessional(p.id)}
+              className={`pro-tab flex min-h-11 shrink-0 items-center gap-2 rounded-full py-1.5 pr-4 pl-1.5 text-sm font-medium ${
+                professional === p.id ? "pro-tab-on" : ""
+              }`}
+            >
+              <span aria-hidden="true" className="pro-avatar">
+                {p.id ? p.display_name.trim().charAt(0).toUpperCase() : "∗"}
+              </span>
+              {p.display_name}
+            </button>
+          ))}
+        </div>
+      )}
       {selected && <AppointmentDetail id={selected} onClose={() => setSelected(null)} />}
       {(appointments.isPending || professionals.isPending || services.isPending) && <Loading />}
       {failed && (
@@ -173,17 +198,31 @@ export default function AppointmentsPage() {
                 {t("agenda.appointmentsCount", { count: group.appointments.length })}
               </span>
             </div>
-            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-              {group.appointments.map((appointment) => (
-                <button
-                  className="min-w-0 rounded-xl border border-slate-200 bg-white p-4 text-left text-slate-900 shadow-sm hover:border-sky-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-700"
-                  key={appointment.id}
-                  onClick={() => setSelected(appointment.id)}
-                >
-                  <AppointmentSummary appointment={appointment} />
-                </button>
-              ))}
-            </div>
+            {groupByDay(group.appointments, zone).map((day) => (
+              <div key={day.date} className="day-group space-y-2 pl-1">
+                <h3 className="flex flex-wrap items-baseline gap-2 text-sm font-semibold">
+                  <span className="day-label first-letter:uppercase">{dayLabel(day.date)}</span>
+                  <span className="font-normal text-slate-600">
+                    {t("agenda.appointmentsCount", { count: day.appointments.length })}
+                    {pendingCount(day.appointments) > 0 &&
+                      ` · ${t("agenda.pendingCount", { count: pendingCount(day.appointments) })}`}
+                  </span>
+                </h3>
+                <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+                  {day.appointments.map((appointment) => (
+                    <button
+                      className={`min-w-0 rounded-xl border border-slate-200 bg-white p-4 text-left text-slate-900 shadow-sm hover:border-sky-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-700 ${
+                        INACTIVE.includes(appointment.status) ? "opacity-60" : ""
+                      }`}
+                      key={appointment.id}
+                      onClick={() => setSelected(appointment.id)}
+                    >
+                      <AppointmentSummary appointment={appointment} />
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ))}
           </section>
         ),
       )}

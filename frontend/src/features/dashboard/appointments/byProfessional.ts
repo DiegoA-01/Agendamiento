@@ -38,3 +38,22 @@ export function groupByProfessional(
   }
   return groups;
 }
+
+export interface DayGroup {
+  /** YYYY-MM-DD en la zona del negocio. */
+  date: string;
+  appointments: Appointment[];
+}
+
+/** Separa las citas (ya ordenadas por hora) por día, en la zona horaria del negocio. */
+export function groupByDay(appointments: Appointment[], timeZone: string): DayGroup[] {
+  const day = new Intl.DateTimeFormat("en-CA", { timeZone });
+  const groups: DayGroup[] = [];
+  for (const appointment of appointments) {
+    const date = day.format(new Date(appointment.start_at));
+    const last = groups.at(-1);
+    if (last?.date === date) last.appointments.push(appointment);
+    else groups.push({ date, appointments: [appointment] });
+  }
+  return groups;
+}

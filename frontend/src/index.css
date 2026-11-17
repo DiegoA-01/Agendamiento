@@ -687,6 +687,12 @@ body {
   background: var(--pf-metal);
   color: var(--pf-metal-ink, var(--pf-ink));
 }
+.day-label {
+  color: var(--pf-green-ink, #0f172a);
+}
+.day-group {
+  animation: pro-in 420ms cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+}
 .pro-group {
   animation: pro-in 420ms cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
 }
@@ -697,7 +703,8 @@ body {
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  .pro-group {
+  .pro-group,
+  .day-group {
     animation: none;
   }
   .pro-tab,
