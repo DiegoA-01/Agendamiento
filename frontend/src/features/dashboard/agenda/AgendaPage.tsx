@@ -232,7 +232,7 @@ export default function AgendaPage() {
                 style={{
                   height: 24 * HOUR_PX,
                   // Línea de cada hora y una más tenue en la media hora, para ubicar bien cada cita.
-                  backgroundImage: `repeating-linear-gradient(to bottom, #e4ddef 0, #e4ddef 1px, transparent 1px, transparent ${HOUR_PX / 2}px, #efeaf6 ${HOUR_PX / 2}px, #efeaf6 ${HOUR_PX / 2 + 1}px, transparent ${HOUR_PX / 2 + 1}px, transparent ${HOUR_PX}px)`, // taste-skill-ignore: son las líneas de la grilla, no un degradado
+                  backgroundImage: `repeating-linear-gradient(to bottom, #ead9c9 0, #ead9c9 1px, transparent 1px, transparent ${HOUR_PX / 2}px, #f3e9df ${HOUR_PX / 2}px, #f3e9df ${HOUR_PX / 2 + 1}px, transparent ${HOUR_PX / 2 + 1}px, transparent ${HOUR_PX}px)`, // taste-skill-ignore: son las líneas de la grilla, no un degradado
                 }}
               >
                 {layoutBlocks(column.appointments, column.date, zone).map(

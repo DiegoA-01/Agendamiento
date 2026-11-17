@@ -140,8 +140,11 @@ export default function HomePage() {
       </div>
 
       <dl className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
-        {kpis.map((kpi) => (
-          <div key={kpi.label} className={`${GLASS} flex min-w-0 flex-col gap-1 p-5`}>
+        {kpis.map((kpi, index) => (
+          <div
+            key={kpi.label}
+            className={`${index === 0 ? "kpi-leather rounded-[22px] border" : GLASS} flex min-w-0 flex-col gap-1 p-5`}
+          >
             <dt className="text-[var(--pf-muted)]">{kpi.label}</dt>
             <dd className="truncate text-3xl font-bold tracking-tight tabular-nums sm:text-4xl">
               {kpi.value}

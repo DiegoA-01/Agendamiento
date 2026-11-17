@@ -8,7 +8,7 @@ import { usePublicCompany } from "../booking/api";
 import { PLATFORM_TERMS_PATH } from "../legal/PlatformTermsPage";
 
 /** Login, recuperación y cambio de contraseña con el mismo vidrio del panel al que se entra: verde
- *  metalizado en el host del Super Admin y púrpura con vidrio líquido en el de cada negocio. */
+ *  metalizado en el host del Super Admin y café metalizado con vidrio líquido en el de cada negocio. */
 export function AuthLayout({ title, children }: { title: string; children: ReactNode }) {
   return isPlatformHost() ? (
     <GlassAuthLayout variant="platform" title={title}>

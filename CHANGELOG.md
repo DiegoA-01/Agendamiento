@@ -1,5 +1,14 @@
 # Changelog
 
+## Panel del dueño en café metalizado, cuero y blanco
+
+- El panel de cada negocio y su login cambian el púrpura por un café metalizado que tira a cuero, de crema a canela y bronce, combinado con blanco.
+- **Fondo:** crema con manchas caramelo detrás del vidrio.
+- **Café metalizado:** opción activa del menú, botón principal, barras de ventas y barras de progreso.
+- **Cuero oscuro:** la tarjeta de «Ventas del mes» del Inicio, con texto crema.
+- **Agenda:** las citas confirmadas y las líneas de la grilla toman los tonos café.
+- El vidrio líquido y el movimiento siguen igual. El panel del Super Admin sigue en verde.
+
 ## Paneles con más vidrio líquido y movimiento
 
 - Paneles del Super Admin y del dueño. La reserva pública no cambia.
