@@ -181,3 +181,60 @@ def entries_for(
     if kind:
         entries = entries.filter(kind=kind)
     return entries
+
+
+def rows_by_appointment(entries):
+    """Filas del CSV por cita: una por cita y profesional, con los servicios juntos y las entradas
+    y ajustes sumados. El porcentaje es el de la cita (comisión / valor)."""
+    groups: dict = {}
+    for entry in entries.select_related("professional", "service"):
+        key = (entry.appointment_id, entry.professional_id)
+        group = groups.setdefault(
+            key,
+            {
+                "start": entry.appointment_start_at,
+                "professional": entry.professional.display_name,
+                "services": [],
+                "base": Decimal(0),
+                "commission": Decimal(0),
+                "business": Decimal(0),
+                "adjustment": Decimal(0),
+                "reasons": [],
+            },
+        )
+        if entry.kind == CommissionEntry.Kind.ENTRY:
+            if entry.service.name not in group["services"]:
+                group["services"].append(entry.service.name)
+        else:
+            group["adjustment"] += entry.commission_amount
+            if entry.reason:
+                group["reasons"].append(entry.reason)
+        group["base"] += entry.base_amount
+        group["commission"] += entry.commission_amount
+        group["business"] += entry.business_amount
+    header = [
+        "fecha_cita",
+        "profesional",
+        "servicios",
+        "valor",
+        "porcentaje",
+        "comision",
+        "negocio",
+        "ajustes",
+        "motivos",
+    ]
+    rows = [
+        [
+            timezone.localtime(group["start"]).strftime("%Y-%m-%d %H:%M"),
+            group["professional"],
+            " + ".join(group["services"]),
+            group["base"],
+            (group["commission"] * 100 / group["base"]).quantize(CENT) if group["base"] else 0,
+            group["commission"],
+            group["business"],
+            group["adjustment"],
+            " · ".join(group["reasons"]),
+        ]
+        for group in groups.values()
+    ]
+    return header, rows

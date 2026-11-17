@@ -64,6 +64,11 @@
     "reason": "Motivo",
     "adjustNote": "La comisión original no se borra: se guarda la diferencia como un ajuste con tu motivo.",
     "saveAdjustment": "Guardar ajuste",
-    "salesBy": "Ventas por {{group}}"
+    "salesBy": "Ventas por {{group}}",
+    "services": "Servicios",
+    "detail": "Detalle",
+    "showDetail": "Ver detalle",
+    "hideDetail": "Ocultar",
+    "includesAdjustment": "Incluye ajuste {{amount}}"
   }
 }

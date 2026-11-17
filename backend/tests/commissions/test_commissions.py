@@ -217,6 +217,29 @@ def test_csv_export_has_bom_and_neutralizes_formulas(shop):
     assert "2026-03-31 23:30,entry,Ana,Barba,15000.00,40.00,6000.00,9000.00," in lines
 
 
+def test_csv_by_appointment_sums_services_and_adjustments_in_one_row(shop):
+    with tenant_context(shop.tenant):
+        entry = CommissionEntry.objects.get(appointment=shop.a3)
+        commissions.create_adjustment(
+            entry, base_amount=Decimal("33333"), commission_amount=Decimal("12000"), reason="Bono"
+        )
+
+    response = shop.client().get(
+        f"{URL}export/", {"from": "2026-03-01", "to": "2026-03-31", "group": "appointment"}
+    )
+
+    assert response.status_code == 200
+    assert "comisiones-por-cita.csv" in response["Content-Disposition"]
+    lines = response.content.decode("utf-8").lstrip("﻿").strip().splitlines()
+    assert (
+        lines[0]
+        == "fecha_cita,profesional,servicios,valor,porcentaje,comision,negocio,ajustes,motivos"
+    )
+    assert "2026-03-02 10:00,Ana,Corte + Barba,45000.00,40.00,18000.00,27000.00,0," in lines
+    assert "2026-03-09 09:00,Luis,Corte,33333.00,36.00,12000.00,21333.00,166.78,Bono" in lines
+    assert len(lines) == 5  # cabecera + 4 citas (a1 junta sus dos servicios)
+
+
 # --- Ajustes -----------------------------------------------------------------------------------
 
 

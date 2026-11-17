@@ -1,5 +1,13 @@
 # Changelog
 
+## Comisiones: una fila por cita
+
+- En Reportes → Comisiones cada cita es una sola fila, aunque tenga varios servicios. La fila trae fecha, profesional, los servicios juntos («Depilación + Corte clásico + Barba»), el total de la cita, el porcentaje, la comisión y lo que queda para el negocio. Antes salía una fila por servicio.
+- Los ajustes se suman en la fila de su cita, con la nota «Incluye ajuste +2.000» y su motivo. El porcentaje de la fila pasa a ser el efectivo de la cita: 12.000 de 25.000 = 48 %. Antes el ajuste salía como fila aparte y confundía.
+- «Ver detalle» abre el desglose por servicio. Ahí el dueño sigue pudiendo ajustar cada servicio.
+- «Descargar CSV» baja el archivo por cita (`comisiones-por-cita.csv`), con las columnas fecha, profesional, servicios, valor, porcentaje, comisión, negocio, ajustes y motivos. El export detallado por servicio sigue disponible sin el parámetro `group=appointment`.
+- El cálculo no cambia: se sigue guardando una comisión por servicio con su porcentaje congelado (spec §11). Si todos van al mismo porcentaje, da lo mismo que sacarlo sobre el total.
+
 ## Citas separadas por profesional
 
 - En «Citas», arriba de la lista, hay una pestaña por cada persona del equipo, con su inicial, más «Todos». El selector de profesional del filtro se cambia por estas pestañas.
