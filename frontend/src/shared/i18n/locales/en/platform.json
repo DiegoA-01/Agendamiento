@@ -280,5 +280,18 @@
     "regenerateTitle": "Generate new codes",
     "regenerateIntro": "Your previous codes will stop working. Confirm with your password and the code from your app.",
     "regenerateSubmit": "Generate new codes"
+  },
+  "styles": {
+    "title": "Booking style",
+    "intro": "How the page where customers book looks: home, booking window and appointment card.",
+    "auto": "Automatic",
+    "autoHint": "By business type: barbershops use Classic barbershop; salons, nails and spas use Salon.",
+    "emerald": "Emerald",
+    "emeraldHint": "Metallic emerald green with gold details.",
+    "barbershop": "Classic barbershop",
+    "barbershopHint": "Charcoal, wine red and brass, with a spinning barber pole.",
+    "salon": "Beauty salon",
+    "salonHint": "Blush, pearl and rose gold, with soft sparkles.",
+    "save": "Save style"
   }
 }

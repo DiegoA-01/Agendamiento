@@ -36,11 +36,11 @@ export function PublicLayout({ children }: { children?: ReactNode }) {
       </main>
     );
   }
-  const { name, logo } = company.data;
+  const { name, logo, public_style: style } = company.data;
 
   return (
     <div
-      className={`booking flex min-h-dvh flex-col ${
+      className={`booking style-${style} flex min-h-dvh flex-col ${
         landing ? "public-dark" : "public-backdrop text-[var(--color-text)]"
       }`}
     >

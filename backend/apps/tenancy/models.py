@@ -87,6 +87,14 @@ class Tenant(BaseModel):
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.ACTIVE)
     plan = models.ForeignKey(Plan, on_delete=models.PROTECT, related_name="tenants")
     theme = models.JSONField(default=dict, blank=True)
+    # Estilo de la página pública de reservas que elige el Super Admin. Vacío = según el tipo de
+    # negocio (barbería → barbershop; salón, uñas y spa → salon).
+    public_style = models.CharField(
+        max_length=20,
+        blank=True,
+        default="",
+        choices=[("emerald", "Esmeralda"), ("barbershop", "Barbería clásica"), ("salon", "Salón")],
+    )
 
     # Reglas de agenda del negocio (spec §8 y §9). Las leen la disponibilidad y la reserva pública.
     slot_step_min = models.PositiveSmallIntegerField(  # cada cuánto se ofrecen horarios

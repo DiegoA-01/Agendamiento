@@ -62,6 +62,24 @@ def test_company_info_is_public_and_has_no_private_data(shop):
     assert "tax_id" not in body and "legal_name" not in body
 
 
+@pytest.mark.parametrize(
+    ("vertical", "chosen", "expected"),
+    [
+        ("barbershop", "", "barbershop"),
+        ("salon", "", "salon"),
+        ("nails", "", "salon"),
+        ("barbershop", "emerald", "emerald"),
+        ("salon", "barbershop", "barbershop"),
+    ],
+)
+def test_public_style_is_the_chosen_one_or_follows_the_vertical(shop, vertical, chosen, expected):
+    shop.tenant.vertical = vertical
+    shop.tenant.public_style = chosen
+    shop.tenant.save()
+
+    assert visitor(shop).get(f"{PUBLIC}/company/").json()["public_style"] == expected
+
+
 def test_services_are_grouped_by_category_and_only_active(shop):
     with tenant_context(shop.tenant):
         from tests.catalog.factories import ServiceFactory

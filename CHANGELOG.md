@@ -1,5 +1,22 @@
 # Changelog
 
+## Tres estilos para la página de reservas, elegidos por el Super Admin
+
+- La página pública de cada negocio (portada, ventana de reserva, «Tu cita» y tarjeta de la cita) tiene tres estilos:
+  - **Esmeralda:** el de siempre, verde metalizado con dorado.
+  - **Barbería clásica:** carbón, rojo vino, crema y latón. Letras de letrero, un poste de barbero que gira junto al celular y la tarjeta de la cita en cuero con borde de latón.
+  - **Salón de belleza:** rosa piel, perla y oro rosa. Serif fina en cursiva, esferas perladas, destellos que titilan y la tarjeta de la cita en oro rosa.
+- **Super Admin:** en Empresas → Tema hay un bloque «Estilo de la reserva» con una muestra de cada estilo y «Automático».
+  - «Automático» toma el estilo del tipo de negocio: barbería usa Barbería clásica; salón, uñas y spa usan Salón.
+  - Solo el Super Admin lo cambia. El cambio queda en la auditoría.
+- **Backend:**
+  - Campo nuevo `Tenant.public_style`: vacío, `emerald`, `barbershop` o `salon`.
+  - La migración deja en `emerald` a los negocios que ya existían, así no cambian de aspecto. Los nuevos arrancan en automático.
+  - `GET /public/company/` devuelve `public_style` ya resuelto.
+  - `PATCH /tenants/{id}/` acepta `public_style`.
+- **CSS:** Esmeralda sigue siendo la base. Los otros dos estilos se aplican encima con la clase `style-barbershop` o `style-salon` en el marco público y cambian variables de color, tipo de letra y los pocos colores fijos.
+- Con «reducir movimiento» en el sistema, el poste y los brillos no se mueven.
+
 ## Agenda con canceladas a la vista y citas del barbero por día
 
 - **Agenda:** las citas canceladas, las inasistencias y las reprogramadas se ven por defecto, atenuadas y con el nombre tachado, en la vista de día y en la de semana. Antes se ocultaban y el barbero no sabía que una cita se había cancelado. La casilla «Mostrar canceladas e inasistencias» sigue sirviendo para ocultarlas.

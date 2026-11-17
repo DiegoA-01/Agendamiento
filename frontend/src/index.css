@@ -1419,6 +1419,372 @@ body {
   }
 }
 
+/* ==== Estilos de la página pública de reservas (los elige el Super Admin) ====================
+   Esmeralda es la base (las reglas de arriba). Barbería clásica y Salón de belleza se aplican
+   encima con la clase `style-barbershop` o `style-salon` en el marco público: cambian las
+   variables de color y tipo, y los pocos colores fijos de la portada, la ventana de reserva y la
+   tarjeta de la cita. La ventana de reserva es un <dialog> dentro del marco, así que hereda. */
+
+/* ---- Barbería clásica: carbón, rojo vino, crema y latón; letras de letrero ---------------- */
+/* prettier-ignore */
+.style-barbershop {
+  --font-display: Rockwell, "Roboto Slab", "Courier New", Georgia, serif;
+  --st-wine: linear-gradient(135deg, #5e0f16 0%, #8c1c24 40%, #c0414a 52%, #7a1820 70%, #4a0b10 100%); /* taste-skill-ignore: vino metalizado pedido */
+  --st-brass: linear-gradient(135deg, #f6e3a8, #c9a35a 40%, #8a6a2a 60%, #e8cf8a); /* taste-skill-ignore: latón pedido */
+  --st-leather: repeating-linear-gradient(100deg, #ffffff06 0 2px, transparent 2px 5px), linear-gradient(135deg, #2a1d16, #4a3122 40%, #2c1e16 70%, #1a120d); /* taste-skill-ignore: cuero pedido */
+}
+/* prettier-ignore */
+.public-dark.style-barbershop {
+  --ld-ground: #141110;
+  --ld-ground-2: #1c1714;
+  --ld-cream: #efe6d6;
+  --ld-muted: #b6a993;
+  --ld-gold: #c9a35a;
+  --ld-metal: var(--st-wine);
+  --ld-metal-light: var(--st-brass);
+}
+/* prettier-ignore */
+.public-dark.style-barbershop::before {
+  background: radial-gradient(35% 30% at 20% 20%, #8c1c2455, transparent 70%), radial-gradient(30% 35% at 85% 15%, #c9a35a33, transparent 70%), radial-gradient(40% 35% at 60% 90%, #3a2a1f88, transparent 70%); /* taste-skill-ignore: luces del fondo */
+}
+/* prettier-ignore */
+.style-barbershop .ld-title {
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  background-image: linear-gradient(100deg, #efe6d6 0%, #efe6d6 40%, #f3d98a 50%, #efe6d6 60%, #efe6d6 100%); /* taste-skill-ignore: brillo del nombre */
+}
+.style-barbershop .ld-cta,
+.style-barbershop .ld-sel,
+.style-barbershop .ld-btn,
+.style-barbershop .ld-toast-dot {
+  color: #fbefe3;
+}
+/* prettier-ignore */
+.style-barbershop .ld-cta {
+  border-radius: 12px;
+  box-shadow: inset 0 1px 0 #ffffff40, 0 18px 40px -16px #8c1c24cc; /* taste-skill-ignore: botón metalizado */
+}
+.style-barbershop .ld-mark,
+.style-barbershop .metal {
+  color: #1a1410;
+}
+.style-barbershop .ld-screen {
+  background: #f4ede1;
+  color: #1a1410;
+}
+.style-barbershop .ld-row,
+.style-barbershop .ld-day,
+.style-barbershop .ld-time,
+.style-barbershop .ld-input {
+  background: #fffaf1;
+}
+.style-barbershop .ld-sel small {
+  color: #f3c9c0;
+}
+.style-barbershop .ld-seal circle {
+  fill: #8c1c2418;
+  stroke: #8c1c24;
+}
+.style-barbershop .ld-seal path {
+  stroke: #8c1c24;
+}
+/* prettier-ignore */
+.style-barbershop .ld-card,
+.style-barbershop .wallet-card {
+  color: #efe6d6;
+  background: var(--st-leather); /* taste-skill-ignore: cuero pedido */
+  box-shadow: inset 0 0 0 2px #c9a35a, inset 0 1px 0 #ffffff26, 0 40px 70px -30px #000; /* taste-skill-ignore: borde de latón */
+}
+/* prettier-ignore */
+.style-barbershop .ld-card::after,
+.style-barbershop .wallet-card::after {
+  background: linear-gradient(105deg, transparent 40%, #f3d98a33 49%, #fff2c855 50%, #f3d98a33 51%, transparent 60%); /* taste-skill-ignore: destello */
+}
+.style-barbershop .ld-when {
+  color: #f3d98a;
+}
+.style-barbershop .ld-pill,
+.style-barbershop .wallet-pill {
+  background: var(--st-brass);
+  color: #1a1410;
+}
+.style-barbershop .wallet-label {
+  color: #d9c08a;
+}
+.style-barbershop .ld-toast {
+  color: #1a1410;
+}
+.style-barbershop .ld-steps {
+  background: #efe6d6;
+  color: #1a1410;
+}
+.style-barbershop .ld-step-on .ld-dot {
+  color: #fbefe3;
+}
+.style-barbershop .ld-service:hover,
+.style-barbershop .ld-service:focus-visible {
+  color: #fbefe3;
+}
+/* prettier-ignore */
+.style-barbershop.booking,
+.style-barbershop .booking {
+  --color-primary: #8c1c24;
+  --color-secondary: #c9a35a;
+  --color-background: #f4ede1;
+  --color-surface: #fffaf1;
+  --color-text: #1a1410;
+  --pk-metal: var(--st-wine);
+  --pk-metal-ink: #fbefe3;
+  --pk-metal-shadow: inset 0 1px 0 #ffffff40, 0 8px 18px -8px #8c1c24aa; /* taste-skill-ignore: vino metalizado */
+}
+/* prettier-ignore */
+.style-barbershop.public-backdrop {
+  background: radial-gradient(45% 50% at 88% 0%, #c9a35a55, transparent 70%), radial-gradient(40% 45% at 0% 35%, #8c1c2422, transparent 70%), #f4ede1; /* taste-skill-ignore: fondo */
+}
+
+/* El poste de barbero: rayas rojas, blancas y azules que suben sin parar, con tapas de latón. */
+.barber-pole {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+.barber-pole-cap {
+  width: 58px;
+  height: 16px;
+  border-radius: 8px;
+  background: var(--st-brass);
+}
+/* prettier-ignore */
+.barber-pole-tube {
+  position: relative;
+  width: 44px;
+  height: 170px;
+  overflow: hidden;
+  border-radius: 22px;
+  background: #fff;
+  box-shadow: inset 0 0 0 3px #c9a35a, 0 20px 40px -18px #000c; /* taste-skill-ignore: poste de barbero */
+}
+/* prettier-ignore */
+.barber-pole-tube::before {
+  content: "";
+  position: absolute;
+  inset: -60px 0 0;
+  background: repeating-linear-gradient(135deg, #b3202c 0 14px, #f4ede1 14px 28px, #1f3f8f 28px 42px, #f4ede1 42px 56px); /* taste-skill-ignore: rayas del poste */
+  animation: barber-pole 1.6s linear infinite;
+}
+/* prettier-ignore */
+.barber-pole-tube::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #0006, transparent 30%, #ffffff55 50%, transparent 70%, #0005); /* taste-skill-ignore: brillo del vidrio */
+}
+@keyframes barber-pole {
+  to {
+    transform: translateY(56px);
+  }
+}
+.ld-motif-pole {
+  position: absolute;
+  top: 40px;
+  left: -10px;
+  z-index: 1;
+  animation: ld-float 8s ease-in-out infinite;
+}
+@media (max-width: 640px) {
+  .ld-motif-pole {
+    left: 0;
+    top: 20px;
+    scale: 0.7;
+    transform-origin: top left;
+  }
+}
+
+/* ---- Salón de belleza: rosa piel, perla y oro rosa; serif fina en cursiva --------------- */
+/* prettier-ignore */
+.style-salon {
+  --font-display: "Bodoni MT", Didot, "Playfair Display", Georgia, serif;
+  --st-rose: linear-gradient(135deg, #f6d9cf 0%, #e3aa9d 35%, #c98b7b 55%, #f2c9bb 80%, #d9a090 100%); /* taste-skill-ignore: oro rosa pedido */
+  --st-pearl: repeating-linear-gradient(100deg, #ffffff18 0 2px, transparent 2px 5px), linear-gradient(135deg, #fbe9e2 0%, #e8b8a8 30%, #f9dcd1 50%, #d9a090 70%, #f6d6c9 100%); /* taste-skill-ignore: oro rosa pedido */
+}
+/* prettier-ignore */
+.public-dark.style-salon {
+  --ld-ground: #f8ece7;
+  --ld-ground-2: #f3e1da;
+  --ld-cream: #3b2a2e;
+  --ld-muted: #8a6d6f;
+  --ld-gold: #b9776a;
+  --ld-metal: var(--st-rose);
+  --ld-metal-light: var(--st-rose);
+}
+/* prettier-ignore */
+.public-dark.style-salon::before {
+  background: radial-gradient(35% 30% at 15% 15%, #f6c9cfaa, transparent 70%), radial-gradient(30% 35% at 85% 10%, #ffffffcc, transparent 70%), radial-gradient(40% 35% at 60% 95%, #e8b8a866, transparent 70%); /* taste-skill-ignore: luces del fondo */
+}
+/* prettier-ignore */
+.public-dark.style-salon > header .glass {
+  background: rgb(255 255 255 / 0.55);
+  border-color: rgb(255 255 255 / 0.9);
+  box-shadow: inset 0 1px 0 #ffffff, 0 12px 30px -18px #b9776a66; /* taste-skill-ignore: barra de vidrio */
+}
+/* prettier-ignore */
+.style-salon .ld-title {
+  font-style: italic;
+  font-weight: 400;
+  background-image: linear-gradient(100deg, #3b2a2e 0%, #3b2a2e 40%, #e3aa9d 50%, #3b2a2e 60%, #3b2a2e 100%); /* taste-skill-ignore: brillo del nombre */
+}
+.style-salon .ld-link {
+  text-decoration-color: rgb(59 42 46 / 0.35);
+}
+.style-salon .ld-cta,
+.style-salon .ld-sel,
+.style-salon .ld-btn,
+.style-salon .ld-toast-dot,
+.style-salon .ld-mark,
+.style-salon .metal {
+  color: #3b2a2e;
+}
+/* prettier-ignore */
+.style-salon .ld-cta {
+  box-shadow: inset 0 1px 0 #ffffff99, 0 18px 40px -16px #c98b7b99; /* taste-skill-ignore: botón oro rosa */
+}
+/* prettier-ignore */
+.style-salon .ld-phone {
+  background: #f2e6e1;
+  box-shadow: inset 0 0 0 1px #ffffff, 0 50px 90px -30px #b9776a88; /* taste-skill-ignore: celular claro */
+}
+.style-salon .ld-screen {
+  background: #fffaf8;
+  color: #3b2a2e;
+}
+.style-salon .ld-row,
+.style-salon .ld-day,
+.style-salon .ld-time,
+.style-salon .ld-input {
+  border-radius: 18px;
+  background: #fbefeb;
+}
+.style-salon .ld-sel small {
+  color: #6e4a46;
+}
+.style-salon .ld-seal circle {
+  fill: #e3aa9d22;
+  stroke: #b9776a;
+}
+.style-salon .ld-seal path {
+  stroke: #b9776a;
+}
+/* prettier-ignore */
+.style-salon .ld-card,
+.style-salon .wallet-card {
+  color: #3b2a2e;
+  background: var(--st-pearl); /* taste-skill-ignore: oro rosa pedido */
+  box-shadow: inset 0 1px 0 #ffffffcc, inset 0 0 0 1px #ffffffaa, 0 40px 70px -30px #b9776a99; /* taste-skill-ignore: profundidad */
+}
+/* prettier-ignore */
+.style-salon .ld-card::after,
+.style-salon .wallet-card::after {
+  background: linear-gradient(105deg, transparent 40%, #ffffff66 49%, #ffffffaa 50%, #ffffff66 51%, transparent 60%); /* taste-skill-ignore: destello perlado */
+}
+.style-salon .ld-when,
+.style-salon .ld-total,
+.style-salon .wallet-emboss {
+  text-shadow: 0 1px 0 #ffffff99; /* taste-skill-ignore: relieve claro */
+}
+.style-salon .ld-pill,
+.style-salon .wallet-pill {
+  background: #3b2a2e;
+  color: #fbe9e2;
+}
+.style-salon .wallet-label {
+  color: #7a5650;
+}
+.style-salon .ld-toast {
+  background: #fffaf8;
+  color: #3b2a2e;
+}
+.style-salon .ld-steps {
+  background: #fffaf8;
+  color: #3b2a2e;
+}
+.style-salon .ld-sub {
+  color: #8a6d6f;
+}
+.style-salon .ld-dot {
+  background: #fbefeb;
+}
+.style-salon .ld-step-on .ld-dot {
+  color: #3b2a2e;
+}
+.style-salon .ld-service:hover,
+.style-salon .ld-service:focus-visible {
+  color: #3b2a2e;
+}
+.style-salon .ld-service:hover .ld-service-min,
+.style-salon .ld-service:hover .ld-service-price {
+  color: #3b2a2e;
+}
+.public-dark.style-salon > footer {
+  color: #8a6d6f;
+}
+/* prettier-ignore */
+.style-salon.booking,
+.style-salon .booking {
+  --color-primary: #b9776a;
+  --color-secondary: #c98b7b;
+  --color-background: #fffaf8;
+  --color-surface: #ffffff;
+  --color-text: #3b2a2e;
+  --pk-metal: var(--st-rose);
+  --pk-metal-ink: #3b2a2e;
+  --pk-metal-shadow: inset 0 1px 0 #ffffffaa, 0 8px 18px -8px #c98b7b99; /* taste-skill-ignore: oro rosa */
+}
+/* prettier-ignore */
+.style-salon.public-backdrop {
+  background: radial-gradient(45% 50% at 88% 0%, #f6c9cfaa, transparent 70%), radial-gradient(40% 45% at 0% 35%, #fbe9e2, transparent 70%), #f8ece7; /* taste-skill-ignore: fondo */
+}
+
+/* Esferas perladas que flotan y destellos que titilan junto al celular. */
+/* prettier-ignore */
+.salon-orb {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #fff 0, #f6d9cf 30%, #e3aa9d 70%, #c98b8b 100%); /* taste-skill-ignore: esfera perlada */
+  opacity: 0.55;
+  animation: ld-float 9s ease-in-out infinite;
+}
+/* prettier-ignore */
+.salon-sparkle {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff 0 20%, transparent 60%); /* taste-skill-ignore: destello */
+  animation: salon-twinkle 3s ease-in-out infinite;
+}
+@keyframes salon-twinkle {
+  0%,
+  100% {
+    opacity: 0.2;
+    scale: 0.6;
+  }
+  50% {
+    opacity: 1;
+    scale: 1.2;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .barber-pole-tube::before,
+  .ld-motif-pole,
+  .salon-orb,
+  .salon-sparkle {
+    animation: none;
+  }
+}
+
 /* Efecto vidrio al pasar el cursor o tocar cualquier botón con forma (los que llevan `rounded-*`):
    un brillo diagonal y un filo de luz arriba, encima del color del botón. Va en un pseudoelemento
    para que aparezca suave y no tape los anillos de selección. */
