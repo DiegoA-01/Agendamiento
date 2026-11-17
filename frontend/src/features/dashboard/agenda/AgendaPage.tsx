@@ -37,9 +37,9 @@ export default function AgendaPage() {
   const [view, setView] = useState<"day" | "week">("day");
   const scrolled = useRef(false);
   const [professional, setProfessional] = useState("");
-  // Las canceladas, inasistencias y reprogramadas ocupan carriles y angostan las demás: se
-  // ocultan por defecto y se pueden mostrar.
-  const [showInactive, setShowInactive] = useState(false);
+  // Las canceladas, inasistencias y reprogramadas se ven por defecto (atenuadas): así el barbero
+  // sabe qué se canceló. Se pueden ocultar con la casilla.
+  const [showInactive, setShowInactive] = useState(true);
   const [selected, setSelected] = useState<string | null>(null);
   // "Nueva cita" del Inicio llega con `?nueva=1` y abre el formulario de una vez.
   const [params] = useSearchParams();

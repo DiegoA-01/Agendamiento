@@ -71,6 +71,10 @@
     "byProfessional": "Appointments by professional",
     "unknownProfessional": "Other professional",
     "appointmentsCount_one": "{{count}} appointment",
-    "appointmentsCount_other": "{{count}} appointments"
+    "appointmentsCount_other": "{{count}} appointments",
+    "tomorrow": "Tomorrow",
+    "appointmentsIntroOwn": "Your appointments, by day.",
+    "pendingCount_one": "{{count}} upcoming",
+    "pendingCount_other": "{{count}} upcoming"
   }
 }

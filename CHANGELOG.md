@@ -1,5 +1,11 @@
 # Changelog
 
+## Agenda con canceladas a la vista y citas del barbero por día
+
+- **Agenda:** las citas canceladas, las inasistencias y las reprogramadas se ven por defecto, atenuadas y con el nombre tachado, en la vista de día y en la de semana. Antes se ocultaban y el barbero no sabía que una cita se había cancelado. La casilla «Mostrar canceladas e inasistencias» sigue sirviendo para ocultarlas.
+- **Citas:** dentro de cada profesional, las citas se separan por día, ordenadas por hora. Cada día lleva un encabezado («Hoy · martes, 17 de noviembre», «Mañana · …») con cuántas citas hay y cuántas siguen pendientes. Las canceladas se ven atenuadas.
+- **Panel del barbero:** en Citas ya no salen las pestañas «Todos / Andrés», porque solo ve lo suyo. La descripción dice «Tus citas, separadas por día».
+
 ## Comisiones: una fila por cita
 
 - En Reportes → Comisiones cada cita es una sola fila, aunque tenga varios servicios. La fila trae fecha, profesional, los servicios juntos («Depilación + Corte clásico + Barba»), el total de la cita, el porcentaje, la comisión y lo que queda para el negocio. Antes salía una fila por servicio.
