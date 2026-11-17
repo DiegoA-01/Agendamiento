@@ -292,6 +292,8 @@
     "barbershopHint": "Charcoal, wine red and brass, with a spinning barber pole.",
     "salon": "Beauty salon",
     "salonHint": "Blush, pearl and rose gold, with soft sparkles.",
-    "save": "Save style"
+    "save": "Save style",
+    "saved": "Saved",
+    "viewSite": "Open the booking page ↗"
   }
 }

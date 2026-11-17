@@ -714,6 +714,62 @@ body {
   }
 }
 
+/* Selector de estilo del Super Admin: cada opción es una tarjeta; la elegida se marca con un
+   anillo verde, fondo blanco y un check, y sube un poco. La que está guardada lleva «Guardado». */
+/* prettier-ignore */
+.style-option {
+  background: rgb(255 255 255 / 0.55);
+  box-shadow: inset 0 0 0 2px transparent; /* taste-skill-ignore: anillo de selección */
+  transition: transform 220ms cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 220ms ease, background-color 220ms ease;
+}
+.style-option:hover {
+  transform: translateY(-2px);
+  background: rgb(255 255 255 / 0.85);
+}
+/* prettier-ignore */
+.style-option-on,
+.style-option-on:hover {
+  background: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: inset 0 0 0 2px var(--pf-green, #5f7e6f), 0 14px 28px -16px var(--pf-green-ink, #2d4a3d); /* taste-skill-ignore: anillo de selección */
+}
+/* prettier-ignore */
+.style-check {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  flex: none;
+  border-radius: 9999px;
+  color: transparent;
+  box-shadow: inset 0 0 0 2px rgb(0 0 0 / 0.12); /* taste-skill-ignore: círculo de selección */
+  transition: background-color 200ms, color 200ms, transform 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.style-option-on .style-check {
+  background: var(--pf-green, #5f7e6f);
+  color: #ffffff;
+  box-shadow: none; /* taste-skill-ignore: quita el círculo */
+  transform: scale(1.1);
+}
+.style-saved {
+  padding: 2px 10px;
+  border-radius: 9999px;
+  background: var(--pf-green-soft, #dfe8e3);
+  color: var(--pf-green-ink, #2d4a3d);
+  font-size: 12px;
+  font-weight: 600;
+}
+@media (prefers-reduced-motion: reduce) {
+  .style-option,
+  .style-check {
+    transition: none;
+  }
+  .style-option:hover,
+  .style-option-on {
+    transform: none;
+  }
+}
+
 /* Horarios: barra del día con la jornada en el color del panel y los descansos en franjas ámbar
    diagonales, para que se vean de un vistazo. Las cajas de cada descanso usan el mismo ámbar. */
 .hours-track {
