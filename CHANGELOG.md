@@ -1,5 +1,18 @@
 # Changelog
 
+## Portada del negocio en esmeralda metalizado, con la tarjeta de cita que sale del celular
+
+- La portada pública usa el verde esmeralda metalizado de la tarjeta de la cita: fondo verde muy oscuro con luces que se mueven despacio, texto crema y detalles dorados.
+- **Arriba:**
+  - El nombre del negocio, enorme en serif, con un brillo que lo cruza cada tanto.
+  - Una frase corta y el botón «Reservar cita» metalizado, con destello y un enlace a los servicios.
+  - Tres datos en dorado: 1 min para reservar, cuántas horas antes se cancela gratis (el valor del negocio) y 0 cuentas.
+- **El celular:** inclinado y flotando, hace la reserva solo. Usa los servicios reales del negocio, en el paso 2 muestra un descanso en ámbar y termina con el sello dibujado. Al confirmar, **la tarjeta de la cita sale del celular** girando, con chip dorado y destello holográfico, y aparece el aviso «Cita confirmada».
+- **«Así se reserva»:** va en una franja crema. Los cuatro pasos están en línea, con una barra que se llena y el paso activo en esmeralda, sincronizado con el celular. Cada paso se puede tocar, y se puede pausar.
+- **Servicios:** van en verde oscuro, como una lista grande con duración y precio en dorado. Al pasar el cursor, la fila se llena de esmeralda metalizado. Cada servicio lleva a la reserva.
+- La ventana de la reserva sigue igual y se abre encima. Las páginas legales y la de la cita siguen en su estilo claro.
+- Con «reducir movimiento» en el sistema no hay animaciones. En el celular el diseño se reacomoda en una columna, sin desplazamiento horizontal.
+
 ## Horarios con jornada y descansos, y el descanso visible al reservar
 
 - **Horarios:** cada día se arma con un «Trabaja», la **jornada** (desde, hasta) y sus **descansos** (desde, hasta).
