@@ -15,7 +15,8 @@ export function PublicLayout({ children }: { children?: ReactNode }) {
   const company = usePublicCompany();
   // La portada (y la reserva, que se abre encima de ella) usa todo el ancho; el resto, una columna.
   const { pathname } = useLocation();
-  const width = pathname === "/" || pathname === "/reservar" ? "max-w-6xl" : "max-w-2xl";
+  const landing = pathname === "/" || pathname === "/reservar";
+  const width = landing ? "max-w-[1280px]" : "max-w-2xl";
   const language = company.data?.language;
 
   useEffect(() => {
@@ -38,7 +39,11 @@ export function PublicLayout({ children }: { children?: ReactNode }) {
   const { name, logo } = company.data;
 
   return (
-    <div className="booking public-backdrop flex min-h-dvh flex-col text-[var(--color-text)]">
+    <div
+      className={`booking flex min-h-dvh flex-col ${
+        landing ? "public-dark" : "public-backdrop text-[var(--color-text)]"
+      }`}
+    >
       <a
         href="#contenido"
         className="sr-only rounded bg-white px-3 py-2 focus:not-sr-only focus:absolute focus:top-2 focus:left-2"
@@ -62,7 +67,12 @@ export function PublicLayout({ children }: { children?: ReactNode }) {
           </Link>
         </div>
       </header>
-      <main id="contenido" className={`mx-auto w-full ${width} flex-1 px-4 py-6 pb-32 lg:py-10`}>
+      <main
+        id="contenido"
+        className={
+          landing ? "w-full flex-1" : `mx-auto w-full ${width} flex-1 px-4 py-6 pb-32 lg:py-10`
+        }
+      >
         {children ?? <Outlet />}
       </main>
       <footer className="px-4 py-6 text-sm">

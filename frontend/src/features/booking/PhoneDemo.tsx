@@ -4,11 +4,15 @@ import { formatMoney } from "../../shared/money";
 import { DEMO_STEPS, nextDays, type DemoStep } from "./howItWorks";
 import { todayIn } from "./wizard";
 
-const TIMES = ["9:00", "10:30", "11:00", "15:30"];
+/** Horas de ejemplo del paso 2: tres antes del descanso y tres después. */
+const BEFORE = ["12:00", "12:15", "12:30"];
+const AFTER = ["14:00", "14:15", "14:30"];
+export const DEMO_TIME = "14:00";
+export const DEMO_DAY_INDEX = 2;
 
-/** Celular dibujado con CSS que enseña la reserva pantalla por pantalla. Es ilustrativo: los mismos
- *  pasos van en texto al lado, así que el celular queda oculto para lectores de pantalla. Usa los
- *  colores del tema del negocio y, si los hay, sus primeros servicios reales. */
+/** Celular dibujado con CSS que enseña la reserva pantalla por pantalla, en el verde esmeralda
+ *  metalizado de la tarjeta de la cita. Es ilustrativo: los mismos pasos van en texto debajo, así
+ *  que queda oculto para lectores de pantalla. Usa los primeros servicios reales del negocio. */
 export function PhoneDemo({
   step,
   services,
@@ -22,57 +26,41 @@ export function PhoneDemo({
   timeZone: string;
   businessName: string;
 }) {
-  const { t } = useTranslation();
   const index = DEMO_STEPS.indexOf(step);
 
   return (
-    <div aria-hidden="true" className="phone-demo relative mx-auto w-[300px] shrink-0 sm:w-[320px]">
-      <div className="phone-frame rounded-[52px] p-3">
-        <div className="relative flex h-[560px] flex-col overflow-hidden phone-screen-bg rounded-[42px] text-[var(--color-text)] sm:h-[580px]">
-          <div className="absolute top-2.5 left-1/2 h-6 w-24 -translate-x-1/2 rounded-full bg-black" />
-          <div className="flex items-center justify-between px-7 pt-3 text-[11px] font-semibold opacity-80">
-            <span>9:41</span>
-            <span className="tracking-widest">●●●</span>
-          </div>
-
-          <div className="flex items-center gap-2 px-5 pt-6 pb-3">
-            <span className="metal flex size-8 items-center justify-center rounded-xl text-sm font-bold">
-              {businessName.trim().charAt(0).toUpperCase()}
-            </span>
-            <span className="truncate text-sm font-semibold">{businessName}</span>
-          </div>
-
-          {step !== "done" && (
-            <div className="px-5">
-              <p className="text-[11px] text-[var(--bk-muted)]">
-                {t("booking.wizard.stepOf", { step: index + 1, total: 3 })}
-              </p>
-              <div className="mt-1.5 flex gap-1.5">
-                {[0, 1, 2].map((bar) => (
-                  <span
-                    key={bar}
-                    className={`h-1 flex-1 rounded-full transition-colors duration-500 ${
-                      bar <= index ? "bg-[var(--color-primary)]" : "bg-[var(--bk-raised)]"
-                    }`}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
-
-          <div key={step} className="phone-screen flex flex-1 flex-col gap-3 px-5 pt-4 pb-5">
-            {step === "services" && <ServicesScreen services={services} currency={currency} />}
-            {step === "schedule" && <ScheduleScreen timeZone={timeZone} />}
-            {step === "details" && <DetailsScreen />}
-            {step === "done" && <DoneScreen />}
-          </div>
+    <div aria-hidden="true" className="ld-phone">
+      <div className="ld-screen">
+        <span className="ld-island" />
+        <div className="flex justify-between px-2 text-[11px] font-semibold">
+          <span>9:41</span>
+          <span>●●●</span>
         </div>
+        <div className="mt-6 mb-3 flex items-center gap-2 text-[13px] font-semibold">
+          <span className="ld-mark size-7 text-xs">
+            {businessName.trim().charAt(0).toUpperCase()}
+          </span>
+          <span className="truncate">{businessName}</span>
+        </div>
+        <div className="flex gap-1.5">
+          {[0, 1, 2].map((bar) => (
+            <i key={bar} className={`ld-bar ${bar <= Math.min(index, 2) ? "ld-bar-on" : ""}`} />
+          ))}
+        </div>
+        {DEMO_STEPS.map((name, i) => (
+          <div key={name} className={`ld-view ${i === index ? "ld-view-on" : ""}`}>
+            {name === "services" && <ServicesScreen services={services} currency={currency} />}
+            {name === "schedule" && <ScheduleScreen timeZone={timeZone} />}
+            {name === "details" && <DetailsScreen />}
+            {name === "done" && <DoneScreen />}
+          </div>
+        ))}
       </div>
     </div>
   );
 }
 
-function ScreenTitle({ children }: { children: string }) {
+function Title({ children }: { children: string }) {
   return <p className="font-display text-xl leading-tight font-semibold">{children}</p>;
 }
 
@@ -92,34 +80,17 @@ function ServicesScreen({ services, currency }: { services: PublicService[]; cur
         }));
   return (
     <>
-      <ScreenTitle>{t("booking.wizard.steps.services")}</ScreenTitle>
-      <div className="flex flex-col gap-2">
-        {rows.map((row, i) => (
-          <div
-            key={row.id}
-            className={`flex items-center gap-3 rounded-2xl border px-3 py-3 ${
-              i === 0
-                ? "border-[var(--color-primary)] bg-[var(--bk-raised)]"
-                : "border-[var(--bk-line)]"
-            }`}
-          >
-            <span className="min-w-0 flex-1">
-              <span className="block truncate text-sm font-semibold">{row.name}</span>
-              <span className="block truncate text-[11px] text-[var(--bk-muted)]">{row.meta}</span>
-            </span>
-            <span
-              className={`flex size-5 shrink-0 items-center justify-center rounded-full border text-[11px] ${
-                i === 0
-                  ? "border-[var(--color-primary)] bg-[var(--color-primary)] text-[var(--color-background)]"
-                  : "border-[var(--bk-line)]"
-              }`}
-            >
-              {i === 0 && <Check className="size-3" />}
-            </span>
-          </div>
-        ))}
-      </div>
-      <FakeButton>{t("booking.wizard.continue")}</FakeButton>
+      <Title>{t("booking.wizard.steps.services")}</Title>
+      {rows.map((row, i) => (
+        <div key={row.id} className={`ld-row ${i === 0 ? "ld-sel" : ""}`}>
+          <span className="min-w-0">
+            <span className="block truncate">{row.name}</span>
+            <small className="block truncate">{row.meta}</small>
+          </span>
+          <span className="ld-tick" />
+        </div>
+      ))}
+      <span className="ld-btn">{t("booking.wizard.continue")}</span>
     </>
   );
 }
@@ -130,47 +101,29 @@ function ScheduleScreen({ timeZone }: { timeZone: string }) {
   const weekday = new Intl.DateTimeFormat(i18n.language, { weekday: "short", timeZone: "UTC" });
   return (
     <>
-      <ScreenTitle>{t("booking.wizard.steps.schedule")}</ScreenTitle>
-      <div className="flex gap-2">
-        <span className="rounded-full bg-[var(--color-primary)] px-3 py-1.5 text-[11px] font-semibold text-[var(--color-background)]">
-          {t("booking.home.demo.anyPro")}
-        </span>
-        <span className="rounded-full border border-[var(--bk-line)] px-3 py-1.5 text-[11px]">
-          {t("booking.home.demo.pro")}
-        </span>
-      </div>
+      <Title>{t("booking.wizard.steps.schedule")}</Title>
       <div className="grid grid-cols-5 gap-1.5">
         {days.map((day, i) => (
-          <span
-            key={day}
-            className={`flex flex-col items-center rounded-xl py-2 text-[11px] ${
-              i === 1
-                ? "bg-[var(--color-primary)] font-semibold text-[var(--color-background)]"
-                : "bg-[var(--bk-raised)]"
-            }`}
-          >
-            <span className="capitalize">
-              {weekday.format(new Date(`${day}T12:00:00Z`)).replace(".", "")}
-            </span>
-            <span className="text-base font-semibold">{Number(day.slice(8))}</span>
+          <span key={day} className={`ld-day ${i === DEMO_DAY_INDEX ? "ld-sel" : ""}`}>
+            {weekday.format(new Date(`${day}T12:00:00Z`)).replace(".", "")}
+            <b>{Number(day.slice(8))}</b>
           </span>
         ))}
       </div>
-      <div className="grid grid-cols-2 gap-2">
-        {TIMES.map((time, i) => (
-          <span
-            key={time}
-            className={`rounded-xl border py-2 text-center text-sm tabular-nums ${
-              i === 1
-                ? "border-[var(--color-primary)] bg-[var(--bk-raised)] font-semibold"
-                : "border-[var(--bk-line)]"
-            }`}
-          >
+      <div className="grid grid-cols-3 gap-1.5">
+        {BEFORE.map((time) => (
+          <span key={time} className="ld-time">
+            {time}
+          </span>
+        ))}
+        <span className="ld-break col-span-3">{t("booking.wizard.break")} 13:00 – 14:00</span>
+        {AFTER.map((time) => (
+          <span key={time} className={`ld-time ${time === DEMO_TIME ? "ld-sel" : ""}`}>
             {time}
           </span>
         ))}
       </div>
-      <FakeButton>{t("booking.wizard.continue")}</FakeButton>
+      <span className="ld-btn">{t("booking.wizard.continue")}</span>
     </>
   );
 }
@@ -179,18 +132,14 @@ function DetailsScreen() {
   const { t } = useTranslation();
   return (
     <>
-      <ScreenTitle>{t("booking.wizard.steps.details")}</ScreenTitle>
+      <Title>{t("booking.wizard.steps.details")}</Title>
       {(["name", "phone"] as const).map((field) => (
-        <div key={field} className="flex flex-col gap-1">
-          <span className="text-[11px] text-[var(--bk-muted)]">
-            {t(`booking.home.demo.${field}Label`)}
-          </span>
-          <span className="rounded-xl border border-[var(--bk-line)] bg-[var(--color-surface)] px-3 py-2.5 text-sm">
-            {t(`booking.home.demo.${field}Value`)}
-          </span>
-        </div>
+        <span key={field} className="text-[11px] opacity-70">
+          {t(`booking.home.demo.${field}Label`)}
+          <span className="ld-input">{t(`booking.home.demo.${field}Value`)}</span>
+        </span>
       ))}
-      <FakeButton>{t("booking.wizard.confirm")}</FakeButton>
+      <span className="ld-btn">{t("booking.wizard.confirm")}</span>
     </>
   );
 }
@@ -198,36 +147,13 @@ function DetailsScreen() {
 function DoneScreen() {
   const { t } = useTranslation();
   return (
-    <div className="flex flex-1 flex-col items-center justify-center gap-4 text-center">
-      <span className="flex size-16 items-center justify-center rounded-full bg-[var(--color-primary)] text-3xl text-[var(--color-background)]">
-        <Check className="size-8" />
-      </span>
-      <ScreenTitle>{t("booking.home.demo.doneTitle")}</ScreenTitle>
-      <p className="text-sm text-[var(--bk-muted)]">{t("booking.home.demo.doneText")}</p>
+    <div className="flex flex-1 flex-col items-center justify-center gap-3 text-center">
+      <svg viewBox="0 0 52 52" className="ld-seal size-16">
+        <circle cx="26" cy="26" r="24" />
+        <path d="M15 27l7.5 7.5L37.5 19" />
+      </svg>
+      <Title>{t("booking.home.demo.doneTitle")}</Title>
+      <p className="text-xs opacity-70">{t("booking.home.demo.doneText")}</p>
     </div>
-  );
-}
-
-function FakeButton({ children }: { children: string }) {
-  return (
-    <span className="mt-auto block rounded-2xl bg-[var(--color-primary)] py-3 text-center text-sm font-semibold text-[var(--color-background)]">
-      {children}
-    </span>
-  );
-}
-
-function Check({ className }: { className: string }) {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      className={className}
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="3"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="m5 12.5 4.5 4.5L19 7.5" />
-    </svg>
   );
 }

@@ -175,6 +175,18 @@
         "phoneValue": "300 123 4567",
         "doneTitle": "Appointment confirmed!",
         "doneText": "See you soon. Keep the link to view or cancel your appointment."
+      },
+      "lead": "Your cut, whenever you want it. Pick the service, who does it and the time, and in under a minute your appointment is in your pocket.",
+      "seeServices": "See services and prices",
+      "howSub": "Four taps, no calls and no waiting. The phone above does it live.",
+      "toast": "Appointment confirmed · {{time}}",
+      "facts": {
+        "minute": "1 min",
+        "minuteLabel": "to book",
+        "cancel_one": "{{count}} hour",
+        "cancel_other": "{{count}} hours",
+        "cancelLabel": "before, free cancellation",
+        "accountLabel": "accounts or passwords"
       }
     },
     "wallet": {
