@@ -4,22 +4,13 @@ import { useTranslation } from "react-i18next";
 import { Link, useParams } from "react-router-dom";
 import { ApiError } from "../../shared/api/client";
 import { describeError } from "../../shared/api/errors";
-import type { AppointmentStatus, PublicAppointment } from "../../shared/api/types";
+import type { PublicAppointment } from "../../shared/api/types";
 import { formatMoney } from "../../shared/money";
-import { Badge, Card, ErrorBox, Loading, Notice } from "../../shared/ui/primitives";
+import { ErrorBox, Loading, Notice } from "../../shared/ui/primitives";
 import { usePublicAppointment, usePublicCompany } from "./api";
 import { CancelAppointment } from "./CancelAppointment";
+import { WalletCard } from "./WalletCard";
 import { formatDateTime, formatTime } from "./wizard";
-
-const TONE: Partial<Record<AppointmentStatus, "success" | "warning" | "danger" | "info">> = {
-  confirmed: "success",
-  pending: "info",
-  in_progress: "info",
-  completed: "success",
-  cancelled: "danger",
-  no_show: "warning",
-  rescheduled: "warning",
-};
 
 /** Resumen de una cita con su total. También se usa al confirmar una reserva. */
 export function AppointmentSummary({ appointment }: { appointment: PublicAppointment }) {
@@ -91,12 +82,13 @@ export default function ManagePage() {
     <div className="flex flex-col gap-5">
       <div className="flex flex-wrap items-center gap-3">
         <h1 className="text-2xl font-semibold">{t("booking.pages.manage.title")}</h1>
-        <Badge tone={TONE[data.status] ?? "neutral"}>{t(`booking.status.${data.status}`)}</Badge>
       </div>
       <p>{t("booking.manage.hello", { name: data.customer_name })}</p>
-      <Card className="!bg-[var(--color-surface,#ffffff)]">
-        <AppointmentSummary appointment={data} />
-      </Card>
+      <WalletCard
+        appointment={data}
+        status={t(`booking.status.${data.status}`)}
+        dimmed={data.status === "cancelled"}
+      />
       {justCancelled && <Notice tone="success">{t("booking.manage.cancelled")}</Notice>}
       {(data.status === "confirmed" || data.status === "pending") && (
         <CancelAppointment
