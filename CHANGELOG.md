@@ -1,5 +1,11 @@
 # Changelog
 
+## El detalle de la cita se abre en su sitio, sin duplicarse
+
+- En Citas, y en la Agenda del día vista en el celular, al tocar una cita su tarjeta se convierte en el detalle ahí mismo. Antes el detalle aparecía arriba, aparte, y la misma cita seguía repetida abajo en la lista.
+- El detalle se despliega con una animación corta. En Citas ocupa todo el ancho de la fila, y un correo largo ya no estira la tarjeta.
+- En la grilla de la Agenda (computador y vista de semana), el detalle sigue saliendo arriba, porque los bloques de la grilla son muy chicos para abrirse en su sitio.
+
 ## El selector de estilo del Super Admin marca la opción elegida
 
 - En Empresas → Tema → «Estilo de la reserva», al tocar una opción ahora se nota cuál quedó elegida: se pone blanca, con un anillo verde y un check, y sube un poco. Antes no cambiaba nada a la vista, porque faltaban sus estilos.

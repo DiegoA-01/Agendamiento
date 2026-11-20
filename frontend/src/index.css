@@ -696,6 +696,17 @@ body {
 .pro-group {
   animation: pro-in 420ms cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
 }
+/* Detalle de una cita abierto en el sitio de su tarjeta: se despliega sin saltos. */
+.appointment-open {
+  animation: appointment-open 320ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  transform-origin: top center;
+}
+@keyframes appointment-open {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+}
 @keyframes pro-in {
   from {
     opacity: 0;
@@ -704,7 +715,8 @@ body {
 }
 @media (prefers-reduced-motion: reduce) {
   .pro-group,
-  .day-group {
+  .day-group,
+  .appointment-open {
     animation: none;
   }
   .pro-tab,

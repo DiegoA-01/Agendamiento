@@ -94,9 +94,11 @@ function ActionButton({
 function DetailContent({
   appointment,
   onClose,
+  className = "",
 }: {
   appointment: Appointment;
   onClose: () => void;
+  className?: string;
 }) {
   const { t, i18n } = useTranslation();
   const me = useMe().data;
@@ -143,7 +145,7 @@ function DetailContent({
       ? (mutation.error.fields.suggestions ?? [])
       : [];
   return (
-    <Card className="space-y-4 border-sky-300" aria-label={t("agenda.detail")}>
+    <Card className={`space-y-4 border-sky-300 ${className}`} aria-label={t("agenda.detail")}>
       <div className="flex flex-wrap items-start justify-between gap-2">
         <h2 className="text-lg font-semibold">{t("agenda.detail")}</h2>
         <Button variant="ghost" onClick={onClose}>
@@ -253,7 +255,17 @@ function DetailContent({
   );
 }
 
-export function AppointmentDetail({ id, onClose }: { id: string; onClose: () => void }) {
+/** Detalle de una cita. Con `className="appointment-open"` se abre en el sitio de su tarjeta de la
+ *  lista (sin repetir la cita en otro lugar). */
+export function AppointmentDetail({
+  id,
+  onClose,
+  className = "",
+}: {
+  id: string;
+  onClose: () => void;
+  className?: string;
+}) {
   const { t } = useTranslation();
   const detail = useQuery({
     queryKey: [...KEYS.appointments, "detail", id],
@@ -264,5 +276,7 @@ export function AppointmentDetail({ id, onClose }: { id: string; onClose: () => 
     return (
       <ErrorBox message={describeError(t, detail.error)} onRetry={() => void detail.refetch()} />
     );
-  return <DetailContent key={id} appointment={detail.data} onClose={onClose} />;
+  return (
+    <DetailContent key={id} appointment={detail.data} onClose={onClose} className={className} />
+  );
 }

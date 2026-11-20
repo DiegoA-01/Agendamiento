@@ -162,7 +162,12 @@ export default function AgendaPage() {
           <AppointmentForm onDone={() => setCreating(false)} />
         </Card>
       )}
-      {selected && <AppointmentDetail id={selected} onClose={() => setSelected(null)} />}
+      {/* En el día en móvil la cita se abre dentro de la lista; aquí arriba solo para la grilla. */}
+      {selected && (
+        <div className={view === "day" ? "hidden sm:block" : ""}>
+          <AppointmentDetail id={selected} onClose={() => setSelected(null)} />
+        </div>
+      )}
       {(appointments.isPending || professionals.isPending || services.isPending) && <Loading />}
       {failed && (
         <ErrorBox message={describeError(t, failed.error)} onRetry={() => void failed.refetch()} />
@@ -170,18 +175,27 @@ export default function AgendaPage() {
       {ready && !list.length && <EmptyState>{t("agenda.emptyAppointments")}</EmptyState>}
       {ready && view === "day" && (
         <div className="space-y-3 sm:hidden">
-          {list.map((a) => (
-            <button
-              key={a.id}
-              className="w-full rounded-xl border border-slate-200 bg-white p-4 focus-visible:outline-2 focus-visible:outline-sky-700"
-              onClick={() => setSelected(a.id)}
-            >
-              <AppointmentSummary appointment={a} />
-              <p className="mt-2 text-left text-sm">
-                {professionals.data?.find((p) => p.id === a.professional_id)?.display_name}
-              </p>
-            </button>
-          ))}
+          {list.map((a) =>
+            selected === a.id ? (
+              <AppointmentDetail
+                key={a.id}
+                id={a.id}
+                onClose={() => setSelected(null)}
+                className="appointment-open"
+              />
+            ) : (
+              <button
+                key={a.id}
+                className="w-full rounded-xl border border-slate-200 bg-white p-4 focus-visible:outline-2 focus-visible:outline-sky-700"
+                onClick={() => setSelected(a.id)}
+              >
+                <AppointmentSummary appointment={a} />
+                <p className="mt-2 text-left text-sm">
+                  {professionals.data?.find((p) => p.id === a.professional_id)?.display_name}
+                </p>
+              </button>
+            ),
+          )}
         </div>
       )}
       {ready && columns.length > 0 && (
