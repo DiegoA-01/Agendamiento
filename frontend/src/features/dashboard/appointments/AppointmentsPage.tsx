@@ -172,7 +172,6 @@ export default function AppointmentsPage() {
           ))}
         </div>
       )}
-      {selected && <AppointmentDetail id={selected} onClose={() => setSelected(null)} />}
       {(appointments.isPending || professionals.isPending || services.isPending) && <Loading />}
       {failed && (
         <ErrorBox message={describeError(t, failed.error)} onRetry={() => void failed.refetch()} />
@@ -209,17 +208,27 @@ export default function AppointmentsPage() {
                   </span>
                 </h3>
                 <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-                  {day.appointments.map((appointment) => (
-                    <button
-                      className={`min-w-0 rounded-xl border border-slate-200 bg-white p-4 text-left text-slate-900 shadow-sm hover:border-sky-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-700 ${
-                        INACTIVE.includes(appointment.status) ? "opacity-60" : ""
-                      }`}
-                      key={appointment.id}
-                      onClick={() => setSelected(appointment.id)}
-                    >
-                      <AppointmentSummary appointment={appointment} />
-                    </button>
-                  ))}
+                  {/* La cita elegida se abre en su sitio, a todo el ancho de la fila. */}
+                  {day.appointments.map((appointment) =>
+                    selected === appointment.id ? (
+                      <AppointmentDetail
+                        key={appointment.id}
+                        id={appointment.id}
+                        onClose={() => setSelected(null)}
+                        className="appointment-open min-w-0 sm:col-span-2 xl:col-span-3"
+                      />
+                    ) : (
+                      <button
+                        className={`min-w-0 rounded-xl border border-slate-200 bg-white p-4 text-left text-slate-900 shadow-sm hover:border-sky-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-700 ${
+                          INACTIVE.includes(appointment.status) ? "opacity-60" : ""
+                        }`}
+                        key={appointment.id}
+                        onClick={() => setSelected(appointment.id)}
+                      >
+                        <AppointmentSummary appointment={appointment} />
+                      </button>
+                    ),
+                  )}
                 </div>
               </div>
             ))}
